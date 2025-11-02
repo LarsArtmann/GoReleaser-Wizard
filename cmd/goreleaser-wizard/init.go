@@ -42,11 +42,11 @@ type ProjectConfig struct {
 	MainPath           string
 
 	// Build Options
-	Platforms      []string
-	Architectures  []string
-	CGOEnabled     bool
-	BuildTags      []string
-	LDFlags        bool
+	Platforms     []string
+	Architectures []string
+	CGOEnabled    bool
+	BuildTags     []string
+	LDFlags       bool
 
 	// Release Options
 	GitProvider    string
@@ -263,7 +263,7 @@ func askBasicInfo(config *ProjectConfig) error {
 				Title("Main Package Path").
 				Description("Path to main.go (e.g., . or ./cmd/app)").
 				Value(&config.MainPath).
-				Placeholder("./cmd/" + config.BinaryName),
+				Placeholder("./cmd/"+config.BinaryName),
 		).Title("Basic Information"),
 	)
 
@@ -488,4 +488,3 @@ func askAdvancedOptions(config *ProjectConfig) error {
 
 	return nil
 }
-

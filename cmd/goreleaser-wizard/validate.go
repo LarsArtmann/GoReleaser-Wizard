@@ -212,9 +212,9 @@ func runValidate(cmd *cobra.Command, args []string) {
 
 	// Check 8: GitHub Actions workflow
 	total++
-	workflowFound := CheckFileExists(".github/workflows/release.yml", false) == nil || 
-					 CheckFileExists(".github/workflows/release.yaml", false) == nil
-	
+	workflowFound := CheckFileExists(".github/workflows/release.yml", false) == nil ||
+		CheckFileExists(".github/workflows/release.yaml", false) == nil
+
 	if workflowFound {
 		passed++
 		fmt.Println(successStyle.Render("✓ GitHub Actions workflow found"))
@@ -231,7 +231,7 @@ func runValidate(cmd *cobra.Command, args []string) {
 	fmt.Println()
 	fmt.Println(titleStyle.Render("📊 Validation Summary"))
 	fmt.Printf("Checks passed: %d/%d\n", passed, total)
-	
+
 	if len(issues) > 0 {
 		fmt.Println()
 		fmt.Println(errorStyle.Render("❌ Critical Issues:"))

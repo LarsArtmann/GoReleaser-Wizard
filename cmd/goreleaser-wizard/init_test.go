@@ -285,14 +285,14 @@ func TestFlagHandling(t *testing.T) {
 		{
 			name:  "debug_flag",
 			flags: map[string]string{"debug": "true"},
-			expectedViper: map[string]interface{}{
+			expectedViper: map[string]any{
 				"debug": true,
 			},
 		},
 		{
 			name:  "force_flag",
 			flags: map[string]string{"force": "true"},
-			expectedViper: map[string]interface{}{
+			expectedViper: map[string]any{
 				"force": true,
 			},
 		},
@@ -305,10 +305,13 @@ func TestFlagHandling(t *testing.T) {
 
 			// Simulate flag parsing (simplified)
 			for flag, value := range tt.flags {
-				if flag == "debug" {
+				switch flag {
+				case "debug":
 					viper.Set("debug", value == "true")
-				} else if flag == "force" {
+				case "force":
 					viper.Set("force", value == "true")
+				default:
+					viper.Set(flag, value)
 				}
 			}
 

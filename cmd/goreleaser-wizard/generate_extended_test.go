@@ -481,8 +481,8 @@ func TestErrorRecovery(t *testing.T) {
 			shouldPanic: true,
 			testFunc: func() {
 				// This should panic
-				var nilPointer *string
-				_ = *nilPointer
+				var nilPointer *string = nil
+				_ = *nilPointer // This will panic
 			},
 		},
 	}

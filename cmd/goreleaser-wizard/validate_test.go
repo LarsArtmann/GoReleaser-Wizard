@@ -11,6 +11,7 @@ import (
 	"github.com/charmbracelet/log"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"slices"
 )
 
 func TestRunValidate(t *testing.T) {
@@ -381,21 +382,9 @@ func TestValidateDependencies(t *testing.T) {
 				path, err := exec.LookPath(dep)
 				found := err == nil
 
-				expectedFound := false
-				for _, expected := range tt.expectFound {
-					if expected == dep {
-						expectedFound = true
-						break
-					}
-				}
+				expectedFound := slices.Contains(tt.expectFound, dep)
 
-				expectedMissing := false
-				for _, expected := range tt.expectMissing {
-					if expected == dep {
-						expectedMissing = true
-						break
-					}
-				}
+				expectedMissing := slices.Contains(tt.expectMissing, dep)
 
 				if expectedFound && !found {
 					t.Errorf("Expected to find %s, but it was not found", dep)

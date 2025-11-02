@@ -5,15 +5,18 @@ import (
 	"strings"
 )
 
+// TODO: This should be generated from TypeSpec!
+// Eliminate split brains by making this the single source of truth.
+
 // ProjectType represents the type of project being configured
 type ProjectType string
 
 const (
-	ProjectTypeCLI      ProjectType = "CLI Application"
-	ProjectTypeWeb      ProjectType = "Web Service"
-	ProjectTypeLibrary  ProjectType = "Library"
-	ProjectTypeAPI      ProjectType = "API Service"
-	ProjectTypeDesktop  ProjectType = "Desktop Application"
+	ProjectTypeCLI      ProjectType = "cli"           // Renamed for type safety
+	ProjectTypeWeb      ProjectType = "web"          
+	ProjectTypeLibrary  ProjectType = "library"
+	ProjectTypeAPI      ProjectType = "api"
+	ProjectTypeDesktop  ProjectType = "desktop"
 )
 
 func (pt ProjectType) IsValid() bool {
@@ -26,6 +29,26 @@ func (pt ProjectType) IsValid() bool {
 	}
 }
 
+func (pt ProjectType) String() string {
+	// TODO: Should be generated from TypeSpec with human-readable names
+	switch pt {
+	case ProjectTypeCLI:
+		return "CLI Application"
+	case ProjectTypeWeb:
+		return "Web Service"
+	case ProjectTypeLibrary:
+		return "Library"
+	case ProjectTypeAPI:
+		return "API Service"
+	case ProjectTypeDesktop:
+		return "Desktop Application"
+	default:
+		return string(pt)
+	}
+}
+
+// TODO: Generate from TypeSpec with invariants!
+// Docker should be invalid for Library types, etc.
 func (pt ProjectType) DefaultCGOEnabled() bool {
 	switch pt {
 	case ProjectTypeCLI, ProjectTypeLibrary:
@@ -37,22 +60,31 @@ func (pt ProjectType) DefaultCGOEnabled() bool {
 	}
 }
 
-func (pt ProjectType) Validate() error {
-	if !pt.IsValid() {
-		return fmt.Errorf("invalid project type: %s (must be one of: CLI Application, Web Service, Library, API Service, Desktop Application)", pt)
+// TODO: Should be exhaustive pattern matching from TypeSpec
+func (pt ProjectType) RecommendedPlatforms() []Platform {
+	switch pt {
+	case ProjectTypeCLI:
+		return []Platform{PlatformLinux, PlatformDarwin, PlatformWindows}
+	case ProjectTypeWeb, ProjectTypeAPI:
+		return []Platform{PlatformLinux, PlatformDarwin}
+	case ProjectTypeLibrary:
+		return []Platform{PlatformLinux, PlatformDarwin, PlatformWindows}
+	case ProjectTypeDesktop:
+		return []Platform{PlatformWindows, PlatformDarwin, PlatformLinux}
+	default:
+		return []Platform{PlatformLinux, PlatformDarwin, PlatformWindows}
 	}
-	return nil
 }
 
 // GitProvider represents the git hosting provider
 type GitProvider string
 
 const (
-	GitProviderGitHub GitProvider = "GitHub"
-	GitProviderGitLab GitProvider = "GitLab"
-	GitProviderBitbucket GitProvider = "Bitbucket"
-	GitProviderGitea GitProvider = "Gitea"
-	GitProviderSelfHosted GitProvider = "Self-hosted"
+	GitProviderGitHub    GitProvider = "github"
+	GitProviderGitLab    GitProvider = "gitlab"
+	GitProviderBitbucket GitProvider = "bitbucket"
+	GitProviderGitea     GitProvider = "gitea"
+	GitProviderSelfHosted GitProvider = "self-hosted"
 )
 
 func (gp GitProvider) IsValid() bool {
@@ -65,11 +97,21 @@ func (gp GitProvider) IsValid() bool {
 	}
 }
 
-func (gp GitProvider) Validate() error {
-	if !gp.IsValid() {
-		return fmt.Errorf("invalid git provider: %s (must be one of: GitHub, GitLab, Bitbucket, Gitea, Self-hosted)", gp)
+func (gp GitProvider) String() string {
+	switch gp {
+	case GitProviderGitHub:
+		return "GitHub"
+	case GitProviderGitLab:
+		return "GitLab"
+	case GitProviderBitbucket:
+		return "Bitbucket"
+	case GitProviderGitea:
+		return "Gitea"
+	case GitProviderSelfHosted:
+		return "Self-hosted"
+	default:
+		return string(gp)
 	}
-	return nil
 }
 
 // Platform represents supported target platforms
@@ -92,13 +134,6 @@ func (p Platform) IsValid() bool {
 	default:
 		return false
 	}
-}
-
-func (p Platform) Validate() error {
-	if !p.IsValid() {
-		return fmt.Errorf("invalid platform: %s", p)
-	}
-	return nil
 }
 
 // Architecture represents supported CPU architectures
@@ -126,26 +161,58 @@ func (a Architecture) IsValid() bool {
 	}
 }
 
-func (a Architecture) Validate() error {
-	if !a.IsValid() {
-		return fmt.Errorf("invalid architecture: %s", a)
-	}
-	return nil
-}
-
-// DockerRegistryType represents the type of Docker registry
-type DockerRegistryType string
+// ActionTrigger represents GitHub Actions triggers
+type ActionTrigger string
 
 const (
-	DockerRegistryDockerHub DockerRegistryType = "docker.io"
-	DockerRegistryGitHub DockerRegistryType = "ghcr.io"
-	DockerRegistryGitLab DockerRegistryType = "registry.gitlab.com"
-	DockerRegistryQuay DockerRegistryType = "quay.io"
-	DockerRegistryCustom DockerRegistryType = "custom"
+	ActionTriggerVersionTags ActionTrigger = "version-tags"  // v*, v1.0.0, etc.
+	ActionTriggerAllTags     ActionTrigger = "all-tags"       // *
+	ActionTriggerManual      ActionTrigger = "manual"         // workflow_dispatch
+	ActionTriggerMain        ActionTrigger = "main"           // push to main
+	ActionTriggerRelease     ActionTrigger = "release"        // published release
 )
 
-func (drt DockerRegistryType) IsValid() bool {
-	switch drt {
+func (at ActionTrigger) IsValid() bool {
+	switch at {
+	case ActionTriggerVersionTags, ActionTriggerAllTags, ActionTriggerManual,
+	     ActionTriggerMain, ActionTriggerRelease:
+		return true
+	default:
+		return false
+	}
+}
+
+func (at ActionTrigger) ToGitHubActions() []string {
+	// TODO: Should be generated from TypeSpec
+	switch at {
+	case ActionTriggerVersionTags:
+		return []string{"push:\n  tags:\n    - 'v*'"}
+	case ActionTriggerAllTags:
+		return []string{"push:\n  tags:\n    - '*'"}
+	case ActionTriggerManual:
+		return []string{"workflow_dispatch:"}
+	case ActionTriggerMain:
+		return []string{"push:\n  branches:\n    - main"}
+	case ActionTriggerRelease:
+		return []string{"release:\n    types: [published]"}
+	default:
+		return []string{}
+	}
+}
+
+// DockerRegistry represents Docker registry types
+type DockerRegistry string
+
+const (
+	DockerRegistryDockerHub DockerRegistry = "docker.io"
+	DockerRegistryGitHub   DockerRegistry = "ghcr.io"
+	DockerRegistryGitLab   DockerRegistry = "registry.gitlab.com"
+	DockerRegistryQuay     DockerRegistry = "quay.io"
+	DockerRegistryCustom   DockerRegistry = "custom"
+)
+
+func (dr DockerRegistry) IsValid() bool {
+	switch dr {
 	case DockerRegistryDockerHub, DockerRegistryGitHub, DockerRegistryGitLab,
 	     DockerRegistryQuay, DockerRegistryCustom:
 		return true
@@ -154,277 +221,272 @@ func (drt DockerRegistryType) IsValid() bool {
 	}
 }
 
-// ValidateDockerRegistry validates and normalizes Docker registry URLs
-func ValidateDockerRegistry(registry string) (string, error) {
-	if registry == "" {
-		return "", fmt.Errorf("docker registry cannot be empty")
+// TODO: Generate from TypeSpec with validation!
+func (dr DockerRegistry) ValidateRegistryURL(url string) error {
+	if url == "" {
+		return fmt.Errorf("docker registry URL cannot be empty")
 	}
 
-	// Normalize common registry patterns
-	registry = strings.TrimSpace(registry)
+	url = strings.TrimSpace(url)
 	
-	// Add docker.io if just username
-	if !strings.Contains(registry, ".") && !strings.Contains(registry, "/") {
-		registry = "docker.io/" + registry
-	}
-
-	// Validate common registries
-	parts := strings.Split(registry, "/")
-	switch parts[0] {
-	case "docker.io", "ghcr.io", "registry.gitlab.com", "quay.io":
-		return registry, nil
-	default:
-		// Allow custom registries but warn
-		return registry, nil
-	}
-}
-
-// EnhancedProjectConfig represents the configuration with type safety
-type EnhancedProjectConfig struct {
-	// Basic Info
-	ProjectName        string       `validate:"required,min=1,max=63"`
-	ProjectDescription string       `validate:"max=255"`
-	ProjectType        ProjectType  `validate:"required"`
-	BinaryName         string       `validate:"required,min=1,max=63"`
-	MainPath           string       `validate:"required"`
-
-	// Build Options
-	Platforms     []Platform    `validate:"required,min=1"`
-	Architectures []Architecture `validate:"required,min=1"`
-	CGOEnabled    bool
-	BuildTags     []string
-	LDFlags       bool
-
-	// Release Options
-	GitProvider    GitProvider `validate:"required"`
-	DockerEnabled  bool
-	DockerRegistry string       `validate:"required_if=DockerEnabled"`
-	Signing        bool
-	Homebrew       bool
-	Snap           bool
-	SBOM           bool
-
-	// GitHub Actions
-	GenerateActions bool
-	ActionsOn       []string `validate:"required_if=GenerateActions"`
-
-	// Advanced
-	ProVersion bool
-}
-
-// ToProjectConfig converts EnhancedProjectConfig to legacy ProjectConfig
-func (epc *EnhancedProjectConfig) ToProjectConfig() ProjectConfig {
-	// Convert enums to strings
-	platforms := make([]string, len(epc.Platforms))
-	for i, p := range epc.Platforms {
-		platforms[i] = string(p)
-	}
-
-	architectures := make([]string, len(epc.Architectures))
-	for i, a := range epc.Architectures {
-		architectures[i] = string(a)
-	}
-
-	return ProjectConfig{
-		ProjectName:        epc.ProjectName,
-		ProjectDescription: epc.ProjectDescription,
-		ProjectType:        string(epc.ProjectType),
-		BinaryName:         epc.BinaryName,
-		MainPath:           epc.MainPath,
-		Platforms:          platforms,
-		Architectures:      architectures,
-		CGOEnabled:         epc.CGOEnabled,
-		BuildTags:          epc.BuildTags,
-		LDFlags:            epc.LDFlags,
-		GitProvider:         string(epc.GitProvider),
-		DockerEnabled:       epc.DockerEnabled,
-		DockerRegistry:      epc.DockerRegistry,
-		Signing:            epc.Signing,
-		Homebrew:           epc.Homebrew,
-		Snap:               epc.Snap,
-		SBOM:               epc.SBOM,
-		GenerateActions:     epc.GenerateActions,
-		ActionsOn:          epc.ActionsOn,
-		ProVersion:         epc.ProVersion,
-	}
-}
-
-// FromProjectConfig creates EnhancedProjectConfig from legacy ProjectConfig
-func FromProjectConfig(pc ProjectConfig) (*EnhancedProjectConfig, error) {
-	epc := &EnhancedProjectConfig{
-		ProjectName:        pc.ProjectName,
-		ProjectDescription: pc.ProjectDescription,
-		BinaryName:         pc.BinaryName,
-		MainPath:           pc.MainPath,
-		CGOEnabled:         pc.CGOEnabled,
-		BuildTags:          pc.BuildTags,
-		LDFlags:            pc.LDFlags,
-		DockerRegistry:      pc.DockerRegistry,
-		Signing:            pc.Signing,
-		Homebrew:           pc.Homebrew,
-		Snap:               pc.Snap,
-		SBOM:               pc.SBOM,
-		GenerateActions:     pc.GenerateActions,
-		ActionsOn:          pc.ActionsOn,
-		ProVersion:         pc.ProVersion,
-	}
-
-	// Parse enums from strings
-	epc.ProjectType = ProjectType(pc.ProjectType)
-	if err := epc.ProjectType.Validate(); err != nil {
-		return nil, fmt.Errorf("invalid project type: %w", err)
-	}
-
-	epc.GitProvider = GitProvider(pc.GitProvider)
-	if err := epc.GitProvider.Validate(); err != nil {
-		return nil, fmt.Errorf("invalid git provider: %w", err)
-	}
-
-	// Parse platforms
-	epc.Platforms = make([]Platform, len(pc.Platforms))
-	for i, p := range pc.Platforms {
-		platform := Platform(p)
-		if err := platform.Validate(); err != nil {
-			return nil, fmt.Errorf("invalid platform %d: %w", i, err)
+	// TODO: Should be type-safe validation from TypeSpec
+	switch dr {
+	case DockerRegistryDockerHub:
+		if !strings.Contains(url, "docker.io") && !strings.Contains(url, "/") {
+			return fmt.Errorf("Docker Hub registry should include docker.io or be username")
 		}
-		epc.Platforms[i] = platform
-	}
-
-	// Parse architectures
-	epc.Architectures = make([]Architecture, len(pc.Architectures))
-	for i, a := range pc.Architectures {
-		arch := Architecture(a)
-		if err := arch.Validate(); err != nil {
-			return nil, fmt.Errorf("invalid architecture %d: %w", i, err)
+	case DockerRegistryGitHub:
+		if !strings.Contains(url, "ghcr.io") {
+			return fmt.Errorf("GitHub Container Registry should include ghcr.io")
 		}
-		epc.Architectures[i] = arch
-	}
-
-	return epc, nil
-}
-
-// Validate performs comprehensive validation of the configuration
-func (epc *EnhancedProjectConfig) Validate() error {
-	// Basic validation
-	if epc.ProjectName == "" {
-		return fmt.Errorf("project name is required")
+	// TODO: Add validation for all registry types
 	}
 	
-	if len(epc.ProjectName) > 63 {
-		return fmt.Errorf("project name must be 63 characters or less")
-	}
-
-	if epc.BinaryName == "" {
-		return fmt.Errorf("binary name is required")
-	}
-
-	if epc.MainPath == "" {
-		return fmt.Errorf("main path is required")
-	}
-
-	// Validate enums
-	if err := epc.ProjectType.Validate(); err != nil {
-		return fmt.Errorf("project type validation: %w", err)
-	}
-
-	if err := epc.GitProvider.Validate(); err != nil {
-		return fmt.Errorf("git provider validation: %w", err)
-	}
-
-	// Validate slices
-	if len(epc.Platforms) == 0 {
-		return fmt.Errorf("at least one platform is required")
-	}
-
-	for i, platform := range epc.Platforms {
-		if err := platform.Validate(); err != nil {
-			return fmt.Errorf("platform %d validation: %w", i, err)
-		}
-	}
-
-	if len(epc.Architectures) == 0 {
-		return fmt.Errorf("at least one architecture is required")
-	}
-
-	for i, arch := range epc.Architectures {
-		if err := arch.Validate(); err != nil {
-			return fmt.Errorf("architecture %d validation: %w", i, err)
-		}
-	}
-
-	// Conditional validation
-	if epc.DockerEnabled && epc.DockerRegistry == "" {
-		return fmt.Errorf("docker registry is required when docker is enabled")
-	}
-
-	if epc.GenerateActions && len(epc.ActionsOn) == 0 {
-		return fmt.Errorf("actions triggers are required when github actions is enabled")
-	}
-
 	return nil
 }
 
-// ApplyDefaults applies intelligent defaults based on project type
-func (epc *EnhancedProjectConfig) ApplyDefaults() {
-	// Set default project type if not specified
-	if epc.ProjectType == "" {
-		epc.ProjectType = ProjectTypeCLI
-	}
+// ConfigState represents the validation state of configuration
+type ConfigState string
 
-	// Set default CGO based on project type
-	if !epc.CGOEnabled && !epc.LDFlags {
-		epc.CGOEnabled = epc.ProjectType.DefaultCGOEnabled()
-	}
+const (
+	ConfigStateDraft      ConfigState = "draft"       // TODO: Should be generated
+	ConfigStateValid      ConfigState = "valid"
+	ConfigStateInvalid    ConfigState = "invalid"
+	ConfigStateProcessing ConfigState = "processing"
+)
 
-	// Set default platforms if not specified
-	if len(epc.Platforms) == 0 {
-		epc.Platforms = []Platform{PlatformLinux, PlatformDarwin, PlatformWindows}
-	}
-
-	// Set default architectures if not specified
-	if len(epc.Architectures) == 0 {
-		epc.Architectures = []Architecture{ArchAMD64, ArchARM64}
-	}
-
-	// Set default git provider if not specified
-	if epc.GitProvider == "" {
-		epc.GitProvider = GitProviderGitHub
-	}
-
-	// Set default docker registry if docker is enabled but registry not specified
-	if epc.DockerEnabled && epc.DockerRegistry == "" {
-		epc.DockerRegistry = "docker.io"
+func (cs ConfigState) IsValid() bool {
+	switch cs {
+	case ConfigStateDraft, ConfigStateValid, ConfigStateInvalid, ConfigStateProcessing:
+		return true
+	default:
+		return false
 	}
 }
 
-// GetRecommendedPlatforms returns recommended platforms for the project type
-func (pt ProjectType) GetRecommendedPlatforms() []Platform {
-	switch pt {
-	case ProjectTypeCLI:
-		return []Platform{PlatformLinux, PlatformDarwin, PlatformWindows}
-	case ProjectTypeWeb, ProjectTypeAPI:
-		return []Platform{PlatformLinux, PlatformDarwin}
-	case ProjectTypeLibrary:
-		return []Platform{PlatformLinux, PlatformDarwin, PlatformWindows}
-	case ProjectTypeDesktop:
-		return []Platform{PlatformWindows, PlatformDarwin, PlatformLinux}
-	default:
-		return []Platform{PlatformLinux, PlatformDarwin, PlatformWindows}
+// TODO: CRITICAL: Single source of truth configuration
+// This eliminates split brains and provides type safety
+
+// TODO: Should be generated from TypeSpec!
+// All fields should be typed, no string[] anywhere!
+type SafeProjectConfig struct {
+	// Basic Information
+	ProjectName        string       `json:"project_name" yaml:"project_name" validate:"required,min=1,max=63"`
+	ProjectDescription string       `json:"project_description" yaml:"project_description" validate:"max=255"`
+	ProjectType        ProjectType  `json:"project_type" yaml:"project_type" validate:"required"`
+	BinaryName         string       `json:"binary_name" yaml:"binary_name" validate:"required,min=1,max=63"`
+	MainPath           string       `json:"main_path" yaml:"main_path" validate:"required"`
+
+	// Build Configuration
+	Platforms     []Platform    `json:"platforms" yaml:"platforms" validate:"required,min=1"`
+	Architectures []Architecture `json:"architectures" yaml:"architectures" validate:"required,min=1"`
+	CGOEnabled    bool          `json:"cgo_enabled" yaml:"cgo_enabled"`
+	BuildTags     []string      `json:"build_tags" yaml:"build_tags"`
+	LDFlags       bool          `json:"ldflags" yaml:"ldflags"`
+
+	// Release Configuration
+	GitProvider     GitProvider     `json:"git_provider" yaml:"git_provider" validate:"required"`
+	DockerEnabled   bool            `json:"docker_enabled" yaml:"docker_enabled"`
+	DockerRegistry  DockerRegistry  `json:"docker_registry" yaml:"docker_registry" validate:"required_if=DockerEnabled"`
+	DockerImage     string          `json:"docker_image" yaml:"docker_image"` // TODO: Should be typed
+	Signing         bool            `json:"signing" yaml:"signing"`
+	Homebrew        bool            `json:"homebrew" yaml:"homebrew"`
+	Snap            bool            `json:"snap" yaml:"snap"`
+	SBOM            bool            `json:"sbom" yaml:"sbom"`
+
+	// CI/CD Configuration
+	GenerateActions bool           `json:"generate_actions" yaml:"generate_actions"`
+	ActionsOn      []ActionTrigger `json:"actions_on" yaml:"actions_on" validate:"required_if=GenerateActions"`
+
+	// Advanced Features
+	ProVersion bool        `json:"pro_version" yaml:"pro_version"`
+	State      ConfigState `json:"state" yaml:"state"`
+}
+
+// TODO: Should be generated from TypeSpec with invariants!
+func (spc *SafeProjectConfig) ValidateInvariants() error {
+	// TODO: Should be compile-time generated validation
+	
+	// Invariant: Required fields must not be empty
+	if spc.ProjectName == "" {
+		return fmt.Errorf("project name is required")
+	}
+	
+	if spc.BinaryName == "" {
+		return fmt.Errorf("binary name is required")
+	}
+	
+	if spc.MainPath == "" {
+		return fmt.Errorf("main path is required")
+	}
+	
+	// Invariant: Project type must be valid
+	if !spc.ProjectType.IsValid() {
+		return fmt.Errorf("invalid project type: %s", spc.ProjectType)
+	}
+
+	// Invariant: Platforms must not be empty
+	if len(spc.Platforms) == 0 {
+		return fmt.Errorf("at least one platform is required")
+	}
+	
+	// Validate each platform
+	for _, platform := range spc.Platforms {
+		if !platform.IsValid() {
+			return fmt.Errorf("invalid platform: %s", platform)
+		}
+	}
+	
+	// Invariant: Architectures must not be empty
+	if len(spc.Architectures) == 0 {
+		return fmt.Errorf("at least one architecture is required")
+	}
+	
+	// Validate each architecture
+	for _, arch := range spc.Architectures {
+		if !arch.IsValid() {
+			return fmt.Errorf("invalid architecture: %s", arch)
+		}
+	}
+	
+	// Invariant: Git provider must be valid
+	if !spc.GitProvider.IsValid() {
+		return fmt.Errorf("invalid git provider: %s", spc.GitProvider)
+	}
+
+	// Invariant: Docker enabled requires valid registry
+	if spc.DockerEnabled && !spc.DockerRegistry.IsValid() {
+		return fmt.Errorf("Docker enabled requires valid registry")
+	}
+
+	// Invariant: Actions enabled requires triggers
+	if spc.GenerateActions && len(spc.ActionsOn) == 0 {
+		return fmt.Errorf("GitHub Actions enabled requires at least one trigger")
+	}
+	
+	// Validate action triggers
+	for _, trigger := range spc.ActionsOn {
+		if !trigger.IsValid() {
+			return fmt.Errorf("invalid action trigger: %s", trigger)
+		}
+	}
+
+	// TODO: Add more invariants for all type combinations
+	
+	return nil
+}
+
+// TODO: Should be generated from TypeSpec!
+func (spc *SafeProjectConfig) ApplyDefaults() {
+	// TODO: Should be intelligent defaults from TypeSpec
+	if spc.ProjectType == "" {
+		spc.ProjectType = ProjectTypeCLI
+	}
+
+	// Apply CGO defaults based on project type
+	if spc.ProjectType.DefaultCGOEnabled() && !spc.CGOEnabled {
+		spc.CGOEnabled = spc.ProjectType.DefaultCGOEnabled()
+	}
+
+	if len(spc.Platforms) == 0 {
+		spc.Platforms = spc.ProjectType.RecommendedPlatforms()
+	}
+
+	if len(spc.Architectures) == 0 {
+		spc.Architectures = []Architecture{ArchAMD64, ArchARM64}
+	}
+
+	if spc.GitProvider == "" {
+		spc.GitProvider = GitProviderGitHub
+	}
+
+	if spc.DockerEnabled && spc.DockerRegistry == "" {
+		spc.DockerRegistry = DockerRegistryDockerHub
+	}
+
+	if spc.State == "" {
+		spc.State = ConfigStateDraft
 	}
 }
 
-// GetRecommendedArchitectures returns recommended architectures for the project type
-func (pt ProjectType) GetRecommendedArchitectures() []Architecture {
-	switch pt {
-	case ProjectTypeCLI:
-		return []Architecture{ArchAMD64, ArchARM64}
-	case ProjectTypeWeb, ProjectTypeAPI:
-		return []Architecture{ArchAMD64, ArchARM64}
-	case ProjectTypeLibrary:
-		return []Architecture{ArchAMD64, ArchARM64, Arch386}
-	case ProjectTypeDesktop:
-		return []Architecture{ArchAMD64, ArchARM64, Arch386}
+// TODO: Should be generated from TypeSpec!
+// Converts legacy ProjectConfig to SafeProjectConfig
+func (spc *SafeProjectConfig) FromLegacy(legacy ProjectConfig) error {
+	spc.ProjectName = legacy.ProjectName
+	spc.ProjectDescription = legacy.ProjectDescription
+	
+	// TODO: This conversion is problematic - eliminates type safety
+	switch legacy.ProjectType {
+	case "CLI Application":
+		spc.ProjectType = ProjectTypeCLI
+	case "Web Service":
+		spc.ProjectType = ProjectTypeWeb
+	case "Library":
+		spc.ProjectType = ProjectTypeLibrary
+	case "API Service":
+		spc.ProjectType = ProjectTypeAPI
+	case "Desktop Application":
+		spc.ProjectType = ProjectTypeDesktop
 	default:
-		return []Architecture{ArchAMD64, ArchARM64}
+		return fmt.Errorf("invalid project type: %s", legacy.ProjectType)
 	}
+
+	spc.BinaryName = legacy.BinaryName
+	spc.MainPath = legacy.MainPath
+
+	// TODO: This is split brain! Should be type-safe!
+	spc.Platforms = make([]Platform, len(legacy.Platforms))
+	for i, p := range legacy.Platforms {
+		spc.Platforms[i] = Platform(p)
+	}
+
+	spc.Architectures = make([]Architecture, len(legacy.Architectures))
+	for i, a := range legacy.Architectures {
+		spc.Architectures[i] = Architecture(a)
+	}
+
+	spc.CGOEnabled = legacy.CGOEnabled
+	spc.BuildTags = legacy.BuildTags
+	spc.LDFlags = legacy.LDFlags
+
+	switch legacy.GitProvider {
+	case "GitHub":
+		spc.GitProvider = GitProviderGitHub
+	case "GitLab":
+		spc.GitProvider = GitProviderGitLab
+	case "Bitbucket":
+		spc.GitProvider = GitProviderBitbucket
+	case "Gitea":
+		spc.GitProvider = GitProviderGitea
+	case "Self-hosted":
+		spc.GitProvider = GitProviderSelfHosted
+	default:
+		return fmt.Errorf("invalid git provider: %s", legacy.GitProvider)
+	}
+
+	spc.DockerEnabled = legacy.DockerEnabled
+	spc.DockerImage = legacy.DockerRegistry // TODO: Fix mapping
+	spc.DockerRegistry = DockerRegistryGitHub // Default
+
+	// TODO: More split brain cleanup needed
+	spc.GenerateActions = legacy.GenerateActions
+	
+	spc.ActionsOn = make([]ActionTrigger, len(legacy.ActionsOn))
+	for i, a := range legacy.ActionsOn {
+		// TODO: This mapping is error-prone
+		if strings.Contains(a, "version tags") {
+			spc.ActionsOn[i] = ActionTriggerVersionTags
+		} else if strings.Contains(a, "all tags") {
+			spc.ActionsOn[i] = ActionTriggerAllTags
+		} else if strings.Contains(a, "manual") {
+			spc.ActionsOn[i] = ActionTriggerManual
+		} else {
+			spc.ActionsOn[i] = ActionTriggerManual // Default
+		}
+	}
+
+	spc.ProVersion = legacy.ProVersion
+	spc.State = ConfigStateDraft
+
+	return nil
 }

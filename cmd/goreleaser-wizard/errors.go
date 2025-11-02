@@ -66,21 +66,21 @@ func HandleError(err error, logger *log.Logger) {
 		// Display structured error information
 		fmt.Println()
 		fmt.Println(errorStyle.Render("❌ Error: " + wizErr.Message))
-		
+
 		if wizErr.Details != "" {
 			fmt.Println(infoStyle.Render("Details: " + wizErr.Details))
 		}
-		
+
 		if wizErr.Suggestion != "" {
 			suggestStyle := lipgloss.NewStyle().
 				Foreground(lipgloss.Color("220")).
 				Bold(true)
 			fmt.Println(suggestStyle.Render("💡 Suggestion: " + wizErr.Suggestion))
 		}
-		
+
 		// Log the full error for debugging
 		if logger != nil {
-			logger.Error("Wizard error", 
+			logger.Error("Wizard error",
 				"type", wizErr.Type,
 				"message", wizErr.Message,
 				"details", wizErr.Details,
@@ -90,7 +90,7 @@ func HandleError(err error, logger *log.Logger) {
 		// Generic error handling
 		fmt.Println()
 		fmt.Println(errorStyle.Render("❌ Error: " + err.Error()))
-		
+
 		// Provide generic suggestions based on error content
 		suggestion := getSuggestionForError(err)
 		if suggestion != "" {
@@ -99,7 +99,7 @@ func HandleError(err error, logger *log.Logger) {
 				Bold(true)
 			fmt.Println(suggestStyle.Render("💡 Suggestion: " + suggestion))
 		}
-		
+
 		if logger != nil {
 			logger.Error("Unexpected error", "error", err)
 		}
@@ -109,7 +109,7 @@ func HandleError(err error, logger *log.Logger) {
 // getSuggestionForError provides suggestions for common errors
 func getSuggestionForError(err error) string {
 	errStr := strings.ToLower(err.Error())
-	
+
 	switch {
 	case strings.Contains(errStr, "permission"):
 		return "Try running with appropriate permissions or check file ownership"
@@ -134,7 +134,7 @@ func RecoverFromPanic(logger *log.Logger) {
 		fmt.Println()
 		fmt.Println(errorStyle.Render("💥 Unexpected error occurred!"))
 		fmt.Println(infoStyle.Render("The wizard encountered an unexpected problem and had to stop."))
-		
+
 		suggestStyle := lipgloss.NewStyle().
 			Foreground(lipgloss.Color("220")).
 			Bold(true)
@@ -143,11 +143,11 @@ func RecoverFromPanic(logger *log.Logger) {
 		fmt.Println()
 		fmt.Println("Include this information:")
 		fmt.Printf("   Error: %v\n", r)
-		
+
 		if logger != nil {
 			logger.Fatal("Panic recovered", "panic", r)
 		}
-		
+
 		os.Exit(1)
 	}
 }
@@ -185,7 +185,7 @@ func ValidateFilePermissions(path string) error {
 			nil,
 		)
 	}
-	
+
 	// Test write permissions by creating a temporary file
 	testFile := fmt.Sprintf("%s/.wizard_test_%d", path, os.Getpid())
 	if f, err := os.Create(testFile); err != nil {
@@ -200,7 +200,7 @@ func ValidateFilePermissions(path string) error {
 		f.Close()
 		os.Remove(testFile)
 	}
-	
+
 	return nil
 }
 
@@ -215,7 +215,7 @@ func SafeFileWrite(path string, content []byte, perm os.FileMode) error {
 			}
 		}
 	}
-	
+
 	// Write the file
 	if err := os.WriteFile(path, content, perm); err != nil {
 		return NewWizardError(
@@ -226,7 +226,7 @@ func SafeFileWrite(path string, content []byte, perm os.FileMode) error {
 			err,
 		)
 	}
-	
+
 	return nil
 }
 
@@ -264,7 +264,7 @@ func CheckFileExists(path string, requireDir bool) error {
 			err,
 		)
 	}
-	
+
 	if requireDir && !info.IsDir() {
 		return NewWizardError(
 			ErrInvalidInput,
@@ -274,7 +274,7 @@ func CheckFileExists(path string, requireDir bool) error {
 			nil,
 		)
 	}
-	
+
 	return nil
 }
 
@@ -335,7 +335,7 @@ func SafeCreateFile(path string) (*os.File, error) {
 			err,
 		)
 	}
-	
+
 	file, err := os.Create(path)
 	if err != nil {
 		return nil, NewWizardError(

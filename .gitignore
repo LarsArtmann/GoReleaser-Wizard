@@ -183,3 +183,4 @@ config.local.yml
 .buildkite/local/
 .circleci/local/
 .gitlab-ci-local/goreleaser-cli*
+.claude/settings.local.json

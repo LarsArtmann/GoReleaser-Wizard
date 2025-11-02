@@ -42,12 +42,12 @@ func TestGenerateGoReleaserConfig(t *testing.T) {
 		{
 			name: "docker_enabled",
 			config: ProjectConfig{
-				ProjectName:     "docker-app",
-				BinaryName:      "docker-app",
-				MainPath:        "./cmd/app",
-				DockerEnabled:   true,
-				DockerRegistry:  "ghcr.io/testuser",
-				GitProvider:     "GitHub",
+				ProjectName:    "docker-app",
+				BinaryName:     "docker-app",
+				MainPath:       "./cmd/app",
+				DockerEnabled:  true,
+				DockerRegistry: "ghcr.io/testuser",
+				GitProvider:    "GitHub",
 			},
 			wantErr: false,
 			checks: []string{

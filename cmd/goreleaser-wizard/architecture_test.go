@@ -366,7 +366,7 @@ func TestConcurrentJobExecution(t *testing.T) {
 	defer os.RemoveAll(tmpDir)
 
 	// Create multiple test projects
-	for i := 0; i < 3; i++ {
+	for i := range 3 {
 		projectDir := filepath.Join(tmpDir, fmt.Sprintf("project-%d", i))
 		os.MkdirAll(projectDir, 0755)
 
@@ -381,7 +381,7 @@ func TestConcurrentJobExecution(t *testing.T) {
 	os.Chdir(tmpDir)
 
 	// Add validation jobs for all projects
-	for i := 0; i < 3; i++ {
+	for i := range 3 {
 		projectDir := fmt.Sprintf("project-%d", i)
 		jm.AddJob(NewProjectValidationJob(projectDir, logger))
 	}

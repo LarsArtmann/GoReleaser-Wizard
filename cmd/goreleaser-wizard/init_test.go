@@ -280,7 +280,7 @@ func TestFlagHandling(t *testing.T) {
 	tests := []struct {
 		name          string
 		flags         map[string]string
-		expectedViper map[string]interface{}
+		expectedViper map[string]any
 	}{
 		{
 			name:  "debug_flag",

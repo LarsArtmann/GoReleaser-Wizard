@@ -296,11 +296,11 @@ func (jm *JobManager) Clear() {
 }
 
 // GetStatistics returns job execution statistics
-func (jm *JobManager) GetStatistics() map[string]interface{} {
+func (jm *JobManager) GetStatistics() map[string]any {
 	jm.mu.Lock()
 	defer jm.mu.Unlock()
 
-	stats := map[string]interface{}{
+	stats := map[string]any{
 		"total_jobs":     len(jm.jobs),
 		"total_results":  len(jm.results),
 		"completed":      0,

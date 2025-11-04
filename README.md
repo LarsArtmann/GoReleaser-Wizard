@@ -1,7 +1,7 @@
 # GoReleaser Wizard 🚀
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Go Version](https://img.shields.io/badge/go-1.23+-blue.svg)](https://golang.org)
+[![Go Version](https://img.shields.io/badge/go-1.25+-blue.svg)](https://golang.org)
 [![GoReleaser](https://img.shields.io/badge/powered%20by-GoReleaser-blue.svg)](https://goreleaser.com)
 
 **The interactive setup wizard that creates perfect GoReleaser configurations in seconds.**

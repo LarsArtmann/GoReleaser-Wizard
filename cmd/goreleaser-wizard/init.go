@@ -177,10 +177,10 @@ func detectProjectInfo(config *ProjectConfig) {
 	// Try to detect project name from go.mod with error handling
 	data, err := SafeReadFile("go.mod")
 	if err == nil {
-		lines := strings.Split(string(data), "\n")
-		for _, line := range lines {
-			if strings.HasPrefix(line, "module ") {
-				module := strings.TrimPrefix(line, "module ")
+		lines := strings.SplitSeq(string(data), "\n")
+		for line := range lines {
+			if after, ok := strings.CutPrefix(line, "module "); ok {
+				module := after
 				parts := strings.Split(module, "/")
 				if len(parts) > 0 {
 					config.ProjectName = parts[len(parts)-1]

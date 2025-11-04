@@ -76,7 +76,7 @@ func (w *Workflow) GetResults() []JobResult {
 }
 
 // GetStatistics returns workflow statistics
-func (w *Workflow) GetStatistics() map[string]interface{} {
+func (w *Workflow) GetStatistics() map[string]any {
 	stats := w.JobManager.GetStatistics()
 	stats["workflow_name"] = w.Name
 	stats["workflow_description"] = w.Description

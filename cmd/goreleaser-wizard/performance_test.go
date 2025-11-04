@@ -34,9 +34,7 @@ require github.com/charmbracelet/lipgloss v1.1.0
 	defer os.Chdir(originalDir)
 	os.Chdir(tmpDir)
 
-	b.ResetTimer()
-
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		config := &ProjectConfig{}
 		detectProjectInfo(config)
 	}
@@ -78,9 +76,7 @@ go 1.21
 		ActionsOn:          []string{"On version tags (v*)"},
 	}
 
-	b.ResetTimer()
-
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		err := generateGoReleaserConfig(config)
 		if err != nil {
 			b.Fatalf("Config generation failed: %v", err)
@@ -116,9 +112,7 @@ go 1.21
 		ActionsOn:       []string{"On all tags"},
 	}
 
-	b.ResetTimer()
-
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		err := generateGitHubActions(config)
 		if err != nil {
 			b.Fatalf("GitHub Actions generation failed: %v", err)
@@ -142,9 +136,7 @@ func BenchmarkFileOperations(b *testing.B) {
 		strings.Repeat("Very large content for testing file operations with much more data. ", 200),
 	}
 
-	b.ResetTimer()
-
-	for i := 0; i < b.N; i++ {
+	for i := 0; b.Loop(); i++ {
 		content := testContent[i%len(testContent)]
 		filename := fmt.Sprintf("benchmark-file-%d.txt", i)
 
@@ -235,7 +227,7 @@ func TestMemoryUsage(t *testing.T) {
 	originalDir, _ := os.Getwd()
 	defer os.Chdir(originalDir)
 
-	for i := 0; i < 10; i++ {
+	for i := range 10 {
 		projectDir := filepath.Join(tmpDir, fmt.Sprintf("project-%d", i))
 		os.MkdirAll(projectDir, 0755)
 		os.Chdir(projectDir)
@@ -274,7 +266,7 @@ func TestConcurrentOperations(t *testing.T) {
 	done := make(chan bool, concurrency)
 	errors := make(chan error, concurrency)
 
-	for i := 0; i < concurrency; i++ {
+	for i := range concurrency {
 		go func(id int) {
 			defer func() {
 				done <- true
@@ -306,7 +298,7 @@ func TestConcurrentOperations(t *testing.T) {
 	}
 
 	// Wait for all operations to complete
-	for i := 0; i < concurrency; i++ {
+	for range concurrency {
 		<-done
 	}
 
@@ -358,10 +350,10 @@ go 1.21
 
 	if complexity >= 10 {
 		// Add extensive structure
-		for i := 0; i < 5; i++ {
+		for i := range 5 {
 			pkgName := fmt.Sprintf("pkg%02d", i)
 			os.MkdirAll(filepath.Join(dir, pkgName), 0755)
-			os.WriteFile(filepath.Join(dir, pkgName, fmt.Sprintf("%s.go", pkgName)), []byte(fmt.Sprintf("package %s\n\nfunc Func() {}", pkgName)), 0644)
+			os.WriteFile(filepath.Join(dir, pkgName, fmt.Sprintf("%s.go", pkgName)), fmt.Appendf(nil, "package %s\n\nfunc Func() {}", pkgName), 0644)
 		}
 	}
 }

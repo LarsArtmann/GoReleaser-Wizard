@@ -1,0 +1,3 @@
+name: 'Build Status'
+description: 'Shows the current build status of the GoReleaser Wizard'
+color: '28a745'

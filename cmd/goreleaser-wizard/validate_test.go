@@ -7,11 +7,12 @@ import (
 	"strings"
 	"testing"
 
+	"slices"
+
 	"github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/log"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"slices"
 )
 
 func TestRunValidate(t *testing.T) {
@@ -181,9 +182,9 @@ func TestCheckFileExists(t *testing.T) {
 			errContains: "File not found",
 		},
 		{
-			name:       "file_when_directory_required",
-			requireDir: true,
-			wantErr:    true,
+			name:        "file_when_directory_required",
+			requireDir:  true,
+			wantErr:     true,
 			errContains: "Expected directory",
 			setupFunc: func() string {
 				file, _ := os.CreateTemp("", "wizard-test-file")
@@ -226,9 +227,9 @@ func TestCheckFileExists(t *testing.T) {
 
 func TestValidateProjectStructure(t *testing.T) {
 	tests := []struct {
-		name          string
-		setupFunc     func() string
-		expectIssues  []string
+		name           string
+		setupFunc      func() string
+		expectIssues   []string
 		expectWarnings []string
 	}{
 		{
@@ -250,7 +251,7 @@ build:
 				os.WriteFile(filepath.Join(dir, ".goreleaser.yaml"), []byte(goreleaser), 0644)
 				return dir
 			},
-			expectIssues:  []string{},
+			expectIssues: []string{},
 		},
 		{
 			name: "project_with_cmd_structure",
@@ -272,7 +273,7 @@ build:
 				os.WriteFile(filepath.Join(dir, ".goreleaser.yaml"), []byte(goreleaser), 0644)
 				return dir
 			},
-			expectIssues:  []string{},
+			expectIssues: []string{},
 		},
 		{
 			name: "missing_main_package",
@@ -354,14 +355,14 @@ build:
 
 func TestValidateDependencies(t *testing.T) {
 	tests := []struct {
-		name         string
-		dependencies []string
-		expectFound  []string
+		name          string
+		dependencies  []string
+		expectFound   []string
 		expectMissing []string
 	}{
 		{
-			name:         "check_goreleaser",
-			dependencies: []string{"goreleaser"},
+			name:          "check_goreleaser",
+			dependencies:  []string{"goreleaser"},
 			expectMissing: []string{"goreleaser"},
 		},
 		{
@@ -370,8 +371,8 @@ func TestValidateDependencies(t *testing.T) {
 			expectFound:  []string{"go"},
 		},
 		{
-			name:         "check_docker",
-			dependencies: []string{"nonexistent-docker-binary"},
+			name:          "check_docker",
+			dependencies:  []string{"nonexistent-docker-binary"},
 			expectMissing: []string{"nonexistent-docker-binary"},
 		},
 	}
@@ -405,14 +406,14 @@ func TestValidateCommandFlags(t *testing.T) {
 		Short: "Validate GoReleaser configuration",
 		Run:   runValidate,
 	}
-	
+
 	// Initialize flags like in init()
 	validateCmd.Flags().Bool("verbose", false, "show detailed validation output")
 	validateCmd.Flags().Bool("fix", false, "attempt to fix common issues")
 
 	// Check that flags are properly set up
 	flags := validateCmd.Flags()
-	
+
 	verboseFlag := flags.Lookup("verbose")
 	if verboseFlag == nil {
 		t.Error("Expected 'verbose' flag to be present")

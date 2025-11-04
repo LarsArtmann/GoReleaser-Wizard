@@ -23,19 +23,19 @@ require github.com/charmbracelet/huh v0.7.0
 require github.com/charmbracelet/lipgloss v1.1.0
 `
 	os.WriteFile(filepath.Join(tmpDir, "go.mod"), []byte(goMod), 0644)
-	
+
 	// Create main and cmd structure
 	os.MkdirAll(filepath.Join(tmpDir, "cmd", "benchmark-test"), 0755)
 	os.WriteFile(filepath.Join(tmpDir, "main.go"), []byte("package main\n\nfunc main() {}"), 0644)
 	os.WriteFile(filepath.Join(tmpDir, "cmd", "benchmark-test", "main.go"), []byte("package main\n\nfunc main() {}"), 0644)
-	
+
 	// Change to test directory
 	originalDir, _ := os.Getwd()
 	defer os.Chdir(originalDir)
 	os.Chdir(tmpDir)
 
 	b.ResetTimer()
-	
+
 	for i := 0; i < b.N; i++ {
 		config := &ProjectConfig{}
 		detectProjectInfo(config)
@@ -54,7 +54,7 @@ go 1.21
 `
 	os.WriteFile(filepath.Join(tmpDir, "go.mod"), []byte(goMod), 0644)
 	os.WriteFile(filepath.Join(tmpDir, "main.go"), []byte("package main\n\nfunc main() {}"), 0644)
-	
+
 	// Change to test directory
 	originalDir, _ := os.Getwd()
 	defer os.Chdir(originalDir)
@@ -62,7 +62,7 @@ go 1.21
 
 	config := &ProjectConfig{
 		ProjectName:        "config-benchmark",
-		ProjectDescription:  "A benchmark test project",
+		ProjectDescription: "A benchmark test project",
 		ProjectType:        "CLI Application",
 		BinaryName:         "config-benchmark",
 		MainPath:           ".",
@@ -72,14 +72,14 @@ go 1.21
 		GitProvider:        "GitHub",
 		DockerEnabled:      true,
 		DockerRegistry:     "ghcr.io/user",
-		Signing:           true,
-		Homebrew:          true,
+		Signing:            true,
+		Homebrew:           true,
 		GenerateActions:    true,
-		ActionsOn:         []string{"On version tags (v*)"},
+		ActionsOn:          []string{"On version tags (v*)"},
 	}
 
 	b.ResetTimer()
-	
+
 	for i := 0; i < b.N; i++ {
 		err := generateGoReleaserConfig(config)
 		if err != nil {
@@ -101,7 +101,7 @@ go 1.21
 `
 	os.WriteFile(filepath.Join(tmpDir, "go.mod"), []byte(goMod), 0644)
 	os.WriteFile(filepath.Join(tmpDir, "main.go"), []byte("package main\n\nfunc main() {}"), 0644)
-	
+
 	// Change to test directory
 	originalDir, _ := os.Getwd()
 	defer os.Chdir(originalDir)
@@ -110,14 +110,14 @@ go 1.21
 	config := &ProjectConfig{
 		ProjectName:     "actions-benchmark",
 		BinaryName:      "actions-benchmark",
-		GenerateActions:  true,
+		GenerateActions: true,
 		DockerEnabled:   true,
 		Signing:         true,
 		ActionsOn:       []string{"On all tags"},
 	}
 
 	b.ResetTimer()
-	
+
 	for i := 0; i < b.N; i++ {
 		err := generateGitHubActions(config)
 		if err != nil {
@@ -143,27 +143,27 @@ func BenchmarkFileOperations(b *testing.B) {
 	}
 
 	b.ResetTimer()
-	
+
 	for i := 0; i < b.N; i++ {
 		content := testContent[i%len(testContent)]
 		filename := fmt.Sprintf("benchmark-file-%d.txt", i)
-		
+
 		// Test write operation
 		err := SafeFileWrite(filename, []byte(content), 0644)
 		if err != nil {
 			b.Fatalf("SafeFileWrite failed: %v", err)
 		}
-		
+
 		// Test read operation
 		readContent, err := SafeReadFile(filename)
 		if err != nil {
 			b.Fatalf("SafeReadFile failed: %v", err)
 		}
-		
+
 		if string(readContent) != content {
 			b.Fatalf("Content mismatch")
 		}
-		
+
 		// Clean up
 		os.Remove(filename)
 	}
@@ -172,25 +172,25 @@ func BenchmarkFileOperations(b *testing.B) {
 // TestPerformanceCharacteristics tests performance characteristics under different conditions
 func TestPerformanceCharacteristics(t *testing.T) {
 	tests := []struct {
-		name           string
-		complexity     int
-		expectedMaxMs  int64
+		name          string
+		complexity    int
+		expectedMaxMs int64
 	}{
-		{"simple_project", 1, 100},   // Simple project should complete in <100ms
-		{"medium_project", 5, 500},  // Medium project should complete in <500ms
+		{"simple_project", 1, 100},    // Simple project should complete in <100ms
+		{"medium_project", 5, 500},    // Medium project should complete in <500ms
 		{"complex_project", 10, 2000}, // Complex project should complete in <2s
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			start := time.Now()
-			
+
 			// Create project with specified complexity
 			tmpDir, _ := os.MkdirTemp("", fmt.Sprintf("wizard-perf-%s", tt.name))
 			defer os.RemoveAll(tmpDir)
 
 			createBenchmarkProject(t, tmpDir, tt.complexity)
-			
+
 			originalDir, _ := os.Getwd()
 			defer os.Chdir(originalDir)
 			os.Chdir(tmpDir)
@@ -198,24 +198,24 @@ func TestPerformanceCharacteristics(t *testing.T) {
 			// Run full wizard workflow
 			config := &ProjectConfig{}
 			detectProjectInfo(config)
-			
+
 			err := generateGoReleaserConfig(config)
 			if err != nil {
 				t.Errorf("Config generation failed: %v", err)
 			}
-			
+
 			err = generateGitHubActions(config)
 			if err != nil {
 				t.Errorf("GitHub Actions generation failed: %v", err)
 			}
-			
+
 			duration := time.Since(start)
-			
+
 			// Check performance requirements
 			if duration.Milliseconds() > tt.expectedMaxMs {
 				t.Errorf("Performance exceeded threshold: %v > %dms", duration, tt.expectedMaxMs)
 			}
-			
+
 			t.Logf("Performance: %v for %s (threshold: %dms)", duration, tt.name, tt.expectedMaxMs)
 		})
 	}
@@ -279,7 +279,7 @@ func TestConcurrentOperations(t *testing.T) {
 			defer func() {
 				done <- true
 			}()
-			
+
 			// Create temporary project
 			tmpDir, _ := os.MkdirTemp("", fmt.Sprintf("wizard-concurrent-%d", id))
 			defer os.RemoveAll(tmpDir)
@@ -297,7 +297,7 @@ func TestConcurrentOperations(t *testing.T) {
 			config := &ProjectConfig{}
 			detectProjectInfo(config)
 			err := generateGoReleaserConfig(config)
-			
+
 			if err != nil {
 				errors <- fmt.Errorf("project %d: %v", id, err)
 				return

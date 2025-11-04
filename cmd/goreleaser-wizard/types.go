@@ -12,17 +12,17 @@ import (
 type ProjectType string
 
 const (
-	ProjectTypeCLI      ProjectType = "cli"           // Renamed for type safety
-	ProjectTypeWeb      ProjectType = "web"          
-	ProjectTypeLibrary  ProjectType = "library"
-	ProjectTypeAPI      ProjectType = "api"
-	ProjectTypeDesktop  ProjectType = "desktop"
+	ProjectTypeCLI     ProjectType = "cli" // Renamed for type safety
+	ProjectTypeWeb     ProjectType = "web"
+	ProjectTypeLibrary ProjectType = "library"
+	ProjectTypeAPI     ProjectType = "api"
+	ProjectTypeDesktop ProjectType = "desktop"
 )
 
 func (pt ProjectType) IsValid() bool {
 	switch pt {
-	case ProjectTypeCLI, ProjectTypeWeb, ProjectTypeLibrary, 
-	     ProjectTypeAPI, ProjectTypeDesktop:
+	case ProjectTypeCLI, ProjectTypeWeb, ProjectTypeLibrary,
+		ProjectTypeAPI, ProjectTypeDesktop:
 		return true
 	default:
 		return false
@@ -80,17 +80,17 @@ func (pt ProjectType) RecommendedPlatforms() []Platform {
 type GitProvider string
 
 const (
-	GitProviderGitHub    GitProvider = "github"
-	GitProviderGitLab    GitProvider = "gitlab"
-	GitProviderBitbucket GitProvider = "bitbucket"
-	GitProviderGitea     GitProvider = "gitea"
+	GitProviderGitHub     GitProvider = "github"
+	GitProviderGitLab     GitProvider = "gitlab"
+	GitProviderBitbucket  GitProvider = "bitbucket"
+	GitProviderGitea      GitProvider = "gitea"
 	GitProviderSelfHosted GitProvider = "self-hosted"
 )
 
 func (gp GitProvider) IsValid() bool {
 	switch gp {
 	case GitProviderGitHub, GitProviderGitLab, GitProviderBitbucket,
-	     GitProviderGitea, GitProviderSelfHosted:
+		GitProviderGitea, GitProviderSelfHosted:
 		return true
 	default:
 		return false
@@ -129,7 +129,7 @@ const (
 func (p Platform) IsValid() bool {
 	switch p {
 	case PlatformLinux, PlatformDarwin, PlatformWindows,
-	     PlatformFreeBSD, PlatformOpenBSD, PlatformNetBSD:
+		PlatformFreeBSD, PlatformOpenBSD, PlatformNetBSD:
 		return true
 	default:
 		return false
@@ -140,21 +140,21 @@ func (p Platform) IsValid() bool {
 type Architecture string
 
 const (
-	ArchAMD64 Architecture = "amd64"
-	ArchARM64 Architecture = "arm64"
-	Arch386   Architecture = "386"
-	ArchARM   Architecture = "arm"
-	ArchPPC64  Architecture = "ppc64"
+	ArchAMD64   Architecture = "amd64"
+	ArchARM64   Architecture = "arm64"
+	Arch386     Architecture = "386"
+	ArchARM     Architecture = "arm"
+	ArchPPC64   Architecture = "ppc64"
 	ArchPPC64LE Architecture = "ppc64le"
-	ArchS390X  Architecture = "s390x"
-	ArchMIPS   Architecture = "mips"
-	ArchMIPSLE Architecture = "mipsle"
+	ArchS390X   Architecture = "s390x"
+	ArchMIPS    Architecture = "mips"
+	ArchMIPSLE  Architecture = "mipsle"
 )
 
 func (a Architecture) IsValid() bool {
 	switch a {
 	case ArchAMD64, ArchARM64, Arch386, ArchARM,
-	     ArchPPC64, ArchPPC64LE, ArchS390X, ArchMIPS, ArchMIPSLE:
+		ArchPPC64, ArchPPC64LE, ArchS390X, ArchMIPS, ArchMIPSLE:
 		return true
 	default:
 		return false
@@ -165,17 +165,17 @@ func (a Architecture) IsValid() bool {
 type ActionTrigger string
 
 const (
-	ActionTriggerVersionTags ActionTrigger = "version-tags"  // v*, v1.0.0, etc.
-	ActionTriggerAllTags     ActionTrigger = "all-tags"       // *
-	ActionTriggerManual      ActionTrigger = "manual"         // workflow_dispatch
-	ActionTriggerMain        ActionTrigger = "main"           // push to main
-	ActionTriggerRelease     ActionTrigger = "release"        // published release
+	ActionTriggerVersionTags ActionTrigger = "version-tags" // v*, v1.0.0, etc.
+	ActionTriggerAllTags     ActionTrigger = "all-tags"     // *
+	ActionTriggerManual      ActionTrigger = "manual"       // workflow_dispatch
+	ActionTriggerMain        ActionTrigger = "main"         // push to main
+	ActionTriggerRelease     ActionTrigger = "release"      // published release
 )
 
 func (at ActionTrigger) IsValid() bool {
 	switch at {
 	case ActionTriggerVersionTags, ActionTriggerAllTags, ActionTriggerManual,
-	     ActionTriggerMain, ActionTriggerRelease:
+		ActionTriggerMain, ActionTriggerRelease:
 		return true
 	default:
 		return false
@@ -205,16 +205,16 @@ type DockerRegistry string
 
 const (
 	DockerRegistryDockerHub DockerRegistry = "docker.io"
-	DockerRegistryGitHub   DockerRegistry = "ghcr.io"
-	DockerRegistryGitLab   DockerRegistry = "registry.gitlab.com"
-	DockerRegistryQuay     DockerRegistry = "quay.io"
-	DockerRegistryCustom   DockerRegistry = "custom"
+	DockerRegistryGitHub    DockerRegistry = "ghcr.io"
+	DockerRegistryGitLab    DockerRegistry = "registry.gitlab.com"
+	DockerRegistryQuay      DockerRegistry = "quay.io"
+	DockerRegistryCustom    DockerRegistry = "custom"
 )
 
 func (dr DockerRegistry) IsValid() bool {
 	switch dr {
 	case DockerRegistryDockerHub, DockerRegistryGitHub, DockerRegistryGitLab,
-	     DockerRegistryQuay, DockerRegistryCustom:
+		DockerRegistryQuay, DockerRegistryCustom:
 		return true
 	default:
 		return false
@@ -228,7 +228,7 @@ func (dr DockerRegistry) ValidateRegistryURL(url string) error {
 	}
 
 	url = strings.TrimSpace(url)
-	
+
 	// TODO: Should be type-safe validation from TypeSpec
 	switch dr {
 	case DockerRegistryDockerHub:
@@ -239,9 +239,9 @@ func (dr DockerRegistry) ValidateRegistryURL(url string) error {
 		if !strings.Contains(url, "ghcr.io") {
 			return fmt.Errorf("GitHub Container Registry should include ghcr.io")
 		}
-	// TODO: Add validation for all registry types
+		// TODO: Add validation for all registry types
 	}
-	
+
 	return nil
 }
 
@@ -249,7 +249,7 @@ func (dr DockerRegistry) ValidateRegistryURL(url string) error {
 type ConfigState string
 
 const (
-	ConfigStateDraft      ConfigState = "draft"       // TODO: Should be generated
+	ConfigStateDraft      ConfigState = "draft" // TODO: Should be generated
 	ConfigStateValid      ConfigState = "valid"
 	ConfigStateInvalid    ConfigState = "invalid"
 	ConfigStateProcessing ConfigState = "processing"
@@ -271,32 +271,32 @@ func (cs ConfigState) IsValid() bool {
 // All fields should be typed, no string[] anywhere!
 type SafeProjectConfig struct {
 	// Basic Information
-	ProjectName        string       `json:"project_name" yaml:"project_name" validate:"required,min=1,max=63"`
-	ProjectDescription string       `json:"project_description" yaml:"project_description" validate:"max=255"`
-	ProjectType        ProjectType  `json:"project_type" yaml:"project_type" validate:"required"`
-	BinaryName         string       `json:"binary_name" yaml:"binary_name" validate:"required,min=1,max=63"`
-	MainPath           string       `json:"main_path" yaml:"main_path" validate:"required"`
+	ProjectName        string      `json:"project_name" yaml:"project_name" validate:"required,min=1,max=63"`
+	ProjectDescription string      `json:"project_description" yaml:"project_description" validate:"max=255"`
+	ProjectType        ProjectType `json:"project_type" yaml:"project_type" validate:"required"`
+	BinaryName         string      `json:"binary_name" yaml:"binary_name" validate:"required,min=1,max=63"`
+	MainPath           string      `json:"main_path" yaml:"main_path" validate:"required"`
 
 	// Build Configuration
-	Platforms     []Platform    `json:"platforms" yaml:"platforms" validate:"required,min=1"`
+	Platforms     []Platform     `json:"platforms" yaml:"platforms" validate:"required,min=1"`
 	Architectures []Architecture `json:"architectures" yaml:"architectures" validate:"required,min=1"`
-	CGOEnabled    bool          `json:"cgo_enabled" yaml:"cgo_enabled"`
-	BuildTags     []string      `json:"build_tags" yaml:"build_tags"`
-	LDFlags       bool          `json:"ldflags" yaml:"ldflags"`
+	CGOEnabled    bool           `json:"cgo_enabled" yaml:"cgo_enabled"`
+	BuildTags     []string       `json:"build_tags" yaml:"build_tags"`
+	LDFlags       bool           `json:"ldflags" yaml:"ldflags"`
 
 	// Release Configuration
-	GitProvider     GitProvider     `json:"git_provider" yaml:"git_provider" validate:"required"`
-	DockerEnabled   bool            `json:"docker_enabled" yaml:"docker_enabled"`
-	DockerRegistry  DockerRegistry  `json:"docker_registry" yaml:"docker_registry" validate:"required_if=DockerEnabled"`
-	DockerImage     string          `json:"docker_image" yaml:"docker_image"` // TODO: Should be typed
-	Signing         bool            `json:"signing" yaml:"signing"`
-	Homebrew        bool            `json:"homebrew" yaml:"homebrew"`
-	Snap            bool            `json:"snap" yaml:"snap"`
-	SBOM            bool            `json:"sbom" yaml:"sbom"`
+	GitProvider    GitProvider    `json:"git_provider" yaml:"git_provider" validate:"required"`
+	DockerEnabled  bool           `json:"docker_enabled" yaml:"docker_enabled"`
+	DockerRegistry DockerRegistry `json:"docker_registry" yaml:"docker_registry" validate:"required_if=DockerEnabled"`
+	DockerImage    string         `json:"docker_image" yaml:"docker_image"` // TODO: Should be typed
+	Signing        bool           `json:"signing" yaml:"signing"`
+	Homebrew       bool           `json:"homebrew" yaml:"homebrew"`
+	Snap           bool           `json:"snap" yaml:"snap"`
+	SBOM           bool           `json:"sbom" yaml:"sbom"`
 
 	// CI/CD Configuration
-	GenerateActions bool           `json:"generate_actions" yaml:"generate_actions"`
-	ActionsOn      []ActionTrigger `json:"actions_on" yaml:"actions_on" validate:"required_if=GenerateActions"`
+	GenerateActions bool            `json:"generate_actions" yaml:"generate_actions"`
+	ActionsOn       []ActionTrigger `json:"actions_on" yaml:"actions_on" validate:"required_if=GenerateActions"`
 
 	// Advanced Features
 	ProVersion bool        `json:"pro_version" yaml:"pro_version"`
@@ -306,20 +306,20 @@ type SafeProjectConfig struct {
 // TODO: Should be generated from TypeSpec with invariants!
 func (spc *SafeProjectConfig) ValidateInvariants() error {
 	// TODO: Should be compile-time generated validation
-	
+
 	// Invariant: Required fields must not be empty
 	if spc.ProjectName == "" {
 		return fmt.Errorf("project name is required")
 	}
-	
+
 	if spc.BinaryName == "" {
 		return fmt.Errorf("binary name is required")
 	}
-	
+
 	if spc.MainPath == "" {
 		return fmt.Errorf("main path is required")
 	}
-	
+
 	// Invariant: Project type must be valid
 	if !spc.ProjectType.IsValid() {
 		return fmt.Errorf("invalid project type: %s", spc.ProjectType)
@@ -329,26 +329,26 @@ func (spc *SafeProjectConfig) ValidateInvariants() error {
 	if len(spc.Platforms) == 0 {
 		return fmt.Errorf("at least one platform is required")
 	}
-	
+
 	// Validate each platform
 	for _, platform := range spc.Platforms {
 		if !platform.IsValid() {
 			return fmt.Errorf("invalid platform: %s", platform)
 		}
 	}
-	
+
 	// Invariant: Architectures must not be empty
 	if len(spc.Architectures) == 0 {
 		return fmt.Errorf("at least one architecture is required")
 	}
-	
+
 	// Validate each architecture
 	for _, arch := range spc.Architectures {
 		if !arch.IsValid() {
 			return fmt.Errorf("invalid architecture: %s", arch)
 		}
 	}
-	
+
 	// Invariant: Git provider must be valid
 	if !spc.GitProvider.IsValid() {
 		return fmt.Errorf("invalid git provider: %s", spc.GitProvider)
@@ -363,7 +363,7 @@ func (spc *SafeProjectConfig) ValidateInvariants() error {
 	if spc.GenerateActions && len(spc.ActionsOn) == 0 {
 		return fmt.Errorf("GitHub Actions enabled requires at least one trigger")
 	}
-	
+
 	// Validate action triggers
 	for _, trigger := range spc.ActionsOn {
 		if !trigger.IsValid() {
@@ -372,7 +372,7 @@ func (spc *SafeProjectConfig) ValidateInvariants() error {
 	}
 
 	// TODO: Add more invariants for all type combinations
-	
+
 	return nil
 }
 
@@ -414,7 +414,7 @@ func (spc *SafeProjectConfig) ApplyDefaults() {
 func (spc *SafeProjectConfig) FromLegacy(legacy ProjectConfig) error {
 	spc.ProjectName = legacy.ProjectName
 	spc.ProjectDescription = legacy.ProjectDescription
-	
+
 	// TODO: This conversion is problematic - eliminates type safety
 	switch legacy.ProjectType {
 	case "CLI Application":
@@ -465,12 +465,12 @@ func (spc *SafeProjectConfig) FromLegacy(legacy ProjectConfig) error {
 	}
 
 	spc.DockerEnabled = legacy.DockerEnabled
-	spc.DockerImage = legacy.DockerRegistry // TODO: Fix mapping
+	spc.DockerImage = legacy.DockerRegistry   // TODO: Fix mapping
 	spc.DockerRegistry = DockerRegistryGitHub // Default
 
 	// TODO: More split brain cleanup needed
 	spc.GenerateActions = legacy.GenerateActions
-	
+
 	spc.ActionsOn = make([]ActionTrigger, len(legacy.ActionsOn))
 	for i, a := range legacy.ActionsOn {
 		// TODO: This mapping is error-prone

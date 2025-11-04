@@ -19,8 +19,8 @@ func TestInitCommand(t *testing.T) {
 		expectError bool
 	}{
 		{
-			name: "basic_init_command",
-			args: []string{},
+			name:  "basic_init_command",
+			args:  []string{},
 			flags: map[string]string{},
 			setupFunc: func() string {
 				dir, _ := os.MkdirTemp("", "wizard-init-test")
@@ -34,8 +34,8 @@ go 1.21
 			expectError: false,
 		},
 		{
-			name: "init_in_non_go_project",
-			args: []string{},
+			name:  "init_in_non_go_project",
+			args:  []string{},
 			flags: map[string]string{},
 			setupFunc: func() string {
 				dir, _ := os.MkdirTemp("", "wizard-init-test")
@@ -278,8 +278,8 @@ func TestCommandHelp(t *testing.T) {
 
 func TestFlagHandling(t *testing.T) {
 	tests := []struct {
-		name         string
-		flags        map[string]string
+		name          string
+		flags         map[string]string
 		expectedViper map[string]interface{}
 	}{
 		{

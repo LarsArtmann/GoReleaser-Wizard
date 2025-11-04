@@ -85,21 +85,21 @@ func TestHandleError(t *testing.T) {
 			logger: nil,
 		},
 		{
-			name:   "wizard_error_with_details",
-			err:    NewWizardError(ErrConfigExists, "Config exists", "Details here", "Use --force", os.ErrExist),
-			logger: nil,
+			name:       "wizard_error_with_details",
+			err:        NewWizardError(ErrConfigExists, "Config exists", "Details here", "Use --force", os.ErrExist),
+			logger:     nil,
 			wantOutput: "❌ Error: Config exists\nDetails: Details here\n💡 Suggestion: Use --force",
 		},
 		{
-			name:   "wizard_error_minimal",
-			err:    NewWizardError(ErrInvalidInput, "Invalid input", "", "", nil),
-			logger: nil,
+			name:       "wizard_error_minimal",
+			err:        NewWizardError(ErrInvalidInput, "Invalid input", "", "", nil),
+			logger:     nil,
 			wantOutput: "❌ Error: Invalid input",
 		},
 		{
-			name:   "generic_error",
-			err:    os.ErrPermission,
-			logger: nil,
+			name:       "generic_error",
+			err:        os.ErrPermission,
+			logger:     nil,
 			wantOutput: "❌ Error: permission denied\n💡 Suggestion: Try running with appropriate permissions or check file ownership",
 		},
 	}
@@ -303,7 +303,7 @@ func TestSafeFileWrite(t *testing.T) {
 			if tt.setupFunc != nil {
 				tt.path = tt.setupFunc()
 			}
-			
+
 			defer func() {
 				if tt.path != "" {
 					os.Remove(tt.path)
@@ -454,7 +454,7 @@ func TestSafeCreateFile(t *testing.T) {
 					return
 				}
 				file.Close()
-				
+
 				// Verify file was created
 				if _, err := os.Stat(tt.path); os.IsNotExist(err) {
 					t.Errorf("File was not created at %s", tt.path)

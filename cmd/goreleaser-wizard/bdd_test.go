@@ -18,7 +18,7 @@ func TestBDD_ProjectType_CLI_Defaults(t *testing.T) {
 	}
 }
 
-// BDD: When project type is Web Service, then CGO should be true by default  
+// BDD: When project type is Web Service, then CGO should be true by default
 func TestBDD_ProjectType_Web_Defaults(t *testing.T) {
 	config := &SafeProjectConfig{}
 	config.ProjectType = ProjectTypeWeb
@@ -76,10 +76,10 @@ func TestBDD_ProjectType_Library_Docker(t *testing.T) {
 // BDD: When converting from legacy config, all types should be valid
 func TestBDD_Legacy_Conversion_Types(t *testing.T) {
 	legacy := ProjectConfig{
-		ProjectType: "CLI Application",
-		Platforms:   []string{"linux", "darwin", "windows"},
+		ProjectType:   "CLI Application",
+		Platforms:     []string{"linux", "darwin", "windows"},
 		Architectures: []string{"amd64", "arm64"},
-		GitProvider:  "GitHub",
+		GitProvider:   "GitHub",
 	}
 
 	config := &SafeProjectConfig{}
@@ -115,10 +115,10 @@ func TestBDD_Validation_EmptyProjectName(t *testing.T) {
 	}
 }
 
-// BDD: When binary name is empty, validation should fail  
+// BDD: When binary name is empty, validation should fail
 func TestBDD_Validation_EmptyBinaryName(t *testing.T) {
 	config := &SafeProjectConfig{}
-	config.BinaryName = "" // Invalid
+	config.BinaryName = ""      // Invalid
 	config.ProjectName = "test" // Valid to avoid other errors
 
 	err := config.ValidateInvariants()
@@ -130,9 +130,9 @@ func TestBDD_Validation_EmptyBinaryName(t *testing.T) {
 // BDD: When main path is empty, validation should fail
 func TestBDD_Validation_EmptyMainPath(t *testing.T) {
 	config := &SafeProjectConfig{}
-	config.MainPath = "" // Invalid
-	config.ProjectName = "test"    // Valid to avoid other errors
-	config.BinaryName = "test"    // Valid to avoid other errors
+	config.MainPath = ""        // Invalid
+	config.ProjectName = "test" // Valid to avoid other errors
+	config.BinaryName = "test"  // Valid to avoid other errors
 
 	err := config.ValidateInvariants()
 	if err == nil {
@@ -179,7 +179,7 @@ func TestBDD_Validation_EmptyArchitectures(t *testing.T) {
 	config.BinaryName = "test"
 	config.MainPath = "."
 	config.Platforms = []Platform{PlatformLinux} // Valid
-	config.Architectures = []Architecture{}       // Empty
+	config.Architectures = []Architecture{}      // Empty
 
 	err := config.ValidateInvariants()
 	if err == nil {

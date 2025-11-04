@@ -17,7 +17,7 @@ func TestEndToEndWizard(t *testing.T) {
 			name: "complete_wizard_flow",
 			setupFunc: func() string {
 				dir, _ := os.MkdirTemp("", "wizard-e2e-test")
-				
+
 				// Create basic Go project
 				goMod := `module github.com/user/e2e-test
 go 1.21
@@ -25,11 +25,11 @@ require github.com/charmbracelet/bubbletea v0.25.0
 `
 				os.WriteFile(filepath.Join(dir, "go.mod"), []byte(goMod), 0644)
 				os.WriteFile(filepath.Join(dir, "main.go"), []byte("package main\n\nfunc main() {}"), 0644)
-				
+
 				// Create cmd directory structure
 				os.MkdirAll(filepath.Join(dir, "cmd", "e2e-test"), 0755)
 				os.WriteFile(filepath.Join(dir, "cmd", "e2e-test", "main.go"), []byte("package main\n\nfunc main() {}"), 0644)
-				
+
 				return dir
 			},
 			expectFiles: []string{"go.mod", "main.go", "cmd/e2e-test/main.go"},
@@ -100,16 +100,16 @@ require github.com/charmbracelet/bubbletea v0.25.0
 
 func TestConfigurationValidation(t *testing.T) {
 	tests := []struct {
-		name           string
-		config         ProjectConfig
-		expectError    bool
-		errorContains  string
+		name          string
+		config        ProjectConfig
+		expectError   bool
+		errorContains string
 	}{
 		{
 			name: "valid_cli_config",
 			config: ProjectConfig{
 				ProjectName:        "test-cli",
-				ProjectDescription:  "A test CLI application",
+				ProjectDescription: "A test CLI application",
 				BinaryName:         "test-cli",
 				MainPath:           "./cmd/test-cli",
 				ProjectType:        "CLI Application",
@@ -117,7 +117,7 @@ func TestConfigurationValidation(t *testing.T) {
 				Architectures:      []string{"amd64", "arm64"},
 				CGOEnabled:         false,
 				GitProvider:        "GitHub",
-				GenerateActions:     true,
+				GenerateActions:    true,
 				ActionsOn:          []string{"On version tags (v*)"},
 			},
 			expectError: false,
@@ -126,7 +126,7 @@ func TestConfigurationValidation(t *testing.T) {
 			name: "valid_web_service_config",
 			config: ProjectConfig{
 				ProjectName:        "test-web",
-				ProjectDescription:  "A test web service",
+				ProjectDescription: "A test web service",
 				BinaryName:         "test-web",
 				MainPath:           ".",
 				ProjectType:        "Web Service",
@@ -198,7 +198,7 @@ func TestConfigurationValidation(t *testing.T) {
 				}
 
 				contentStr := string(content)
-				
+
 				// Check for required fields
 				if !strings.Contains(contentStr, "version: 2") {
 					t.Error("Config should specify version 2")
@@ -227,7 +227,7 @@ func TestDifferentProjectTypes(t *testing.T) {
 			projectType: "CLI Application",
 			expectedConfig: ProjectConfig{
 				ProjectType: "CLI Application",
-				CGOEnabled: false,
+				CGOEnabled:  false,
 			},
 		},
 		{
@@ -235,7 +235,7 @@ func TestDifferentProjectTypes(t *testing.T) {
 			projectType: "Web Service",
 			expectedConfig: ProjectConfig{
 				ProjectType: "Web Service",
-				CGOEnabled: true,
+				CGOEnabled:  true,
 			},
 		},
 		{
@@ -243,7 +243,7 @@ func TestDifferentProjectTypes(t *testing.T) {
 			projectType: "Library",
 			expectedConfig: ProjectConfig{
 				ProjectType: "Library",
-				CGOEnabled: false,
+				CGOEnabled:  false,
 			},
 		},
 	}
@@ -349,7 +349,7 @@ func TestEdgeCaseScenarios(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			testDir := tt.setupFunc()
-			
+
 			// Ensure we can cleanup even for read-only test
 			defer func() {
 				if testDir != "" {

@@ -78,7 +78,7 @@ func TestTemplateGeneration(t *testing.T) {
 			name: "generate_complete_config",
 			config: ProjectConfig{
 				ProjectName:        "complete-test",
-				ProjectDescription:  "A complete test project",
+				ProjectDescription: "A complete test project",
 				BinaryName:         "complete-test",
 				MainPath:           "./cmd/complete-test",
 				ProjectType:        "CLI Application",
@@ -88,10 +88,10 @@ func TestTemplateGeneration(t *testing.T) {
 				GitProvider:        "GitHub",
 				DockerEnabled:      true,
 				DockerRegistry:     "ghcr.io/user",
-				Signing:           true,
-				Homebrew:          true,
+				Signing:            true,
+				Homebrew:           true,
 				GenerateActions:    true,
-				ActionsOn:         []string{"On version tags (v*)"},
+				ActionsOn:          []string{"On version tags (v*)"},
 			},
 			expectError: false,
 			checks: []string{
@@ -173,12 +173,12 @@ func TestGitHubActionsGeneration(t *testing.T) {
 		{
 			name: "actions_with_docker",
 			config: ProjectConfig{
-				ProjectName:    "docker-test",
-				BinaryName:     "docker-test",
+				ProjectName:     "docker-test",
+				BinaryName:      "docker-test",
 				GenerateActions: true,
-				DockerEnabled:  true,
-				DockerRegistry: "ghcr.io/user",
-				ActionsOn:      []string{"Manual trigger only"},
+				DockerEnabled:   true,
+				DockerRegistry:  "ghcr.io/user",
+				ActionsOn:       []string{"Manual trigger only"},
 			},
 			expectError: false,
 			checks: []string{
@@ -191,11 +191,11 @@ func TestGitHubActionsGeneration(t *testing.T) {
 		{
 			name: "actions_with_signing",
 			config: ProjectConfig{
-				ProjectName:    "signing-test",
-				BinaryName:     "signing-test",
+				ProjectName:     "signing-test",
+				BinaryName:      "signing-test",
 				GenerateActions: true,
-				Signing:        true,
-				ActionsOn:      []string{"On all tags"},
+				Signing:         true,
+				ActionsOn:       []string{"On all tags"},
 			},
 			expectError: false,
 			checks: []string{
@@ -250,15 +250,15 @@ func TestGitHubActionsGeneration(t *testing.T) {
 
 func TestConfigValidation(t *testing.T) {
 	tests := []struct {
-		name     string
-		config   ProjectConfig
-		wantErr  bool
+		name    string
+		config  ProjectConfig
+		wantErr bool
 	}{
 		{
 			name: "valid_complete_config",
 			config: ProjectConfig{
 				ProjectName:        "valid-test",
-				ProjectDescription:  "Valid test project",
+				ProjectDescription: "Valid test project",
 				BinaryName:         "valid-test",
 				MainPath:           "./cmd/valid-test",
 				ProjectType:        "CLI Application",
@@ -340,16 +340,16 @@ func TestFileOperations(t *testing.T) {
 				if err != nil {
 					return err
 				}
-				
+
 				readContent, err := SafeReadFile("test-safe-read.txt")
 				if err != nil {
 					return err
 				}
-				
+
 				if string(readContent) != string(content) {
 					return os.ErrInvalid
 				}
-				
+
 				return nil
 			},
 			wantErr: false,
@@ -393,7 +393,7 @@ func TestFileOperations(t *testing.T) {
 func TestBackupCreation(t *testing.T) {
 	// Test that backup files are created when overwriting existing files
 	tests := []struct {
-		name        string
+		name            string
 		originalContent string
 		newContent      string
 		expectBackup    bool
@@ -444,7 +444,7 @@ func TestBackupCreation(t *testing.T) {
 			backupFile := testFile + ".backup"
 			backupInfo, _ := os.Stat(backupFile)
 			backupExists := backupInfo != nil
-			
+
 			if tt.expectBackup && !backupExists {
 				t.Error("Backup file should exist when overwriting existing file")
 			} else if tt.expectBackup && backupExists {

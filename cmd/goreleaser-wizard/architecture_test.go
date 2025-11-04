@@ -18,8 +18,8 @@ func TestJobManager(t *testing.T) {
 
 	// Test basic job manager
 	tests := []struct {
-		name    string
-		setup   func(*JobManager)
+		name     string
+		setup    func(*JobManager)
 		parallel bool
 		wantErr  bool
 	}{
@@ -89,18 +89,18 @@ go 1.21
 	os.Chdir(tmpDir)
 
 	tests := []struct {
-		name   string
-		job    Job
+		name    string
+		job     Job
 		wantErr bool
 	}{
 		{
-			name:   "project_validation_success",
-			job:    NewProjectValidationJob(".", logger),
+			name:    "project_validation_success",
+			job:     NewProjectValidationJob(".", logger),
 			wantErr: false,
 		},
 		{
-			name:   "config_generation_success",
-			job:    NewConfigGenerationJob(&ProjectConfig{
+			name: "config_generation_success",
+			job: NewConfigGenerationJob(&ProjectConfig{
 				ProjectName: "job-test",
 				BinaryName:  "job-test",
 				MainPath:    ".",
@@ -109,8 +109,8 @@ go 1.21
 			wantErr: false,
 		},
 		{
-			name:   "dependency_check_failure",
-			job:    NewDependencyCheckJob([]string{"nonexistent-binary-xyz"}, logger),
+			name:    "dependency_check_failure",
+			job:     NewDependencyCheckJob([]string{"nonexistent-binary-xyz"}, logger),
 			wantErr: true,
 		},
 	}
@@ -148,13 +148,13 @@ go 1.21
 	os.WriteFile(tmpDir+"/main.go", []byte("package main\n\nfunc main() {}"), 0644)
 
 	tests := []struct {
-		name        string
-		job         Job
+		name            string
+		job             Job
 		executeRollback bool
 	}{
 		{
-			name:          "config_generation_rollback",
-			job:           NewConfigGenerationJob(&ProjectConfig{
+			name: "config_generation_rollback",
+			job: NewConfigGenerationJob(&ProjectConfig{
 				ProjectName: "rollback-test",
 				BinaryName:  "rollback-test",
 				MainPath:    ".",
@@ -163,8 +163,8 @@ go 1.21
 			executeRollback: true,
 		},
 		{
-			name:          "project_validation_rollback",
-			job:           NewProjectValidationJob(".", logger),
+			name:            "project_validation_rollback",
+			job:             NewProjectValidationJob(".", logger),
 			executeRollback: true,
 		},
 	}
@@ -212,9 +212,9 @@ go 1.21
 	os.Chdir(tmpDir)
 
 	tests := []struct {
-		name        string
-		workflow    *Workflow
-		wantErr     bool
+		name     string
+		workflow *Workflow
+		wantErr  bool
 	}{
 		{
 			name: "validation_only_workflow",
@@ -291,7 +291,7 @@ go 1.21
 
 	config := &ProjectConfig{
 		ProjectName:        "builder-test",
-		ProjectDescription:  "A test project for workflow builder",
+		ProjectDescription: "A test project for workflow builder",
 		ProjectType:        "CLI Application",
 		BinaryName:         "builder-test",
 		MainPath:           ".",
@@ -300,38 +300,38 @@ go 1.21
 		CGOEnabled:         false,
 		GitProvider:        "GitHub",
 		GenerateActions:    true,
-		ActionsOn:         []string{"On version tags (v*)"},
+		ActionsOn:          []string{"On version tags (v*)"},
 	}
 
 	tests := []struct {
-		name        string
+		name         string
 		workflowType WorkflowType
-		force       bool
-		wantErr     bool
+		force        bool
+		wantErr      bool
 	}{
 		{
-			name:        "full_wizard_workflow",
+			name:         "full_wizard_workflow",
 			workflowType: WorkflowTypeFullWizard,
-			force:       false,
-			wantErr:     false,
+			force:        false,
+			wantErr:      false,
 		},
 		{
-			name:        "config_only_workflow",
+			name:         "config_only_workflow",
 			workflowType: WorkflowTypeConfigOnly,
-			force:       false,
-			wantErr:     false,
+			force:        false,
+			wantErr:      false,
 		},
 		{
-			name:        "validation_only_workflow",
+			name:         "validation_only_workflow",
 			workflowType: WorkflowTypeValidationOnly,
-			force:       false,
-			wantErr:     false,
+			force:        false,
+			wantErr:      false,
 		},
 		{
-			name:        "unsupported_workflow",
+			name:         "unsupported_workflow",
 			workflowType: "unsupported",
-			force:       false,
-			wantErr:     true,
+			force:        false,
+			wantErr:      true,
 		},
 	}
 
@@ -369,7 +369,7 @@ func TestConcurrentJobExecution(t *testing.T) {
 	for i := 0; i < 3; i++ {
 		projectDir := filepath.Join(tmpDir, fmt.Sprintf("project-%d", i))
 		os.MkdirAll(projectDir, 0755)
-		
+
 		goMod := fmt.Sprintf("module github.com/user/concurrent-test-%d\ngo 1.21\n", i)
 		os.WriteFile(filepath.Join(projectDir, "go.mod"), []byte(goMod), 0644)
 		os.WriteFile(filepath.Join(projectDir, "main.go"), []byte("package main\n\nfunc main() {}"), 0644)

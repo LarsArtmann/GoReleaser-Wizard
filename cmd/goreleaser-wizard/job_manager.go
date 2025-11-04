@@ -71,7 +71,7 @@ type JobManager struct {
 func NewJobManager(logger *log.Logger) *JobManager {
 	return &JobManager{
 		jobs:        make([]Job, 0),
-		results:      make([]JobResult, 0),
+		results:     make([]JobResult, 0),
 		logger:      logger,
 		parallel:    false,
 		maxJobs:     3, // Default max parallel jobs
@@ -142,7 +142,7 @@ func (jm *JobManager) executeParallel(ctx context.Context) error {
 		wg.Add(1)
 		go func(j Job) {
 			defer wg.Done()
-			
+
 			// Acquire semaphore
 			semaphore <- struct{}{}
 			defer func() { <-semaphore }()
@@ -172,7 +172,7 @@ func (jm *JobManager) executeParallel(ctx context.Context) error {
 // executeJob executes a single job and records the result
 func (jm *JobManager) executeJob(ctx context.Context, job Job) JobResult {
 	start := time.Now()
-	
+
 	// Update job status
 	jm.updateJobStatus(job.ID(), JobStatusRunning)
 	jm.logger.Infof("Executing job: %s", job.Name())
@@ -223,7 +223,7 @@ func (jm *JobManager) addResult(result JobResult) {
 func (jm *JobManager) GetResults() []JobResult {
 	jm.mu.Lock()
 	defer jm.mu.Unlock()
-	
+
 	results := make([]JobResult, len(jm.results))
 	copy(results, jm.results)
 	return results
@@ -233,7 +233,7 @@ func (jm *JobManager) GetResults() []JobResult {
 func (jm *JobManager) GetCompletedResults() []JobResult {
 	jm.mu.Lock()
 	defer jm.mu.Unlock()
-	
+
 	completed := make([]JobResult, 0)
 	for _, result := range jm.results {
 		if result.Status == JobStatusCompleted {
@@ -247,7 +247,7 @@ func (jm *JobManager) GetCompletedResults() []JobResult {
 func (jm *JobManager) GetFailedResults() []JobResult {
 	jm.mu.Lock()
 	defer jm.mu.Unlock()
-	
+
 	failed := make([]JobResult, 0)
 	for _, result := range jm.results {
 		if result.Status == JobStatusFailed {
@@ -260,20 +260,20 @@ func (jm *JobManager) GetFailedResults() []JobResult {
 // RollbackFailedJobs rolls back all failed jobs
 func (jm *JobManager) RollbackFailedJobs(ctx context.Context) error {
 	failed := jm.GetFailedResults()
-	
+
 	jm.logger.Infof("Rolling back %d failed jobs", len(failed))
-	
+
 	for i := len(failed) - 1; i >= 0; i-- { // Rollback in reverse order
 		result := failed[i]
-		
+
 		select {
 		case <-ctx.Done():
 			return ctx.Err()
 		default:
 		}
-		
+
 		jm.logger.Infof("Rolling back job: %s", result.Job.Name())
-		
+
 		err := result.Job.Rollback(ctx)
 		if err != nil {
 			jm.logger.Errorf("Failed to rollback job %s: %v", result.Job.Name(), err)
@@ -301,10 +301,10 @@ func (jm *JobManager) GetStatistics() map[string]interface{} {
 	defer jm.mu.Unlock()
 
 	stats := map[string]interface{}{
-		"total_jobs":  len(jm.jobs),
-		"total_results": len(jm.results),
-		"completed":    0,
-		"failed":      0,
+		"total_jobs":     len(jm.jobs),
+		"total_results":  len(jm.results),
+		"completed":      0,
+		"failed":         0,
 		"total_duration": time.Duration(0),
 	}
 

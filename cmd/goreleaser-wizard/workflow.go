@@ -54,14 +54,14 @@ func (w *Workflow) Execute(ctx context.Context) error {
 	err := w.JobManager.ExecuteJobs(timeoutCtx)
 	if err != nil {
 		w.JobManager.logger.Errorf("Workflow failed: %v", err)
-		
+
 		// Attempt rollback
 		rollbackErr := w.JobManager.RollbackFailedJobs(timeoutCtx)
 		if rollbackErr != nil {
 			w.JobManager.logger.Errorf("Rollback failed: %v", rollbackErr)
 			return fmt.Errorf("workflow failed and rollback failed: %w", err)
 		}
-		
+
 		w.JobManager.logger.Info("Workflow rolled back successfully")
 		return fmt.Errorf("workflow failed: %w", err)
 	}
@@ -88,24 +88,24 @@ func (w *Workflow) GetStatistics() map[string]interface{} {
 type WorkflowType string
 
 const (
-	WorkflowTypeFullWizard      WorkflowType = "full-wizard"
-	WorkflowTypeConfigOnly      WorkflowType = "config-only"
-	WorkflowTypeValidationOnly  WorkflowType = "validation-only"
-	WorkflowTypeMigrate         WorkflowType = "migrate"
-	WorkflowTypeUpdate          WorkflowType = "update"
-	WorkflowTypeRollback        WorkflowType = "rollback"
+	WorkflowTypeFullWizard     WorkflowType = "full-wizard"
+	WorkflowTypeConfigOnly     WorkflowType = "config-only"
+	WorkflowTypeValidationOnly WorkflowType = "validation-only"
+	WorkflowTypeMigrate        WorkflowType = "migrate"
+	WorkflowTypeUpdate         WorkflowType = "update"
+	WorkflowTypeRollback       WorkflowType = "rollback"
 )
 
 // WorkflowBuilder builds workflows for different scenarios
 type WorkflowBuilder struct {
 	logger  *log.Logger
-	factory  *JobFactory
+	factory *JobFactory
 }
 
 // NewWorkflowBuilder creates a new workflow builder
 func NewWorkflowBuilder(logger *log.Logger) *WorkflowBuilder {
 	return &WorkflowBuilder{
-		logger: logger,
+		logger:  logger,
 		factory: NewJobFactory(logger),
 	}
 }
@@ -163,7 +163,7 @@ func (wb *WorkflowBuilder) BuildMigrateWorkflow(fromVersion, toVersion string, c
 
 	// Create migration jobs
 	jobs := wb.createMigrationJobs(fromVersion, toVersion, config)
-	
+
 	for _, job := range jobs {
 		workflow.JobManager.AddJob(job)
 	}
@@ -184,7 +184,7 @@ func (wb *WorkflowBuilder) BuildUpdateWorkflow(config *ProjectConfig, dryRun boo
 
 	// Create update jobs
 	jobs := wb.createUpdateJobs(config, dryRun)
-	
+
 	for _, job := range jobs {
 		workflow.JobManager.AddJob(job)
 	}
@@ -217,11 +217,11 @@ func (wb *WorkflowBuilder) createMigrationJobs(fromVersion, toVersion string, co
 
 	// Migrate configuration
 	migrateJob := &ConfigMigrationJob{
-		id:         "migrate-config",
+		id:          "migrate-config",
 		fromVersion: fromVersion,
-		toVersion:  toVersion,
-		config:     config,
-		logger:     wb.logger,
+		toVersion:   toVersion,
+		config:      config,
+		logger:      wb.logger,
 	}
 	jobs = append(jobs, migrateJob)
 
@@ -264,7 +264,7 @@ func (j *ConfigBackupJob) Name() string {
 
 func (j *ConfigBackupJob) Execute(ctx context.Context) error {
 	j.logger.Info("Backing up existing configuration")
-	
+
 	// Check if .goreleaser.yaml exists
 	if _, err := os.Stat(".goreleaser.yaml"); os.IsNotExist(err) {
 		j.logger.Info("No existing configuration to backup")
@@ -274,7 +274,7 @@ func (j *ConfigBackupJob) Execute(ctx context.Context) error {
 	// Create backup with timestamp
 	timestamp := time.Now().Format("20060102-150405")
 	backupFile := fmt.Sprintf(".goreleaser.yaml.backup.%s", timestamp)
-	
+
 	err := os.Rename(".goreleaser.yaml", backupFile)
 	if err != nil {
 		return fmt.Errorf("failed to create backup: %w", err)
@@ -307,8 +307,8 @@ func (j *MigrationValidationJob) Name() string {
 
 func (j *MigrationValidationJob) Execute(ctx context.Context) error {
 	j.logger.Infof("Validating migration from %s to %s", j.fromVersion, j.toVersion)
-	
-	// This is a simplified validation - in real implementation, 
+
+	// This is a simplified validation - in real implementation,
 	// this would check compatibility between versions
 	if j.fromVersion == j.toVersion {
 		return fmt.Errorf("source and target versions are the same")
@@ -325,11 +325,11 @@ func (j *MigrationValidationJob) Rollback(ctx context.Context) error {
 
 // ConfigMigrationJob migrates configuration
 type ConfigMigrationJob struct {
-	id         string
+	id          string
 	fromVersion string
-	toVersion  string
-	config     *ProjectConfig
-	logger     *log.Logger
+	toVersion   string
+	config      *ProjectConfig
+	logger      *log.Logger
 }
 
 func (j *ConfigMigrationJob) ID() string {
@@ -342,7 +342,7 @@ func (j *ConfigMigrationJob) Name() string {
 
 func (j *ConfigMigrationJob) Execute(ctx context.Context) error {
 	j.logger.Infof("Migrating configuration from %s to %s", j.fromVersion, j.toVersion)
-	
+
 	// This is a simplified migration - in real implementation,
 	// this would transform configuration based on version differences
 	err := generateGoReleaserConfig(j.config)
@@ -356,7 +356,7 @@ func (j *ConfigMigrationJob) Execute(ctx context.Context) error {
 
 func (j *ConfigMigrationJob) Rollback(ctx context.Context) error {
 	j.logger.Info("Rolling back configuration migration")
-	
+
 	// Restore from backup (simplified)
 	backupFiles, err := filepath.Glob(".goreleaser.yaml.backup.*")
 	if err != nil || len(backupFiles) == 0 {
@@ -365,7 +365,7 @@ func (j *ConfigMigrationJob) Rollback(ctx context.Context) error {
 
 	// Get the most recent backup
 	latestBackup := backupFiles[len(backupFiles)-1]
-	
+
 	err = os.Rename(latestBackup, ".goreleaser.yaml")
 	if err != nil {
 		return fmt.Errorf("failed to restore backup: %w", err)
@@ -398,7 +398,7 @@ func (j *ConfigUpdateJob) Execute(ctx context.Context) error {
 	}
 
 	j.logger.Info("Updating configuration")
-	
+
 	err := generateGoReleaserConfig(j.config)
 	if err != nil {
 		return fmt.Errorf("configuration update failed: %w", err)

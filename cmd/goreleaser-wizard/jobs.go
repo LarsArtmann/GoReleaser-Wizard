@@ -38,7 +38,7 @@ func (j *ConfigGenerationJob) Name() string {
 
 func (j *ConfigGenerationJob) Execute(ctx context.Context) error {
 	j.logger.Info("Generating GoReleaser configuration")
-	
+
 	// Check if context is cancelled
 	if ctx.Err() != nil {
 		return ctx.Err()
@@ -68,7 +68,7 @@ func (j *ConfigGenerationJob) Execute(ctx context.Context) error {
 
 func (j *ConfigGenerationJob) Rollback(ctx context.Context) error {
 	j.logger.Info("Rolling back GoReleaser configuration generation")
-	
+
 	// Check if context is cancelled
 	if ctx.Err() != nil {
 		return ctx.Err()
@@ -125,7 +125,7 @@ func (j *GitHubActionsGenerationJob) Name() string {
 
 func (j *GitHubActionsGenerationJob) Execute(ctx context.Context) error {
 	j.logger.Info("Generating GitHub Actions workflow")
-	
+
 	// Check if context is cancelled
 	if ctx.Err() != nil {
 		return ctx.Err()
@@ -156,7 +156,7 @@ func (j *GitHubActionsGenerationJob) Execute(ctx context.Context) error {
 
 func (j *GitHubActionsGenerationJob) Rollback(ctx context.Context) error {
 	j.logger.Info("Rolling back GitHub Actions workflow generation")
-	
+
 	// Check if context is cancelled
 	if ctx.Err() != nil {
 		return ctx.Err()
@@ -187,9 +187,9 @@ func (j *GitHubActionsGenerationJob) Rollback(ctx context.Context) error {
 
 // ProjectValidationJob validates project structure
 type ProjectValidationJob struct {
-	id       string
+	id         string
 	projectDir string
-	logger   *log.Logger
+	logger     *log.Logger
 }
 
 // NewProjectValidationJob creates a new project validation job
@@ -211,7 +211,7 @@ func (j *ProjectValidationJob) Name() string {
 
 func (j *ProjectValidationJob) Execute(ctx context.Context) error {
 	j.logger.Info("Validating project structure")
-	
+
 	// Check if context is cancelled
 	if ctx.Err() != nil {
 		return ctx.Err()
@@ -233,7 +233,7 @@ func (j *ProjectValidationJob) Execute(ctx context.Context) error {
 		filepath.Join(j.projectDir, "main.go"),
 		filepath.Join(j.projectDir, "cmd", "*", "main.go"),
 	}
-	
+
 	var mainFound bool
 	for _, mainPath := range mainPaths {
 		matches, err := filepath.Glob(mainPath)
@@ -242,7 +242,7 @@ func (j *ProjectValidationJob) Execute(ctx context.Context) error {
 			break
 		}
 	}
-	
+
 	if !mainFound {
 		return fmt.Errorf("no main.go found in project (expected at main.go or cmd/*/main.go)")
 	}
@@ -259,17 +259,17 @@ func (j *ProjectValidationJob) Rollback(ctx context.Context) error {
 
 // DependencyCheckJob checks for required dependencies
 type DependencyCheckJob struct {
-	id        string
+	id           string
 	dependencies []string
-	logger    *log.Logger
+	logger       *log.Logger
 }
 
 // NewDependencyCheckJob creates a new dependency check job
 func NewDependencyCheckJob(dependencies []string, logger *log.Logger) *DependencyCheckJob {
 	return &DependencyCheckJob{
-		id:          "dependency-check",
+		id:           "dependency-check",
 		dependencies: dependencies,
-		logger:      logger,
+		logger:       logger,
 	}
 }
 
@@ -283,14 +283,14 @@ func (j *DependencyCheckJob) Name() string {
 
 func (j *DependencyCheckJob) Execute(ctx context.Context) error {
 	j.logger.Info("Checking dependencies")
-	
+
 	// Check if context is cancelled
 	if ctx.Err() != nil {
 		return ctx.Err()
 	}
 
 	var missingDeps []string
-	
+
 	for _, dep := range j.dependencies {
 		path, err := exec.LookPath(dep)
 		if err != nil {
@@ -300,7 +300,7 @@ func (j *DependencyCheckJob) Execute(ctx context.Context) error {
 			j.logger.Debugf("Found dependency: %s at %s", dep, path)
 		}
 	}
-	
+
 	if len(missingDeps) > 0 {
 		return fmt.Errorf("missing dependencies: %v", missingDeps)
 	}
@@ -330,10 +330,10 @@ func NewJobFactory(logger *log.Logger) *JobFactory {
 // CreateFullWizardJobs creates all jobs for a complete wizard operation
 func (jf *JobFactory) CreateFullWizardJobs(config *ProjectConfig, force bool) []Job {
 	var jobs []Job
-	
+
 	// Add project validation job
 	jobs = append(jobs, NewProjectValidationJob(".", jf.logger))
-	
+
 	// Add dependency check job
 	dependencies := []string{"go"}
 	if config.DockerEnabled {
@@ -343,15 +343,15 @@ func (jf *JobFactory) CreateFullWizardJobs(config *ProjectConfig, force bool) []
 		dependencies = append(dependencies, "cosign")
 	}
 	jobs = append(jobs, NewDependencyCheckJob(dependencies, jf.logger))
-	
+
 	// Add config generation job
 	jobs = append(jobs, NewConfigGenerationJob(config, force, jf.logger))
-	
+
 	// Add GitHub Actions generation job
 	if config.GenerateActions {
 		jobs = append(jobs, NewGitHubActionsGenerationJob(config, jf.logger))
 	}
-	
+
 	return jobs
 }
 

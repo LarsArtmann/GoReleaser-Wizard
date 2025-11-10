@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/LarsArtmann/template-GoReleaser/internal/validation"
 	"github.com/charmbracelet/huh"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/log"
@@ -221,6 +222,8 @@ func detectProjectInfo(config *ProjectConfig) {
 }
 
 func askBasicInfo(config *ProjectConfig) error {
+	// Create form validator
+	fv := validation.NewFormValidator()
 	var projectTypes = []string{
 		"CLI Application",
 		"Web Service",
@@ -234,17 +237,13 @@ func askBasicInfo(config *ProjectConfig) error {
 				Title("Project Name").
 				Description("Name of your project").
 				Value(&config.ProjectName).
-				Validate(func(s string) error {
-					if s == "" {
-						return fmt.Errorf("project name is required")
-					}
-					return nil
-				}),
+				Validate(fv.ValidateProjectName()),
 
 			huh.NewInput().
 				Title("Project Description").
 				Description("Brief description of your project").
 				Value(&config.ProjectDescription).
+				Validate(fv.ValidateProjectDescription()).
 				Placeholder("A fantastic Go application"),
 
 			huh.NewSelect[string]().
@@ -257,17 +256,29 @@ func askBasicInfo(config *ProjectConfig) error {
 				Title("Binary Name").
 				Description("Name of the compiled binary").
 				Value(&config.BinaryName).
+				Validate(fv.ValidateBinaryName()).
 				Placeholder(config.ProjectName),
 
 			huh.NewInput().
 				Title("Main Package Path").
 				Description("Path to main.go (e.g., . or ./cmd/app)").
 				Value(&config.MainPath).
+				Validate(fv.ValidateMainPath()).
 				Placeholder("./cmd/"+config.BinaryName),
 		).Title("Basic Information"),
 	)
 
-	return form.Run()
+	err := form.Run()
+	if err != nil {
+		return err
+	}
+
+	// Check for any validation errors
+	if fv.HasErrors() {
+		return fmt.Errorf("validation errors:\n%s", fv.GetErrorSummary())
+	}
+
+	return nil
 }
 
 func askBuildOptions(config *ProjectConfig) error {
@@ -383,17 +394,26 @@ func askReleaseOptions(config *ProjectConfig) error {
 
 	// Ask about Docker registry if Docker is enabled
 	if config.DockerEnabled {
+		// Create validator for Docker registry
+		fv := validation.NewFormValidator()
+
 		registryForm := huh.NewForm(
 			huh.NewGroup(
 				huh.NewInput().
 					Title("Docker Registry").
 					Description("Registry to push images (e.g., ghcr.io/username)").
 					Value(&config.DockerRegistry).
+					Validate(fv.ValidateDockerRegistry()).
 					Placeholder("ghcr.io/" + config.ProjectName),
 			),
 		)
 		if err := registryForm.Run(); err != nil {
 			return err
+		}
+
+		// Check for validation errors
+		if fv.HasErrors() {
+			return fmt.Errorf("Docker registry validation failed: %s", fv.GetErrorSummary())
 		}
 	}
 

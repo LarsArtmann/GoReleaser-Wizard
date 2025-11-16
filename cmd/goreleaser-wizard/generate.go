@@ -3,10 +3,9 @@ package main
 import (
 	"fmt"
 	"os"
-	"path/filepath"
 	"strings"
-	"text/template"
 
+	"github.com/LarsArtmann/template-GoReleaser/internal/domain"
 	"github.com/charmbracelet/log"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -31,386 +30,402 @@ func init() {
 	generateCmd.Flags().Bool("signing", false, "enable code signing")
 	generateCmd.Flags().Bool("github-action", false, "generate GitHub Actions workflow")
 	generateCmd.Flags().Bool("force", false, "overwrite existing files")
+	generateCmd.Flags().String("project-type", "cli", "project type")
+	generateCmd.Flags().String("git-provider", "github", "git provider")
 }
 
 func runGenerate(cmd *cobra.Command, args []string) {
-	// Set up logger
-	logger := log.New(os.Stderr)
-	if viper.GetBool("debug") {
-		logger.SetLevel(log.DebugLevel)
-	}
+	// Set up panic recovery using domain error handling
+	defer recoverFromPanic("generate command")
 
-	// Set up panic recovery
-	defer HandlePanic("generate command", logger)
-
-	config := &ProjectConfig{}
-
-	// Parse flags
-	config.ProjectName, _ = cmd.Flags().GetString("name")
-	config.ProjectDescription, _ = cmd.Flags().GetString("description")
-	config.BinaryName, _ = cmd.Flags().GetString("binary")
-	config.MainPath, _ = cmd.Flags().GetString("main")
-	config.Platforms, _ = cmd.Flags().GetStringSlice("platforms")
-	config.Architectures, _ = cmd.Flags().GetStringSlice("architectures")
-	config.DockerEnabled, _ = cmd.Flags().GetBool("docker")
-	config.Signing, _ = cmd.Flags().GetBool("signing")
-	config.GenerateActions, _ = cmd.Flags().GetBool("github-action")
-
-	force, _ := cmd.Flags().GetBool("force")
-
-	// Validate required fields
-	if config.ProjectName == "" {
-		detectProjectInfo(config)
-		if config.ProjectName == "" {
-			err := UserInputError(
-				"project name",
-				fmt.Errorf("project name is required"),
-			)
-			LogAndDisplayError(err, logger)
-			return
-		}
-	}
-
-	if config.BinaryName == "" {
-		config.BinaryName = config.ProjectName
-	}
-
-	// Check existing files
-	if !force {
-		if err := CheckFileExists(".goreleaser.yaml", false); err == nil {
-			err := NewWizardError(
-				ErrFileOperation,
-				".goreleaser.yaml already exists",
-				"Configuration file already exists in current directory",
-				"Use --force flag to overwrite existing file",
-				nil,
-			)
-			LogAndDisplayError(err, logger)
-			return
-		}
-	}
-
-	// Generate files
-	fmt.Println(titleStyle.Render("Generating GoReleaser configuration..."))
-
-	if err := generateGoReleaserConfig(config); err != nil {
-		LogAndDisplayError(TemplateError("goreleaser.yaml", err), logger)
+	// Parse flags and create domain-safe configuration
+	safeConfig, err := parseGenerateFlags(cmd)
+	if err != nil {
+		displayError(err)
 		return
 	}
-	fmt.Println(successStyle.Render("✓ Created .goreleaser.yaml"))
 
+	// Validate configuration using domain types
+	if err := validateConfiguration(safeConfig); err != nil {
+		displayError(err)
+		return
+	}
+
+	// Check for existing files
+	force, _ := cmd.Flags().GetBool("force")
+	if err := checkExistingFiles(safeConfig, force); err != nil {
+		displayError(err)
+		return
+	}
+
+	// Generate configuration files
+	if err := generateConfigurationFiles(safeConfig); err != nil {
+		displayError(err)
+		return
+	}
+
+	fmt.Println()
+	fmt.Println(successStyle.Render("✅ Configuration generated successfully!"))
+	fmt.Println()
+	fmt.Println("Generated files:")
+	fmt.Println("  📄 .goreleaser.yaml")
+	if safeConfig.GenerateActions {
+		fmt.Println("  🔄 .github/workflows/release.yml")
+	}
+	fmt.Println()
+	fmt.Println("Next steps:")
+	fmt.Println("  1. Review generated files")
+	fmt.Println("  2. Test with: goreleaser check")
+	fmt.Println("  3. Create a release")
+}
+
+// parseGenerateFlags parses command-line flags into domain-safe configuration
+func parseGenerateFlags(cmd *cobra.Command) (*domain.SafeProjectConfig, error) {
+	safeConfig := domain.NewSafeProjectConfig()
+
+	// Parse basic information
+	name, _ := cmd.Flags().GetString("name")
+	description, _ := cmd.Flags().GetString("description")
+	binary, _ := cmd.Flags().GetString("binary")
+	main, _ := cmd.Flags().GetString("main")
+	projectTypeStr, _ := cmd.Flags().GetString("project-type")
+
+	if name == "" {
+		return nil, domain.NewValidationError(
+			domain.ErrMissingRequiredField,
+			"Project name required",
+			"Use --name to specify project name",
+		)
+	}
+
+	safeConfig.ProjectName = name
+	safeConfig.ProjectDescription = description
+	safeConfig.BinaryName = binary
+	safeConfig.MainPath = main
+
+	// Convert and validate project type
+	projectType := convertToProjectType(projectTypeStr)
+	if !projectType.IsValid() {
+		return nil, domain.NewValidationError(
+			domain.ErrInvalidProjectName,
+			"Invalid project type",
+			fmt.Sprintf("'%s' is not a valid project type", projectTypeStr),
+		)
+	}
+	safeConfig.ProjectType = projectType
+
+	// Parse build configuration
+	platforms, _ := cmd.Flags().GetStringSlice("platforms")
+	architectures, _ := cmd.Flags().GetStringSlice("architectures")
+
+	// Convert platforms
+	configPlatforms := make([]domain.Platform, len(platforms))
+	for i, p := range platforms {
+		platform := domain.Platform(strings.ToLower(p))
+		if !platform.IsValid() {
+			return nil, domain.NewValidationError(
+				domain.ErrInvalidPlatform,
+				"Invalid platform",
+				fmt.Sprintf("'%s' is not a valid platform", p),
+			)
+		}
+		configPlatforms[i] = platform
+	}
+	safeConfig.Platforms = configPlatforms
+
+	// Convert architectures
+	configArchitectures := make([]domain.Architecture, len(architectures))
+	for i, a := range architectures {
+		arch := domain.Architecture(strings.ToLower(a))
+		if !arch.IsValid() {
+			return nil, domain.NewValidationError(
+				domain.ErrInvalidArchitecture,
+				"Invalid architecture",
+				fmt.Sprintf("'%s' is not a valid architecture", a),
+			)
+		}
+		configArchitectures[i] = arch
+	}
+	safeConfig.Architectures = configArchitectures
+
+	// Parse release configuration
+	docker, _ := cmd.Flags().GetBool("docker")
+	signing, _ := cmd.Flags().GetBool("signing")
+	gitProviderStr, _ := cmd.Flags().GetString("git-provider")
+
+	// Convert git provider
+	gitProvider := convertToGitProvider(gitProviderStr)
+	if !gitProvider.IsValid() {
+		return nil, domain.NewValidationError(
+			domain.ErrInvalidGitProvider,
+			"Invalid git provider",
+			fmt.Sprintf("'%s' is not a valid git provider", gitProviderStr),
+		)
+	}
+
+	safeConfig.DockerEnabled = docker
+	safeConfig.DockerRegistry = gitProvider.DefaultRegistry()
+	safeConfig.Signing = signing
+	safeConfig.GitProvider = gitProvider
+
+	// Parse CI/CD configuration
+	githubAction, _ := cmd.Flags().GetBool("github-action")
+	safeConfig.GenerateActions = githubAction
+	if githubAction {
+		safeConfig.ActionsOn = []domain.ActionTrigger{domain.ActionTriggerVersionTags}
+	}
+
+	// Apply defaults
+	safeConfig.ApplyDefaults()
+
+	// Set binary name if not provided
+	if safeConfig.BinaryName == "" {
+		safeConfig.BinaryName = safeConfig.ProjectName
+	}
+
+	return safeConfig, nil
+}
+
+// validateConfiguration validates configuration using domain types
+func validateConfiguration(config *domain.SafeProjectConfig) error {
+	// Update state to processing
+	config.State = domain.ConfigStateProcessing
+
+	// Validate invariants
+	if err := config.ValidateInvariants(); err != nil {
+		config.State = domain.ConfigStateInvalid
+		return err
+	}
+
+	// Mark as valid
+	config.State = domain.ConfigStateValid
+	return nil
+}
+
+// checkExistingFiles checks for existing configuration files
+func checkExistingFiles(config *domain.SafeProjectConfig, force bool) *domain.DomainError {
+	configFile := ".goreleaser.yaml"
+	actionsFile := ".github/workflows/release.yml"
+
+	// Check GoReleaser config
+	if exists, err := fileExists(configFile); err != nil {
+		return domain.NewSystemError(
+			domain.ErrFileReadFailed,
+			"Failed to check configuration file",
+			fmt.Sprintf("Cannot access %s", configFile),
+			err,
+		).WithContext(configFile)
+	} else if exists && !force {
+		return domain.NewConfigurationError(
+			domain.ErrFileWriteFailed,
+			"Configuration already exists",
+			fmt.Sprintf("File %s already exists", configFile),
+			"Use --force to overwrite",
+		).WithContext(configFile)
+	}
+
+	// Check GitHub Actions
 	if config.GenerateActions {
-		if err := generateGitHubActions(config); err != nil {
-			LogAndDisplayError(TemplateError("github actions workflow", err), logger)
-			return
+		if exists, err := fileExists(actionsFile); err != nil {
+			return domain.NewSystemError(
+				domain.ErrFileReadFailed,
+				"Failed to check GitHub Actions workflow",
+				fmt.Sprintf("Cannot access %s", actionsFile),
+				err,
+			).WithContext(actionsFile)
+		} else if exists && !force {
+			return domain.NewConfigurationError(
+				domain.ErrFileWriteFailed,
+				"GitHub Actions workflow already exists",
+				fmt.Sprintf("File %s already exists", actionsFile),
+				"Use --force to overwrite",
+			).WithContext(actionsFile)
 		}
-		fmt.Println(successStyle.Render("✓ Created .github/workflows/release.yml"))
 	}
 
-	fmt.Println(successStyle.Render("\n✨ Configuration generated successfully!"))
-}
-
-func generateGoReleaserConfig(config *ProjectConfig) error {
-	// Validate config before generating
-	if config.ProjectName == "" {
-		return UserInputError("project name", fmt.Errorf("project name cannot be empty"))
-	}
-	if config.BinaryName == "" {
-		return UserInputError("binary name", fmt.Errorf("binary name cannot be empty"))
-	}
-
-	tmpl := `# GoReleaser configuration
-# Generated by goreleaser-wizard
-# https://goreleaser.com
-
-version: 2
-
-project_name: {{.ProjectName}}
-
-before:
-  hooks:
-    - go mod tidy
-    - go generate ./...{{if not .SkipValidation}}
-    - go test ./...{{end}}
-
-builds:
-  - id: {{.BinaryName}}
-    main: {{.MainPath}}
-    binary: {{.BinaryName}}
-    
-    env:
-      - CGO_ENABLED={{if .CGOEnabled}}1{{else}}0{{end}}
-    
-    goos:{{range .Platforms}}
-      - {{.}}{{end}}
-    
-    goarch:{{range .Architectures}}
-      - {{.}}{{end}}
-    {{if .LDFlags}}
-    ldflags:
-      - -s -w
-      - -X main.version={{"{{"}}.Version{{"}}"}}
-      - -X main.commit={{"{{"}}.Commit{{"}}"}}
-      - -X main.date={{"{{"}}.Date{{"}}"}}
-      - -X main.builtBy=goreleaser{{end}}
-    
-    # Ignore certain platform combinations
-    ignore:
-      - goos: darwin
-        goarch: 386
-      - goos: windows
-        goarch: arm64{{if not .CGOEnabled}}
-    
-    # Build tags for pure Go builds
-    tags:
-      - netgo
-      - osusergo{{end}}
-
-archives:
-  - id: default
-    name_template: >-
-      {{"{{"}}.ProjectName{{"}}"}}_
-      {{"{{"}}.Version{{"}}"}}_
-      {{"{{"}}title .Os{{"}}"}}_
-      {{"{{"}}if eq .Arch "amd64"{{"}}"}}x86_64
-      {{"{{"}}else if eq .Arch "386"{{"}}"}}i386
-      {{"{{"}}else{{"}}"}}{{"{{"}}.Arch{{"}}"}}{{"{{"}}end{{"}}"}}
-    
-    format_overrides:
-      - goos: windows
-        format: zip
-    
-    files:
-      - LICENSE*
-      - README*
-      - CHANGELOG*
-
-checksum:
-  name_template: 'checksums.txt'
-  algorithm: sha256
-
-snapshot:
-  version_template: "{{"{{"}}incpatch .Version{{"}}"}}-next"
-
-changelog:
-  sort: asc
-  use: github
-  filters:
-    exclude:
-      - '^docs:'
-      - '^test:'
-      - '^chore:'
-      - Merge pull request
-      - Merge branch
-
-release:{{if eq .GitProvider "GitHub"}}
-  github:
-    owner: "{{"{{"}}.Env.GITHUB_OWNER{{"}}"}}"
-    name: "{{"{{"}}.Env.GITHUB_REPO{{"}}"}}"{{else if eq .GitProvider "GitLab"}}
-  gitlab:
-    owner: "{{"{{"}}.Env.GITLAB_OWNER{{"}}"}}"
-    name: "{{"{{"}}.Env.GITLAB_REPO{{"}}"}}"{{else if eq .GitProvider "Gitea"}}
-  gitea:
-    owner: "{{"{{"}}.Env.GITEA_OWNER{{"}}"}}"
-    name: "{{"{{"}}.Env.GITEA_REPO{{"}}"}}"{{end}}
-  
-  draft: false
-  prerelease: auto
-  mode: append
-  
-  footer: |
-    ## Installation
-    Download the appropriate archive for your platform from the assets below.
-    
-    ### Quick Install
-    ` + "```bash" + `
-    # macOS/Linux
-    curl -sfL https://github.com/{{"{{"}}.Env.GITHUB_OWNER{{"}}"}}/{{"{{"}}.Env.GITHUB_REPO{{"}}"}}/releases/download/{{"{{"}}.Tag{{"}}"}}/{{"{{"}}.ProjectName{{"}}"}}_{{"{{"}}.Version{{"}}"}}_{{"{{"}}title .Os{{"}}"}}_{{"{{"}}.Arch{{"}}"}}.tar.gz | tar -xz
-    
-    # Windows (PowerShell)
-    Invoke-WebRequest -Uri "https://github.com/{{"{{"}}.Env.GITHUB_OWNER{{"}}"}}/{{"{{"}}.Env.GITHUB_REPO{{"}}"}}/releases/download/{{"{{"}}.Tag{{"}}"}}/{{"{{"}}.ProjectName{{"}}"}}_{{"{{"}}.Version{{"}}"}}_Windows_x86_64.zip" -OutFile "{{.BinaryName}}.zip"
-    ` + "```" + `
-{{if .DockerEnabled}}
-dockers:
-  - image_templates:
-      - "{{.DockerRegistry}}/{{.ProjectName}}:{{"{{"}}.Tag{{"}}"}}"
-      - "{{.DockerRegistry}}/{{.ProjectName}}:latest"
-    
-    dockerfile: Dockerfile
-    
-    build_flag_templates:
-      - "--pull"
-      - "--label=org.opencontainers.image.created={{"{{"}}.Date{{"}}"}}"
-      - "--label=org.opencontainers.image.title={{"{{"}}.ProjectName{{"}}"}}"
-      - "--label=org.opencontainers.image.revision={{"{{"}}.FullCommit{{"}}"}}"
-      - "--label=org.opencontainers.image.version={{"{{"}}.Version{{"}}"}}"
-{{end}}{{if .Signing}}
-signs:
-  - cmd: cosign
-    certificate: '${artifact}.pem'
-    args:
-      - sign-blob
-      - '--oidc-issuer=https://token.actions.githubusercontent.com'
-      - '--output-certificate=${certificate}'
-      - '--output-signature=${signature}'
-      - '${artifact}'
-    artifacts: all
-    output: true
-{{end}}{{if .SBOM}}
-sboms:
-  - artifacts: archive
-{{end}}{{if .Homebrew}}
-brews:
-  - repository:
-      owner: "{{"{{"}}.Env.GITHUB_OWNER{{"}}"}}"
-      name: homebrew-tap
-    
-    folder: Formula
-    
-    description: "{{.ProjectDescription}}"
-    homepage: "https://github.com/{{"{{"}}.Env.GITHUB_OWNER{{"}}"}}/{{.ProjectName}}"
-    license: "MIT"
-    
-    test: |
-      system "#{bin}/{{.BinaryName}} version"
-{{end}}{{if .Snap}}
-snaps:
-  - name: {{.ProjectName}}
-    summary: "{{.ProjectDescription}}"
-    description: |
-      {{.ProjectDescription}}
-      
-      This snap is automatically built and published by GoReleaser.
-    
-    grade: stable
-    confinement: strict
-    
-    apps:
-      {{.BinaryName}}:
-        command: {{.BinaryName}}
-{{end}}`
-
-	t, err := template.New("goreleaser").Parse(tmpl)
-	if err != nil {
-		return TemplateError("goreleaser template parsing", err)
-	}
-
-	file, err := SafeCreateFile(".goreleaser.yaml")
-	if err != nil {
-		return err // Already wrapped by SafeCreateFile
-	}
-	defer func() {
-		if closeErr := file.Close(); closeErr != nil {
-			// Log close error but don't override main error
-			log.Warn("Failed to close file", "file", ".goreleaser.yaml", "error", closeErr)
-		}
-	}()
-
-	// Set defaults
-	if config.LDFlags {
-		config.LDFlags = true
-	}
-	if config.GitProvider == "" {
-		config.GitProvider = "GitHub"
-	}
-
-	if err := t.Execute(file, config); err != nil {
-		return TemplateError("goreleaser template execution", err)
-	}
 	return nil
 }
 
-func generateGitHubActions(config *ProjectConfig) error {
-	// Create directory if it doesn't exist with proper error handling
-	workflowDir := ".github/workflows"
-	if err := os.MkdirAll(workflowDir, 0755); err != nil {
-		return WrapFileError("create workflows directory", workflowDir, err)
+// generateConfigurationFiles generates configuration files
+func generateConfigurationFiles(config *domain.SafeProjectConfig) error {
+	// Update state
+	config.State = domain.ConfigStateProcessing
+
+	// Generate GoReleaser configuration
+	goreleaserYAML := generateGoReleaserConfigFromFlags(config)
+	if err := writeFile(".goreleaser.yaml", goreleaserYAML, 0644); err != nil {
+		config.State = domain.ConfigStateInvalid
+		return err
 	}
 
-	tmpl := `name: Release
-
-on:{{range .ActionsOn}}{{if eq . "On version tags (v*)"}}
-  push:
-    tags:
-      - 'v*'{{else if eq . "On all tags"}}
-  push:
-    tags:
-      - '*'{{else if eq . "Manual trigger only"}}
-  workflow_dispatch:{{else if eq . "On push to main"}}
-  push:
-    branches: [main]{{end}}{{end}}
-
-permissions:
-  contents: write{{if .DockerEnabled}}
-  packages: write{{end}}{{if .Signing}}
-  id-token: write{{end}}
-
-jobs:
-  release:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      
-      - name: Set up Go
-        uses: actions/setup-go@v5
-        with:
-          go-version-file: 'go.mod'
-          cache: true
-      {{if .DockerEnabled}}
-      - name: Login to Docker Registry
-        uses: docker/login-action@v3
-        with:{{if contains .DockerRegistry "ghcr.io"}}
-          registry: ghcr.io
-          username: ${{"{{"}}github.actor{{"}}"}}
-          password: ${{"{{"}}secrets.GITHUB_TOKEN{{"}}"}}{{else}}
-          registry: {{.DockerRegistry}}
-          username: ${{"{{"}}secrets.DOCKER_USERNAME{{"}}"}}
-          password: ${{"{{"}}secrets.DOCKER_PASSWORD{{"}}"}}{{end}}
-      {{end}}{{if .Signing}}
-      - name: Install Cosign
-        uses: sigstore/cosign-installer@v3
-      {{end}}{{if .SBOM}}
-      - name: Install Syft
-        uses: anchore/sbom-action/download-syft@v0
-      {{end}}
-      - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v6
-        with:
-          version: latest
-          args: release --clean{{if .ProVersion}}
-          distribution: goreleaser-pro{{end}}
-        env:
-          GITHUB_TOKEN: ${{"{{"}}secrets.GITHUB_TOKEN{{"}}"}}
-          GITHUB_OWNER: ${{"{{"}}github.repository_owner{{"}}"}}
-          GITHUB_REPO: ${{"{{"}}github.event.repository.name{{"}}"}}{{if .ProVersion}}
-          GORELEASER_KEY: ${{"{{"}}secrets.GORELEASER_KEY{{"}}"}}{{end}}{{if .Homebrew}}
-          HOMEBREW_TAP_GITHUB_TOKEN: ${{"{{"}}secrets.HOMEBREW_TAP_GITHUB_TOKEN{{"}}"}}{{end}}
-`
-
-	t, err := template.New("actions").Funcs(template.FuncMap{
-		"contains": strings.Contains,
-	}).Parse(tmpl)
-	if err != nil {
-		return TemplateError("github actions template parsing", err)
-	}
-
-	workflowFile := filepath.Join(".github", "workflows", "release.yml")
-	file, err := SafeCreateFile(workflowFile)
-	if err != nil {
-		return err // Already wrapped by SafeCreateFile
-	}
-	defer func() {
-		if closeErr := file.Close(); closeErr != nil {
-			// Log close error but don't override main error
-			log.Warn("Failed to close file", "file", workflowFile, "error", closeErr)
+	// Generate GitHub Actions workflow
+	if config.GenerateActions {
+		actionsYAML := generateGitHubActionsFromFlags(config)
+		if err := writeFile(".github/workflows/release.yml", actionsYAML, 0644); err != nil {
+			config.State = domain.ConfigStateInvalid
+			return err
 		}
-	}()
-
-	if err := t.Execute(file, config); err != nil {
-		return TemplateError("github actions template execution", err)
 	}
+
+	// Mark as generated
+	config.State = domain.ConfigStateGenerated
 	return nil
+}
+
+// generateGoReleaserConfigFromFlags generates GoReleaser configuration from flags
+func generateGoReleaserConfigFromFlags(config *domain.SafeProjectConfig) string {
+	var builder strings.Builder
+
+	// Header
+	builder.WriteString("# GoReleaser Configuration\n")
+	builder.WriteString("# Generated by GoReleaser Wizard\n")
+	builder.WriteString(fmt.Sprintf("# Project: %s\n", config.ProjectName))
+	builder.WriteString("\n")
+
+	// Project information
+	builder.WriteString("project_name: ")
+	builder.WriteString(config.ProjectName)
+	builder.WriteString("\n")
+
+	if config.ProjectDescription != "" {
+		builder.WriteString("project_description: ")
+		builder.WriteString(config.ProjectDescription)
+		builder.WriteString("\n")
+	}
+
+	// Build configuration
+	builder.WriteString("\nbuilds:\n")
+	for _, platform := range config.Platforms {
+		for _, arch := range config.Architectures {
+			builder.WriteString("  - env:\n")
+			builder.WriteString(fmt.Sprintf("      - CGO_ENABLED=%t\n", config.CGOEnabled))
+			builder.WriteString("    goos:\n")
+			builder.WriteString(fmt.Sprintf("      - %s\n", platform))
+			builder.WriteString("    goarch:\n")
+			builder.WriteString(fmt.Sprintf("      - %s\n", arch))
+		}
+	}
+
+	// Archive configuration
+	builder.WriteString("\narchives:\n")
+	builder.WriteString("  - format: tar.gz\n")
+	builder.WriteString("    name_template: '{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}'\n")
+
+	// Release configuration
+	builder.WriteString("\nrelease:\n")
+	builder.WriteString("  github:\n")
+	builder.WriteString("    owner: YOUR_USERNAME\n")
+	builder.WriteString("    name: ")
+	builder.WriteString(config.ProjectName)
+	builder.WriteString("\n")
+
+	// Docker configuration
+	if config.DockerEnabled {
+		builder.WriteString("\ndockers:\n")
+		for _, platform := range config.Platforms {
+			builder.WriteString("  - image_templates:\n")
+			if config.DockerRegistry == domain.DockerRegistryGitHub {
+				builder.WriteString(fmt.Sprintf("      - 'ghcr.io/your-username/%s:{{ .Tag }}'\n", config.ProjectName))
+			} else {
+				builder.WriteString(fmt.Sprintf("      - 'your-username/%s:{{ .Tag }}'\n", config.ProjectName))
+			}
+		}
+	}
+
+	// SBOM configuration
+	if config.SBOM {
+		builder.WriteString("\nsbom:\n")
+		builder.WriteString("  artifacts: archive\n")
+	}
+
+	return builder.String()
+}
+
+// generateGitHubActionsFromFlags generates GitHub Actions workflow
+func generateGitHubActionsFromFlags(config *domain.SafeProjectConfig) string {
+	var builder strings.Builder
+
+	// Header
+	builder.WriteString("name: Release\n")
+	builder.WriteString("\n")
+
+	// Triggers
+	builder.WriteString("on:\n")
+	triggers := domain.GenerateGitHubActionsTriggersYAML(config.ActionsOn)
+	for _, trigger := range strings.Split(triggers, "\n") {
+		if strings.TrimSpace(trigger) != "" {
+			builder.WriteString("  ")
+			builder.WriteString(strings.TrimSpace(trigger))
+			builder.WriteString("\n")
+		}
+	}
+
+	// Jobs
+	builder.WriteString("\njobs:\n")
+	builder.WriteString("  goreleaser:\n")
+	builder.WriteString("    runs-on: ubuntu-latest\n")
+	builder.WriteString("    steps:\n")
+
+	// Checkout
+	builder.WriteString("      - name: Checkout\n")
+	builder.WriteString("        uses: actions/checkout@v4\n")
+	builder.WriteString("        with:\n")
+	builder.WriteString("          fetch-depth: 0\n")
+
+	// Setup Go
+	builder.WriteString("\n      - name: Setup Go\n")
+	builder.WriteString("        uses: actions/setup-go@v4\n")
+	builder.WriteString("        with:\n")
+	builder.WriteString("          go-version: 'stable'\n")
+
+	// GoReleaser
+	builder.WriteString("\n      - name: Run GoReleaser\n")
+	builder.WriteString("        uses: goreleaser/goreleaser-action@v5\n")
+	builder.WriteString("        with:\n")
+	builder.WriteString("          version: latest\n")
+	builder.WriteString("          args: release --clean\n")
+
+	if config.DockerEnabled {
+		builder.WriteString("        env:\n")
+		if config.DockerRegistry == domain.DockerRegistryGitHub {
+			builder.WriteString("          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}\n")
+		} else {
+			builder.WriteString("          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}\n")
+			builder.WriteString("          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}\n")
+		}
+	}
+
+	return builder.String()
+}
+
+// Display flag help and usage information
+func displayGenerateHelp() {
+	fmt.Println("Example usage:")
+	fmt.Println("  goreleaser-wizard generate --name my-project --type cli")
+	fmt.Println("  goreleaser-wizard generate --name my-api --type api --docker")
+	fmt.Println("  goreleaser-wizard generate --name my-lib --type library")
+	fmt.Println()
+	fmt.Println("Available flags:")
+	fmt.Println("  --name            Project name (required)")
+	fmt.Println("  --description     Project description")
+	fmt.Println("  --binary          Binary name (defaults to project name)")
+	fmt.Println("  --main            Path to main.go (default: ./)")
+	fmt.Println("  --project-type    Project type (cli, web, library, api, desktop)")
+	fmt.Println("  --platforms       Target platforms (linux, darwin, windows, freebsd, openbsd, netbsd)")
+	fmt.Println("  --architectures   Target architectures (amd64, arm64, 386, arm)")
+	fmt.Println("  --docker          Enable Docker builds")
+	fmt.Println("  --signing         Enable code signing")
+	fmt.Println("  --github-action   Generate GitHub Actions workflow")
+	fmt.Println("  --git-provider     Git provider (github, gitlab, bitbucket, gitea, self-hosted)")
+	fmt.Println("  --force           Overwrite existing files")
+	fmt.Println()
+	fmt.Println("Examples:")
+	fmt.Println("  # CLI application")
+	fmt.Println("  goreleaser-wizard generate --name my-cli --type cli --platforms linux,darwin")
+	fmt.Println()
+	fmt.Println("  # Web service with Docker")
+	fmt.Println("  goreleaser-wizard generate --name my-api --type api --docker --signing")
+	fmt.Println()
+	fmt.Println("  # Library with minimal configuration")
+	fmt.Println("  goreleaser-wizard generate --name my-lib --type library")
 }

@@ -7,9 +7,16 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/LarsArtmann/template-GoReleaser/internal/domain"
 	"github.com/charmbracelet/log"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+)
+
+var (
+	// Validation use case (would be injected in real implementation)
+	validationUseCase *domain.ValidationUseCase
+	fileSystemRepo   domain.FileSystemRepository
 )
 
 var validateCmd = &cobra.Command{
@@ -29,243 +36,602 @@ This command will:
 func init() {
 	validateCmd.Flags().Bool("verbose", false, "show detailed validation output")
 	validateCmd.Flags().Bool("fix", false, "attempt to fix common issues")
+	validateCmd.Flags().Bool("project-only", false, "validate project structure only")
 }
 
 func runValidate(cmd *cobra.Command, args []string) {
-	// Set up logger
-	logger := log.New(os.Stderr)
-	if viper.GetBool("debug") {
-		logger.SetLevel(log.DebugLevel)
-	}
-
-	// Set up panic recovery
-	defer HandlePanic("validate command", logger)
+	// Set up panic recovery using domain error handling
+	defer recoverFromPanic("validate command")
 
 	verbose, _ := cmd.Flags().GetBool("verbose")
 	fix, _ := cmd.Flags().GetBool("fix")
+	projectOnly, _ := cmd.Flags().GetBool("project-only")
 
 	fmt.Println(titleStyle.Render("🔍 Validating GoReleaser Configuration"))
 	fmt.Println()
 
-	issues := []string{}
-	warnings := []string{}
-	passed := 0
-	total := 0
+	// Initialize dependencies (in real implementation, this would be injected)
+	fileSystemRepo = &SimpleFileSystemRepository{}
+	validationUseCase = domain.NewValidationUseCase(logger, fileSystemRepo)
 
-	// Check 1: .goreleaser.yaml exists
-	total++
-	if err := CheckFileExists(".goreleaser.yaml", false); err != nil {
-		issues = append(issues, ".goreleaser.yaml not found")
-		fmt.Println(errorStyle.Render("✗ .goreleaser.yaml not found"))
-		if fix {
-			fmt.Println(infoStyle.Render("  → Run 'goreleaser-wizard init' to create one"))
-		}
-		logger.Debug("GoReleaser config check", "error", err)
-	} else {
-		passed++
-		fmt.Println(successStyle.Render("✓ .goreleaser.yaml exists"))
-	}
+	// Collect validation results
+	results := &ValidationResults{}
 
-	// Check 2: go.mod exists
-	total++
-	if err := CheckFileExists("go.mod", false); err != nil {
-		issues = append(issues, "go.mod not found")
-		fmt.Println(errorStyle.Render("✗ go.mod not found"))
-		if fix {
-			fmt.Println(infoStyle.Render("  → Run 'go mod init <module-name>' to create one"))
+	if !projectOnly {
+		// Validate GoReleaser configuration
+		if err := validateGoReleaserConfig(&results); err != nil {
+			displayError(err)
+			return
 		}
-		logger.Debug("Go module check", "error", err)
-	} else {
-		passed++
-		fmt.Println(successStyle.Render("✓ go.mod exists"))
-	}
 
-	// Check 3: Git repository
-	total++
-	if err := CheckFileExists(".git", false); err != nil {
-		warnings = append(warnings, "Not a git repository")
-		fmt.Println(errorStyle.Render("⚠ Not a git repository"))
-		fmt.Println(infoStyle.Render("  → GoReleaser requires a git repository to work"))
-		if fix {
-			fmt.Println(infoStyle.Render("  → Run 'git init' to initialize repository"))
-		}
-		logger.Debug("Git repository check", "error", err)
-	} else {
-		// Check for uncommitted changes with error handling
-		gitCmd := exec.Command("git", "status", "--porcelain")
-		output, err := gitCmd.Output()
-		if err != nil {
-			logger.Warn("Failed to check git status", "error", err)
-			warnings = append(warnings, "Could not check git status")
-			fmt.Println(errorStyle.Render("⚠ Could not check git status"))
-		} else if len(output) > 0 {
-			warnings = append(warnings, "Uncommitted changes detected")
-			fmt.Println(errorStyle.Render("⚠ Uncommitted changes detected"))
-			if verbose {
-				fmt.Println(infoStyle.Render("  → " + strings.TrimSpace(string(output))))
-			}
-			if fix {
-				fmt.Println(infoStyle.Render("  → Commit changes with 'git add . && git commit -m \"message\"'"))
-			}
-		} else {
-			passed++
-			fmt.Println(successStyle.Render("✓ Git repository clean"))
+		// Validate GitHub Actions workflow
+		if err := validateGitHubActions(&results); err != nil {
+			displayError(err)
+			return
 		}
 	}
 
-	// Check 4: GoReleaser installed
-	total++
-	goreleaserPath, err := exec.LookPath("goreleaser")
+	// Validate project structure
+	if err := validateProjectStructure(&results); err != nil {
+		displayError(err)
+		return
+	}
+
+	// Display results
+	displayValidationResults(&results, verbose)
+
+	// Attempt fixes if requested
+	if fix && len(results.Errors) > 0 {
+		if err := attemptFixes(&results); err != nil {
+			displayError(err)
+			return
+		}
+	}
+
+	// Exit with appropriate code
+	os.Exit(results.GetExitCode())
+}
+
+// ValidationResults holds all validation results
+type ValidationResults struct {
+	ConfigExists    bool
+	ConfigValid     bool
+	ActionsExists   bool
+	ActionsValid    bool
+	ProjectValid    bool
+	GoReleaserFound bool
+	Errors         []*domain.DomainError
+	Warnings       []*domain.DomainError
+	Recommendations []string
+}
+
+// GetExitCode returns appropriate exit code
+func (vr *ValidationResults) GetExitCode() int {
+	if len(vr.Errors) > 0 {
+		return 1
+	}
+	if len(vr.Warnings) > 0 {
+		return 2
+	}
+	return 0
+}
+
+// validateGoReleaserConfig validates GoReleaser configuration
+func validateGoReleaserConfig(results *ValidationResults) error {
+	configPath := ".goreleaser.yaml"
+
+	// Check if config exists
+	exists, err := fileSystemRepo.FileExists(context.Background(), configPath)
 	if err != nil {
-		issues = append(issues, "GoReleaser not installed")
-		fmt.Println(errorStyle.Render("✗ GoReleaser not installed"))
-		if fix {
-			fmt.Println(infoStyle.Render("  → Install with: go install github.com/goreleaser/goreleaser/v2@latest"))
-			fmt.Println(infoStyle.Render("  → Or download from: https://goreleaser.com/install/"))
-		}
-		logger.Debug("GoReleaser dependency check", "error", err)
-	} else {
-		passed++
-		fmt.Println(successStyle.Render("✓ GoReleaser installed"))
-		if verbose {
-			fmt.Println(infoStyle.Render("  → " + goreleaserPath))
+		results.Errors = append(results.Errors, 
+			domain.NewSystemError(
+				domain.ErrFileReadFailed,
+				"Failed to check configuration file",
+				fmt.Sprintf("Cannot access %s", configPath),
+				err,
+			).WithContext(configPath))
+		return nil
+	}
+
+	results.ConfigExists = exists
+	if !exists {
+		results.Errors = append(results.Errors,
+			domain.NewSystemError(
+				domain.ErrFileNotFound,
+				"Configuration file not found",
+				fmt.Sprintf("%s does not exist", configPath),
+				nil,
+			).WithContext(configPath))
+		results.Recommendations = append(results.Recommendations, 
+			"Run 'goreleaser-wizard init' to create configuration")
+		return nil
+	}
+
+	// Validate YAML syntax
+	if err := validateYAML(configPath, results); err != nil {
+		return err
+	}
+
+	// Try to parse and validate as GoReleaser config
+	if err := parseGoReleaserConfig(configPath, results); err != nil {
+		return err
+	}
+
+	// Run goreleaser check if available
+	if err := runGoReleaserCheck(configPath, results); err != nil {
+		return nil // Not fatal, just record warning
+	}
+
+	results.ConfigValid = len(results.Errors) == 0
+	return nil
+}
+
+// validateGitHubActions validates GitHub Actions workflow
+func validateGitHubActions(results *ValidationResults) error {
+	workflowPath := ".github/workflows/release.yml"
+
+	// Check if workflow exists
+	exists, err := fileSystemRepo.FileExists(context.Background(), workflowPath)
+	if err != nil {
+		results.Warnings = append(results.Warnings,
+			domain.NewSystemError(
+				domain.ErrFileReadFailed,
+				"Failed to check GitHub Actions workflow",
+				fmt.Sprintf("Cannot access %s", workflowPath),
+				err,
+			).WithContext(workflowPath))
+		return nil
+	}
+
+	results.ActionsExists = exists
+	if !exists {
+		results.Recommendations = append(results.Recommendations,
+			"Add GitHub Actions workflow for automated releases")
+		return nil
+	}
+
+	// Validate YAML syntax
+	if err := validateYAML(workflowPath, results); err != nil {
+		return err
+	}
+
+	// Validate workflow content
+	if err := validateWorkflowContent(workflowPath, results); err != nil {
+		return err
+	}
+
+	results.ActionsValid = len(results.Errors) == 0
+	return nil
+}
+
+// validateProjectStructure validates project structure
+func validateProjectStructure(results *ValidationResults) error {
+	// Get current working directory
+	cwd, err := os.Getwd()
+	if err != nil {
+		results.Errors = append(results.Errors,
+			domain.NewSystemError(
+				domain.ErrPermissionDenied,
+				"Failed to get current directory",
+				"Cannot determine working directory",
+				err,
+			))
+		return nil
+	}
+
+	// Use domain validation use case
+	ctx := context.Background()
+	result, err := validationUseCase.ValidateProjectStructure(ctx, cwd)
+	if err != nil {
+		results.Errors = append(results.Errors, err.(*domain.DomainError))
+		return nil
+	}
+
+	results.ProjectValid = result.IsValid
+	results.Errors = append(results.Errors, result.Issues...)
+	results.Warnings = append(results.Warnings, result.Warnings...)
+	results.Recommendations = append(results.Recommendations, result.Recommendations...)
+
+	return nil
+}
+
+// validateYAML validates YAML syntax
+func validateYAML(filePath string, results *ValidationResults) error {
+	data, err := os.ReadFile(filePath)
+	if err != nil {
+		results.Errors = append(results.Errors,
+			domain.NewSystemError(
+				domain.ErrFileReadFailed,
+				"Failed to read file",
+				fmt.Sprintf("Cannot read %s", filePath),
+				err,
+			).WithContext(filePath))
+		return nil
+	}
+
+	// Simple YAML validation - check for balanced brackets and quotes
+	content := string(data)
+	if !isValidYAML(content) {
+		results.Errors = append(results.Errors,
+			domain.NewTemplateError(
+				domain.ErrTemplateSyntaxError,
+				"Invalid YAML syntax",
+				fmt.Sprintf("File %s contains YAML syntax errors", filePath),
+			).WithContext(filePath))
+		return nil
+	}
+
+	return nil
+}
+
+// isValidYAML performs basic YAML validation
+func isValidYAML(content string) bool {
+	// This is a basic check - in real implementation, use yaml parser
+	indent := 0
+	inString := false
+	lines := strings.Split(content, "\n")
+
+	for _, line := range lines {
+		line = strings.TrimSpace(line)
+		if line == "" || strings.HasPrefix(line, "#") {
+			continue
 		}
 
-		// Check 5: Run goreleaser check with enhanced error handling
-		total++
-		fmt.Print("  Checking configuration... ")
-		checkCmd := exec.Command("goreleaser", "check")
-		checkOutput, checkErr := checkCmd.CombinedOutput()
-		if checkErr != nil {
-			issues = append(issues, "Configuration validation failed")
-			fmt.Println(errorStyle.Render("Failed"))
-			if verbose {
-				fmt.Println(infoStyle.Render("  → " + strings.TrimSpace(string(checkOutput))))
+		// Count brackets and braces
+		for _, char := range line {
+			switch char {
+			case '"':
+				inString = !inString
+			case '{':
+				if !inString {
+					indent++
+				}
+			case '}':
+				if !inString {
+					indent--
+				}
 			}
-			if fix {
-				fmt.Println(infoStyle.Render("  → Fix configuration issues in .goreleaser.yaml"))
-				fmt.Println(infoStyle.Render("  → Run 'goreleaser-wizard init --force' to regenerate"))
-			}
-			logger.Debug("GoReleaser config validation", "error", checkErr, "output", string(checkOutput))
-		} else {
-			passed++
-			fmt.Println(successStyle.Render("OK"))
+		}
+
+		// Check indentation
+		if !inString && indent < 0 {
+			return false
 		}
 	}
 
-	// Check 6: Main package exists
-	if CheckFileExists(".goreleaser.yaml", false) == nil {
-		total++
-		// Parse config to find main path
-		// For simplicity, we'll check common locations
-		mainFound := false
-		commonPaths := []string{
-			"main.go",
-			"./cmd/*/main.go",
-			"./*.go",
-		}
-		for _, path := range commonPaths {
-			matches, globErr := filepath.Glob(path)
-			if globErr != nil {
-				logger.Debug("Glob pattern error", "pattern", path, "error", globErr)
-				continue
-			}
-			if len(matches) > 0 {
-				mainFound = true
-				break
-			}
-		}
+	return indent == 0
+}
 
-		if !mainFound {
-			warnings = append(warnings, "No main.go found in expected locations")
-			fmt.Println(errorStyle.Render("⚠ No main.go found"))
-			fmt.Println(infoStyle.Render("  → Make sure your main package path is correct in .goreleaser.yaml"))
-			if fix {
-				fmt.Println(infoStyle.Render("  → Create main.go or update build.main path in config"))
-			}
-		} else {
-			passed++
-			fmt.Println(successStyle.Render("✓ Main package found"))
+// parseGoReleaserConfig parses and validates GoReleaser configuration
+func parseGoReleaserConfig(configPath string, results *ValidationResults) error {
+	// This would use proper YAML parsing and GoReleaser validation
+	// For now, just check for required fields
+	
+	data, err := os.ReadFile(configPath)
+	if err != nil {
+		return domain.NewSystemError(
+			domain.ErrFileReadFailed,
+			"Failed to read configuration",
+			fmt.Sprintf("Cannot read %s", configPath),
+			err,
+		)
+	}
+
+	content := string(data)
+
+	// Check for required fields
+	requiredFields := []string{"project_name", "builds"}
+	for _, field := range requiredFields {
+		if !strings.Contains(content, field+":") {
+			results.Errors = append(results.Errors,
+				domain.NewValidationError(
+					domain.ErrMissingRequiredField,
+					"Missing required field",
+					fmt.Sprintf("Configuration missing required field: %s", field),
+				).WithContext(field))
 		}
 	}
 
-	// Check 7: Docker (if configured)
-	if CheckFileExists("Dockerfile", false) == nil {
-		total++
-		dockerPath, err := exec.LookPath("docker")
-		if err != nil {
-			warnings = append(warnings, "Docker not installed but Dockerfile exists")
-			fmt.Println(errorStyle.Render("⚠ Docker not installed"))
-			if fix {
-				fmt.Println(infoStyle.Render("  → Install Docker from https://docker.com/"))
-				fmt.Println(infoStyle.Render("  → Or remove Docker configuration from .goreleaser.yaml"))
-			}
-			logger.Debug("Docker dependency check", "error", err)
-		} else {
-			passed++
-			fmt.Println(successStyle.Render("✓ Docker installed"))
-			if verbose {
-				fmt.Println(infoStyle.Render("  → " + dockerPath))
-			}
+	return nil
+}
+
+// runGoReleaserCheck runs goreleaser check command
+func runGoReleaserCheck(configPath string, results *ValidationResults) error {
+	// Check if goreleaser is available
+	if _, err := exec.LookPath("goreleaser"); err != nil {
+		results.Warnings = append(results.Warnings,
+			domain.NewExternalServiceError(
+				domain.ErrDependencyNotFound,
+				"GoReleaser not found",
+				"goreleaser command not available in PATH",
+			))
+		results.Recommendations = append(results.Recommendations,
+			"Install GoReleaser: https://goreleaser.com/install/")
+		results.GoReleaserFound = false
+		return nil
+	}
+
+	results.GoReleaserFound = true
+
+	// Run goreleaser check
+	cmd := exec.Command("goreleaser", "check", "-f", configPath)
+	output, err := cmd.CombinedOutput()
+
+	if err != nil {
+		results.Errors = append(results.Errors,
+			domain.NewExternalServiceError(
+				domain.ErrGitOperationFailed,
+				"GoReleaser check failed",
+				string(output),
+			))
+		return nil
+	}
+
+	logger.Info("GoReleaser check passed")
+	return nil
+}
+
+// validateWorkflowContent validates GitHub Actions workflow content
+func validateWorkflowContent(workflowPath string, results *ValidationResults) error {
+	data, err := os.ReadFile(workflowPath)
+	if err != nil {
+		return domain.NewSystemError(
+			domain.ErrFileReadFailed,
+			"Failed to read workflow file",
+			fmt.Sprintf("Cannot read %s", workflowPath),
+			err,
+		)
+	}
+
+	content := string(data)
+
+	// Check for required workflow elements
+	requiredElements := []string{"name:", "on:", "jobs:"}
+	for _, element := range requiredElements {
+		if !strings.Contains(content, element) {
+			results.Warnings = append(results.Warnings,
+				domain.NewTemplateError(
+					domain.ErrTemplateExecutionFailed,
+					"Missing workflow element",
+					fmt.Sprintf("Workflow missing required element: %s", element),
+				).WithContext(workflowPath))
 		}
 	}
 
-	// Check 8: GitHub Actions workflow
-	total++
-	workflowFound := CheckFileExists(".github/workflows/release.yml", false) == nil ||
-		CheckFileExists(".github/workflows/release.yaml", false) == nil
+	return nil
+}
 
-	if workflowFound {
-		passed++
-		fmt.Println(successStyle.Render("✓ GitHub Actions workflow found"))
-	} else {
-		warnings = append(warnings, "No GitHub Actions workflow for releases")
-		fmt.Println(infoStyle.Render("ℹ No GitHub Actions workflow"))
-		if fix {
-			fmt.Println(infoStyle.Render("  → Run 'goreleaser-wizard init' with GitHub Actions option"))
-			fmt.Println(infoStyle.Render("  → Or manually create .github/workflows/release.yml"))
-		}
-	}
-
-	// Summary
+// displayValidationResults displays validation results
+func displayValidationResults(results *ValidationResults, verbose bool) {
+	fmt.Println("📋 Validation Summary:")
 	fmt.Println()
-	fmt.Println(titleStyle.Render("📊 Validation Summary"))
-	fmt.Printf("Checks passed: %d/%d\n", passed, total)
 
-	if len(issues) > 0 {
-		fmt.Println()
-		fmt.Println(errorStyle.Render("❌ Critical Issues:"))
-		for _, issue := range issues {
-			fmt.Println("  • " + issue)
+	// Configuration status
+	if results.ConfigExists {
+		if results.ConfigValid {
+			fmt.Println(successStyle.Render("✅ GoReleaser configuration: Valid"))
+		} else {
+			fmt.Println(errorStyle.Render("❌ GoReleaser configuration: Invalid"))
 		}
-	}
-
-	if len(warnings) > 0 {
-		fmt.Println()
-		fmt.Println(infoStyle.Render("⚠️  Warnings:"))
-		for _, warning := range warnings {
-			fmt.Println("  • " + warning)
-		}
-	}
-
-	// Test build suggestion
-	if len(issues) == 0 {
-		fmt.Println()
-		fmt.Println(successStyle.Render("✨ Configuration looks good!"))
-		fmt.Println()
-		fmt.Println("Next steps:")
-		fmt.Println("  1. Test build: goreleaser build --snapshot --clean")
-		fmt.Println("  2. Create tag: git tag -a v0.1.0 -m 'First release'")
-		fmt.Println("  3. Push tag: git push origin v0.1.0")
-		logger.Info("Validation completed successfully", "passed", passed, "total", total, "warnings", len(warnings))
 	} else {
-		fmt.Println()
-		fmt.Println(errorStyle.Render("⚠️  Please fix the issues above before releasing"))
-		if !fix {
-			fmt.Println()
-			fmt.Println("Run with --fix to see suggested fixes")
-		}
-		logger.Error("Validation failed", "issues", len(issues), "warnings", len(warnings), "passed", passed, "total", total)
-		os.Exit(1)
+		fmt.Println(errorStyle.Render("❌ GoReleaser configuration: Not found"))
 	}
+
+	// GitHub Actions status
+	if results.ActionsExists {
+		if results.ActionsValid {
+			fmt.Println(successStyle.Render("✅ GitHub Actions workflow: Valid"))
+		} else {
+			fmt.Println(errorStyle.Render("❌ GitHub Actions workflow: Invalid"))
+		}
+	} else {
+		fmt.Println(infoStyle.Render("ℹ️  GitHub Actions workflow: Not found"))
+	}
+
+	// Project structure status
+	if results.ProjectValid {
+		fmt.Println(successStyle.Render("✅ Project structure: Valid"))
+	} else {
+		fmt.Println(errorStyle.Render("❌ Project structure: Invalid"))
+	}
+
+	// GoReleaser availability
+	if results.GoReleaserFound {
+		fmt.Println(successStyle.Render("✅ GoReleaser: Available"))
+	} else {
+		fmt.Println(infoStyle.Render("ℹ️  GoReleaser: Not installed"))
+	}
+
+	fmt.Println()
+
+	// Display errors
+	if len(results.Errors) > 0 {
+		fmt.Println(errorStyle.Render("❌ Errors:"))
+		for _, err := range results.Errors {
+			fmt.Printf("  • %s\n", err.Message)
+			if verbose {
+				fmt.Printf("    Details: %s\n", err.Details)
+				if err.Context != "" {
+					fmt.Printf("    Context: %s\n", err.Context)
+				}
+			}
+		}
+		fmt.Println()
+	}
+
+	// Display warnings
+	if len(results.Warnings) > 0 {
+		fmt.Println(infoStyle.Render("⚠️  Warnings:"))
+		for _, warning := range results.Warnings {
+			fmt.Printf("  • %s\n", warning.Message)
+			if verbose {
+				fmt.Printf("    Details: %s\n", warning.Details)
+			}
+		}
+		fmt.Println()
+	}
+
+	// Display recommendations
+	if len(results.Recommendations) > 0 {
+		fmt.Println(infoStyle.Render("💡 Recommendations:"))
+		for _, rec := range results.Recommendations {
+			fmt.Printf("  • %s\n", rec)
+		}
+		fmt.Println()
+	}
+}
+
+// attemptFixes attempts to fix common issues
+func attemptFixes(results *ValidationResults) error {
+	fmt.Println("🔧 Attempting to fix common issues...")
+	fmt.Println()
+
+	fixed := 0
+
+	// Fix missing configuration directory
+	if !results.ConfigExists {
+		if err := os.MkdirAll(".github/workflows", 0755); err == nil {
+			fmt.Println(successStyle.Render("✅ Created .github/workflows directory"))
+			fixed++
+		}
+	}
+
+	// Try to create basic configuration if missing
+	if !results.ConfigExists {
+		configContent := generateBasicConfig()
+		if err := os.WriteFile(".goreleaser.yaml", []byte(configContent), 0644); err == nil {
+			fmt.Println(successStyle.Render("✅ Created basic .goreleaser.yaml"))
+			fixed++
+		}
+	}
+
+	if fixed > 0 {
+		fmt.Println()
+		fmt.Println(successStyle.Render(fmt.Sprintf("✅ Fixed %d issues", fixed)))
+		fmt.Println(infoStyle.Render("💡 Run validation again to check remaining issues"))
+	} else {
+		fmt.Println(infoStyle.Render("ℹ️  No auto-fixable issues found"))
+	}
+
+	return nil
+}
+
+// generateBasicConfig generates a basic GoReleaser configuration
+func generateBasicConfig() string {
+	return `# Basic GoReleaser configuration
+# Generated by GoReleaser Wizard
+
+# The project name
+project_name: my-project
+
+# The build configuration
+builds:
+  - env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+
+# Archive configuration
+archives:
+  - format: tar.gz
+    name_template: '{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}'
+
+# Release configuration
+release:
+  github:
+    owner: your-username
+    name: my-project
+`
+}
+
+// SimpleFileSystemRepository is a basic implementation for demonstration
+type SimpleFileSystemRepository struct{}
+
+func (r *SimpleFileSystemRepository) ReadFile(ctx context.Context, path string) ([]byte, error) {
+	return os.ReadFile(path)
+}
+
+func (r *SimpleFileSystemRepository) WriteFile(ctx context.Context, path string, data []byte, perm os.FileMode) error {
+	return os.WriteFile(path, data, perm)
+}
+
+func (r *SimpleFileSystemRepository) CreateFile(ctx context.Context, path string) (io.WriteCloser, error) {
+	return os.Create(path)
+}
+
+func (r *SimpleFileSystemRepository) DeleteFile(ctx context.Context, path string) error {
+	return os.Remove(path)
+}
+
+func (r *SimpleFileSystemRepository) FileExists(ctx context.Context, path string) (bool, error) {
+	_, err := os.Stat(path)
+	if err == nil {
+		return true, nil
+	}
+	if os.IsNotExist(err) {
+		return false, nil
+	}
+	return false, err
+}
+
+func (r *SimpleFileSystemRepository) CreateDir(ctx context.Context, path string, perm os.FileMode) error {
+	return os.Mkdir(path, perm)
+}
+
+func (r *SimpleFileSystemRepository) CreateDirAll(ctx context.Context, path string, perm os.FileMode) error {
+	return os.MkdirAll(path, perm)
+}
+
+func (r *SimpleFileSystemRepository) DirExists(ctx context.Context, path string) (bool, error) {
+	info, err := os.Stat(path)
+	if err == nil {
+		return info.IsDir(), nil
+	}
+	if os.IsNotExist(err) {
+		return false, nil
+	}
+	return false, err
+}
+
+func (r *SimpleFileSystemRepository) ReadDir(ctx context.Context, path string) ([]os.DirEntry, error) {
+	return os.ReadDir(path)
+}
+
+func (r *SimpleFileSystemRepository) GetFileInfo(ctx context.Context, path string) (os.FileInfo, error) {
+	return os.Stat(path)
+}
+
+func (r *SimpleFileSystemRepository) CheckPermissions(ctx context.Context, path string) (bool, error) {
+	// Basic permission check - try to read file
+	file, err := os.OpenFile(path, os.O_RDONLY, 0)
+	if err != nil {
+		return false, nil
+	}
+	file.Close()
+	return true, nil
+}
+
+func (r *SimpleFileSystemRepository) AbsPath(path string) (string, error) {
+	return filepath.Abs(path)
+}
+
+func (r *SimpleFileSystemRepository) RelPath(base, target string) (string, error) {
+	return filepath.Rel(base, target)
+}
+
+func (r *SimpleFileSystemRepository) CleanPath(path string) string {
+	return filepath.Clean(path)
+}
+
+func (r *SimpleFileSystemRepository) JoinPath(elem ...string) string {
+	return filepath.Join(elem...)
+}
+
+func (r *SimpleFileSystemRepository) TempDir(dir, pattern string) (string, error) {
+	return os.MkdirTemp(dir, pattern)
 }

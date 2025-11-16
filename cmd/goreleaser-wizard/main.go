@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/LarsArtmann/template-GoReleaser/internal/domain"
 	"github.com/charmbracelet/log"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -19,7 +20,18 @@ var (
 	gitState       = ""
 
 	cfgFile string
+	
+	// Domain logger for dependency injection
+	logger domain.Logger
 )
+
+// Initialize logger dependency
+func init() {
+	logger = log.New(os.Stderr)
+	if viper.GetBool("debug") {
+		logger.SetLevel(log.DebugLevel)
+	}
+}
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -35,18 +47,76 @@ workflows tailored to your project's needs.`,
 
 // Execute adds all child commands to the root command and sets flags appropriately.
 func Execute() {
-	// Set up logger for error handling
-	logger := log.New(os.Stderr)
-	if viper.GetBool("debug") {
-		logger.SetLevel(log.DebugLevel)
-	}
-
-	// Set up panic recovery
-	defer HandlePanic("command execution", logger)
+	// Set up panic recovery using domain error handling
+	defer recoverFromPanic("command execution")
 
 	if err := rootCmd.Execute(); err != nil {
-		LogAndDisplayError(err, logger)
+		displayError(err)
 	}
+}
+
+// recoverFromPanic provides graceful panic recovery using domain types
+func recoverFromPanic(context string) {
+	if r := recover(); r != nil {
+		logger.Error("Panic recovered", "context", context, "panic", r)
+		
+		err := domain.NewSystemError(
+			domain.ErrTemplateExecutionFailed,
+			"Unexpected error occurred",
+			fmt.Sprintf("The wizard encountered an unexpected problem: %v", r),
+			fmt.Errorf("panic: %v", r),
+		).WithContext(context)
+		
+		displayError(err)
+		
+		os.Exit(1)
+	}
+}
+
+// displayError displays errors using domain error handling
+func displayError(err error) {
+	if err == nil {
+		return
+	}
+	
+	// Convert to domain error if not already
+	var domainErr *domain.DomainError
+	if !errors.As(err, &domainErr) {
+		domainErr = domain.NewSystemError(
+			domain.ErrFileWriteFailed,
+			"Unexpected error",
+			err.Error(),
+			err,
+		)
+	}
+	
+	// Display structured error information
+	fmt.Println()
+	fmt.Println(errorStyle.Render("❌ Error: " + domainErr.Message))
+
+	if domainErr.Details != "" {
+		fmt.Println(infoStyle.Render("Details: " + domainErr.Details))
+	}
+
+	if domainErr.Context != "" {
+		fmt.Println(infoStyle.Render("Context: " + domainErr.Context))
+	}
+
+	suggestion := domainErr.GetRecoverySuggestion()
+	if suggestion != "" {
+		suggestStyle := lipgloss.NewStyle().
+			Foreground(lipgloss.Color("220")).
+			Bold(true)
+		fmt.Println(suggestStyle.Render("💡 Suggestion: " + suggestion))
+	}
+
+	// Log the full error for debugging
+	logger.Error("Domain error",
+		"code", domainErr.Code,
+		"message", domainErr.Message,
+		"details", domainErr.Details,
+		"context", domainErr.Context,
+	)
 }
 
 func init() {
@@ -70,45 +140,28 @@ func init() {
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
-	logger := log.New(os.Stderr)
-	if viper.GetBool("debug") {
-		logger.SetLevel(log.DebugLevel)
-	}
-
 	// Set up panic recovery for config initialization
-	defer HandlePanic("config initialization", logger)
+	defer recoverFromPanic("config initialization")
 
 	if cfgFile != "" {
 		// Use config file from the flag.
 		viper.SetConfigFile(cfgFile)
-		// Validate the config file exists and is readable
-		if err := CheckFileExists(cfgFile, true); err != nil {
-			LogAndDisplayError(
-				NewWizardError(
-					ErrConfiguration,
-					"Custom config file not found",
-					fmt.Sprintf("Could not access config file: %s", cfgFile),
-					"Check the file path and permissions",
-					err,
-				),
-				logger,
-			)
+		
+		// Validate the config file exists and is readable using domain types
+		if err := validateFileExists(cfgFile, true); err != nil {
+			displayError(err)
 			return
 		}
 	} else {
 		// Find home directory.
 		home, err := os.UserHomeDir()
 		if err != nil {
-			LogAndDisplayError(
-				NewWizardError(
-					ErrPermission,
-					"Unable to determine user home directory",
-					"System could not determine the user's home directory",
-					"Check your system's home directory configuration",
-					err,
-				),
-				logger,
-			)
+			displayError(domain.NewSystemError(
+				domain.ErrPermissionDenied,
+				"Unable to determine user home directory",
+				"System could not determine the user's home directory",
+				err,
+			).WithContext("config_initialization"))
 			return
 		}
 
@@ -131,6 +184,37 @@ func initConfig() {
 	}
 }
 
+// validateFileExists validates file existence using domain error types
+func validateFileExists(path string, requireDir bool) *domain.DomainError {
+	info, err := os.Stat(path)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return domain.NewSystemError(
+				domain.ErrFileNotFound,
+				"File not found",
+				fmt.Sprintf("File %s does not exist", path),
+				err,
+			).WithContext(path)
+		}
+		return domain.NewSystemError(
+			domain.ErrFileReadFailed,
+			"File access error",
+			fmt.Sprintf("Cannot access %s", path),
+			err,
+		).WithContext(path)
+	}
+
+	if requireDir && !info.IsDir() {
+		return domain.NewValidationError(
+			domain.ErrInvalidCharacters,
+			"Expected directory",
+			fmt.Sprintf("%s is not a directory", path),
+		).WithContext(path)
+	}
+
+	return nil
+}
+
 var versionCmd = &cobra.Command{
 	Use:   "version",
 	Short: "Print version information",
@@ -150,8 +234,26 @@ var versionCmd = &cobra.Command{
 
 func main() {
 	// Set up global panic recovery
-	logger := log.New(os.Stderr)
-	defer HandlePanic("main", logger)
+	defer recoverFromPanic("main")
 
 	Execute()
 }
+
+// Style definitions - could be moved to a UI package
+var (
+	titleStyle = lipgloss.NewStyle().
+		Bold(true).
+		Foreground(lipgloss.Color("99")).
+		MarginBottom(1)
+
+	successStyle = lipgloss.NewStyle().
+		Foreground(lipgloss.Color("42")).
+		Bold(true)
+
+	errorStyle = lipgloss.NewStyle().
+		Foreground(lipgloss.Color("196")).
+		Bold(true)
+
+	infoStyle = lipgloss.NewStyle().
+		Foreground(lipgloss.Color("86"))
+)

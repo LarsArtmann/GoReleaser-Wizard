@@ -18,7 +18,7 @@ require (
 	github.com/charmbracelet/bubbletea v1.3.10 // indirect
 	github.com/charmbracelet/colorprofile v0.3.3 // indirect
 	github.com/charmbracelet/x/ansi v0.11.0 // indirect
-	github.com/charmbracelet/x/cellbuf v0.0.13 // indirect
+	github.com/charmbracelet/x/cellbuf v0.0.14 // indirect
 	github.com/charmbracelet/x/errors v0.0.0-20250812135814-932da4e322f4 // indirect
 	github.com/charmbracelet/x/exp/strings v0.0.0-20251107210615-3bf63bc1c0e5 // indirect
 	github.com/charmbracelet/x/term v0.2.2 // indirect

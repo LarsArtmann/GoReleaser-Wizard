@@ -1,5 +1,7 @@
 package domain
 
+import "fmt"
+
 // ConfigState represents configuration lifecycle states
 // Generated from TypeSpec specification - DO NOT MODIFY MANUALLY
 type ConfigState string

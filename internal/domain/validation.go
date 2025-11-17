@@ -3,6 +3,8 @@ package domain
 import (
 	"context"
 	"fmt"
+	"path/filepath"
+	"strings"
 )
 
 // Validation use case implementation
@@ -143,13 +145,16 @@ func (vu *ValidationUseCase) validateTypes(ctx context.Context, config *SafeProj
 
 // validatePlatformArchCompatibility validates platform-architecture compatibility
 func (vu *ValidationUseCase) validatePlatformArchCompatibility(ctx context.Context, config *SafeProjectConfig) *DomainError {
-	return ValidatePlatformArchCompatibility(config.Platforms, config.Architectures)
+	if err := ValidatePlatformArchCompatibility(config.Platforms, config.Architectures); err != nil {
+		return NewValidationError(ErrPlatformArchMismatch, "Platform architecture compatibility failed", err.Error()).WithContext("platforms_architectures")
+	}
+	return nil
 }
 
 // validateBusinessRules validates domain business rules
 func (vu *ValidationUseCase) validateBusinessRules(ctx context.Context, config *SafeProjectConfig) *DomainError {
 	// Docker support rule
-	if config.DockerEnabled && !config.ProjectType.DockerSupported() {
+	if config.GetDockerEnabled() && !config.ProjectType.DockerSupported() {
 		return NewConfigurationError(ErrDockerNotSupported, "Docker not supported for project type", fmt.Sprintf("Project type %s does not support Docker", config.ProjectType)).WithContext("docker_enabled")
 	}
 	
@@ -159,12 +164,12 @@ func (vu *ValidationUseCase) validateBusinessRules(ctx context.Context, config *
 	}
 	
 	// State transition rule
-	if !config.State.AllowsGeneration() && config.GenerateActions {
+	if !config.State.AllowsGeneration() && config.GetGenerateActions() {
 		return NewConfigurationError(ErrInvalidStateTransition, "State transition invalid", fmt.Sprintf("Configuration in state '%s' cannot generate actions", config.State)).WithContext("generate_actions")
 	}
 	
 	// Docker registry URL validation
-	if config.DockerEnabled {
+	if config.GetDockerEnabled() {
 		if err := ValidateDockerRegistryURL(config.DockerRegistry, config.DockerImage); err != nil {
 			return NewValidationError(ErrInvalidURLPattern, "Docker registry URL validation failed", err.Error()).WithContext("docker_image")
 		}
@@ -200,28 +205,22 @@ func (vu *ValidationUseCase) generateWarnings(ctx context.Context, config *SafeP
 	// Warning for single platform
 	if len(config.Platforms) == 1 {
 		warning := NewBusinessRuleError(ErrMissingRequiredField, "Single platform configuration", "Consider targeting multiple platforms for broader compatibility").WithContext("platforms")
-		warning.Severity = ErrorSeverityWarning
 		result.Warnings = append(result.Warnings, warning)
 	}
 	
 	// Warning for missing Docker image name
-	if config.DockerEnabled && config.DockerImage == "" {
-		warning := NewBusinessRuleError(ErrMissingRequiredField, "Missing Docker image name", "Docker image name will default to project name").WithContext("docker_image")
-		warning.Severity = ErrorSeverityWarning
-		result.Warnings = append(result.Warnings, warning)
+	if config.GetDockerEnabled() && config.DockerImage == "" {
 	}
 	
 	// Warning for mismatched CGO setting
-	if config.CGOEnabled != config.ProjectType.DefaultCGOEnabled() {
+	if config.CGOStatus.ToBool() != config.ProjectType.DefaultCGOEnabled() {
 		warning := NewConfigurationError(ErrInvalidStateTransition, "CGO setting mismatched", "CGO setting differs from project type default").WithContext("cgo_enabled")
-		warning.Severity = ErrorSeverityWarning
 		result.Warnings = append(result.Warnings, warning)
 	}
 	
 	// Warning for missing version information
 	if !config.LDFlags {
 		warning := NewConfigurationError(ErrMissingRequiredField, "LD flags disabled", "Version information injection is disabled").WithContext("ldflags")
-		warning.Severity = ErrorSeverityWarning
 		result.Warnings = append(result.Warnings, warning)
 	}
 }

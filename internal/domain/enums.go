@@ -1,9 +1,7 @@
 package domain
 
 import (
-	"context"
 	"fmt"
-	"strings"
 )
 
 // CGOStatus represents CGO compilation status with compile-time safety

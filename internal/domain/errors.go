@@ -1,13 +1,8 @@
 package domain
 
 import (
-	"context"
-	"fmt"
-	"io"
-	"os"
-	"path/filepath"
-	"strings"
 	"errors"
+	"fmt"
 )
 
 // DomainError represents all domain-specific errors
@@ -217,12 +212,12 @@ func TemplateNotFoundError(template string) *DomainError {
 }
 
 func TemplateExecutionFailedError(template string, cause error) *DomainError {
-	return NewTemplateError(ErrTemplateExecutionFailed, "Template execution failed", fmt.Sprintf("Failed to execute template '%s'", template), cause)
+	return NewTemplateError(ErrTemplateExecutionFailed, "Template execution failed", fmt.Sprintf("Failed to execute template '%s'", template)).WithCause(cause)
 }
 
 // External service error constructors
 func GitOperationFailedError(operation string, cause error) *DomainError {
-	return NewExternalServiceError(ErrGitOperationFailed, "Git operation failed", fmt.Sprintf("Failed to perform %s", operation), cause)
+	return NewExternalServiceError(ErrGitOperationFailed, "Git operation failed", fmt.Sprintf("Failed to perform %s", operation)).WithCause(cause)
 }
 
 func RegistryAccessDeniedError(registry string) *DomainError {

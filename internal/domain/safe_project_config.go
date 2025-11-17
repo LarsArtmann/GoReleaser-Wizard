@@ -3,6 +3,8 @@ package domain
 import (
 	"fmt"
 	"strings"
+	
+	"github.com/LarsArtmann/template-GoReleaser/internal/validation"
 )
 
 // SafeProjectConfig represents single source of truth for project configuration
@@ -398,4 +400,31 @@ func (spc *SafeProjectConfig) GetProVersion() bool {
 // SetProVersion sets feature level from legacy boolean
 func (spc *SafeProjectConfig) SetProVersion(enabled bool) {
 	spc.FeatureLevel = FeatureLevelFromBool(enabled)
+}
+
+// Additional validation wrapper functions for functions not in domain package
+
+// ValidateProjectName validates project name using validation package
+func ValidateProjectName(name string) error {
+	return validation.ValidateProjectName(name)
+}
+
+// ValidateBinaryName validates binary name using validation package
+func ValidateBinaryName(name string) error {
+	return validation.ValidateBinaryName(name)
+}
+
+// ValidateMainPath validates main path using validation package
+func ValidateMainPath(path string) error {
+	return validation.ValidateMainPath(path)
+}
+
+// ValidateProjectDescription validates project description using validation package
+func ValidateProjectDescription(desc string) error {
+	return validation.ValidateProjectDescription(desc)
+}
+
+// GetRecommendedPlatforms returns recommended platforms for default project type
+func GetRecommendedPlatforms() []Platform {
+	return GetRecommendedProjectType().RecommendedPlatforms()
 }

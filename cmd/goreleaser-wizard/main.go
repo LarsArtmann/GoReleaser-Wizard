@@ -1,14 +1,74 @@
 package main
 
 import (
+	"context"
+	"errors"
 	"fmt"
 	"os"
 
 	"github.com/LarsArtmann/template-GoReleaser/internal/domain"
 	"github.com/charmbracelet/log"
+	"github.com/charmbracelet/lipgloss"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
+
+// Type alias for backward compatibility during migration
+// TODO: Remove after migration complete
+type ProjectConfig = domain.SafeProjectConfig
+
+// LoggerAdapter adapts charmbracelet/log to domain.Logger interface
+type LoggerAdapter struct {
+	logger *log.Logger
+}
+
+func (la *LoggerAdapter) Debug(msg string, args ...interface{}) {
+	la.logger.Debug(msg, args...)
+}
+
+func (la *LoggerAdapter) Info(msg string, args ...interface{}) {
+	la.logger.Info(msg, args...)
+}
+
+func (la *LoggerAdapter) Warn(msg string, args ...interface{}) {
+	la.logger.Warn(msg, args...)
+}
+
+func (la *LoggerAdapter) Error(msg string, args ...interface{}) {
+	la.logger.Error(msg, args...)
+}
+
+func (la *LoggerAdapter) Fatal(msg string, args ...interface{}) {
+	la.logger.Fatal(msg, args...)
+}
+
+func (la *LoggerAdapter) DebugContext(ctx context.Context, msg string, args ...interface{}) {
+	la.logger.Debug(msg, args...)
+}
+
+func (la *LoggerAdapter) InfoContext(ctx context.Context, msg string, args ...interface{}) {
+	la.logger.Info(msg, args...)
+}
+
+func (la *LoggerAdapter) WarnContext(ctx context.Context, msg string, args ...interface{}) {
+	la.logger.Warn(msg, args...)
+}
+
+func (la *LoggerAdapter) ErrorContext(ctx context.Context, msg string, args ...interface{}) {
+	la.logger.Error(msg, args...)
+}
+
+func (la *LoggerAdapter) WithField(key string, value interface{}) domain.Logger {
+	return la // Simplified - doesn't add field
+}
+
+func (la *LoggerAdapter) WithFields(fields map[string]interface{}) domain.Logger {
+	return la // Simplified - doesn't add fields
+}
+
+func (la *LoggerAdapter) WithError(err error) domain.Logger {
+	return la // Simplified - doesn't add error
+}
 
 var (
 	// Build-time variables set by GoReleaser
@@ -20,16 +80,37 @@ var (
 	gitState       = ""
 
 	cfgFile string
-	
-	// Domain logger for dependency injection
-	logger domain.Logger
 )
 
+// Domain logger for dependency injection
+var appLogger domain.Logger
+
+// Style definitions
+var titleStyle, successStyle, errorStyle, infoStyle lipgloss.Style
+
 // Initialize logger dependency
+var appLogger domain.Logger
+
 func init() {
-	logger = log.New(os.Stderr)
+	// Create a logger adapter to satisfy domain.Logger interface
+	appLogger = &LoggerAdapter{logger: log.New(os.Stderr)}
+	
+	// Initialize styles
+	titleStyle = lipgloss.NewStyle().
+		Bold(true).
+		Foreground(lipgloss.Color("99")).
+		MarginBottom(1)
+	successStyle = lipgloss.NewStyle().
+		Foreground(lipgloss.Color("42")).
+		Bold(true)
+	errorStyle = lipgloss.NewStyle().
+		Foreground(lipgloss.Color("196")).
+		Bold(true)
+	infoStyle = lipgloss.NewStyle().
+		Foreground(lipgloss.Color("86"))
+	
 	if viper.GetBool("debug") {
-		logger.SetLevel(log.DebugLevel)
+		appLogger.(*LoggerAdapter).logger.SetLevel(log.DebugLevel)
 	}
 }
 
@@ -232,6 +313,31 @@ var versionCmd = &cobra.Command{
 	},
 }
 
+// Placeholder command definitions - TODO: Implement actual functionality
+var initCmd = &cobra.Command{
+	Use:   "init",
+	Short: "Initialize GoReleaser configuration",
+	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Println("Initializing GoReleaser configuration...")
+	},
+}
+
+var validateCmd = &cobra.Command{
+	Use:   "validate",
+	Short: "Validate GoReleaser configuration",
+	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Println("Validating GoReleaser configuration...")
+	},
+}
+
+var generateCmd = &cobra.Command{
+	Use:   "generate",
+	Short: "Generate GoReleaser configuration",
+	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Println("Generating GoReleaser configuration...")
+	},
+}
+
 func main() {
 	// Set up global panic recovery
 	defer recoverFromPanic("main")
@@ -239,21 +345,3 @@ func main() {
 	Execute()
 }
 
-// Style definitions - could be moved to a UI package
-var (
-	titleStyle = lipgloss.NewStyle().
-		Bold(true).
-		Foreground(lipgloss.Color("99")).
-		MarginBottom(1)
-
-	successStyle = lipgloss.NewStyle().
-		Foreground(lipgloss.Color("42")).
-		Bold(true)
-
-	errorStyle = lipgloss.NewStyle().
-		Foreground(lipgloss.Color("196")).
-		Bold(true)
-
-	infoStyle = lipgloss.NewStyle().
-		Foreground(lipgloss.Color("86"))
-)

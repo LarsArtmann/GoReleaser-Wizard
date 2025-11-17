@@ -7,19 +7,34 @@ import (
 	"os/exec"
 	"path/filepath"
 
+	"github.com/LarsArtmann/template-GoReleaser/internal/domain"
 	"github.com/charmbracelet/log"
 )
+
+// generateGoReleaserConfig generates GoReleaser configuration from SafeProjectConfig
+func generateGoReleaserConfig(config *domain.SafeProjectConfig) error {
+	// TODO: Implement actual configuration generation
+	fmt.Printf("Generating GoReleaser config for project: %s\n", config.ProjectName)
+	return nil
+}
+
+// generateGitHubActions generates GitHub Actions workflow from SafeProjectConfig
+func generateGitHubActions(config *domain.SafeProjectConfig) error {
+	// TODO: Implement actual GitHub Actions generation
+	fmt.Printf("Generating GitHub Actions for project: %s\n", config.ProjectName)
+	return nil
+}
 
 // ConfigGenerationJob generates GoReleaser configuration
 type ConfigGenerationJob struct {
 	id     string
-	config *ProjectConfig
+	config *domain.SafeProjectConfig
 	force  bool
 	logger *log.Logger
 }
 
 // NewConfigGenerationJob creates a new config generation job
-func NewConfigGenerationJob(config *ProjectConfig, force bool, logger *log.Logger) *ConfigGenerationJob {
+func NewConfigGenerationJob(config *domain.SafeProjectConfig, force bool, logger *log.Logger) *ConfigGenerationJob {
 	return &ConfigGenerationJob{
 		id:     "config-generation",
 		config: config,
@@ -102,12 +117,12 @@ func (j *ConfigGenerationJob) Rollback(ctx context.Context) error {
 // GitHubActionsGenerationJob generates GitHub Actions workflow
 type GitHubActionsGenerationJob struct {
 	id     string
-	config *ProjectConfig
+	config *domain.SafeProjectConfig
 	logger *log.Logger
 }
 
 // NewGitHubActionsGenerationJob creates a new GitHub Actions generation job
-func NewGitHubActionsGenerationJob(config *ProjectConfig, logger *log.Logger) *GitHubActionsGenerationJob {
+func NewGitHubActionsGenerationJob(config *domain.SafeProjectConfig, logger *log.Logger) *GitHubActionsGenerationJob {
 	return &GitHubActionsGenerationJob{
 		id:     "github-actions-generation",
 		config: config,
@@ -132,7 +147,7 @@ func (j *GitHubActionsGenerationJob) Execute(ctx context.Context) error {
 	}
 
 	// Check if GitHub Actions is enabled
-	if !j.config.GenerateActions {
+	if !j.config.GetGenerateActions() {
 		j.logger.Info("GitHub Actions generation is disabled, skipping")
 		return nil
 	}
@@ -336,10 +351,10 @@ func (jf *JobFactory) CreateFullWizardJobs(config *ProjectConfig, force bool) []
 
 	// Add dependency check job
 	dependencies := []string{"go"}
-	if config.DockerEnabled {
+	if config.GetDockerEnabled() {
 		dependencies = append(dependencies, "docker")
 	}
-	if config.Signing {
+	if config.GetSigning() {
 		dependencies = append(dependencies, "cosign")
 	}
 	jobs = append(jobs, NewDependencyCheckJob(dependencies, jf.logger))
@@ -348,7 +363,7 @@ func (jf *JobFactory) CreateFullWizardJobs(config *ProjectConfig, force bool) []
 	jobs = append(jobs, NewConfigGenerationJob(config, force, jf.logger))
 
 	// Add GitHub Actions generation job
-	if config.GenerateActions {
+	if config.GetGenerateActions() {
 		jobs = append(jobs, NewGitHubActionsGenerationJob(config, jf.logger))
 	}
 

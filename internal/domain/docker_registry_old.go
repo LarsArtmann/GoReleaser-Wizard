@@ -1,9 +1,7 @@
 package domain
 
 import (
-	"fmt"
 	"regexp"
-	"strings"
 )
 
 // DockerRegistry represents Docker registry types
@@ -19,14 +17,14 @@ const (
 )
 
 // DockerRegistry metadata - generated from TypeSpec invariants
-type dockerRegistryMeta struct {
+type dockerRegistryMetadata struct {
 	urlPattern           string
 	supportsHTTPSOnly    bool
 	requiresAuthentication bool
 	defaultNamespace     string
 }
 
-var dockerRegistryMetaMap = map[DockerRegistry]dockerRegistryMeta{
+var dockerRegistryMetadata = map[DockerRegistry]dockerRegistryMetadata{
 	DockerRegistryDockerHub: {
 		urlPattern:           "^[a-z0-9]([a-z0-9-]*[a-z0-9])?$",
 		supportsHTTPSOnly:    false,
@@ -61,7 +59,7 @@ var dockerRegistryMetaMap = map[DockerRegistry]dockerRegistryMeta{
 
 // IsValid returns true if DockerRegistry is valid
 func (dr DockerRegistry) IsValid() bool {
-	_, exists := dockerRegistryMetaMap[dr]
+	_, exists := dockerRegistryMetadata[dr]
 	return exists
 }
 
@@ -85,7 +83,7 @@ func (dr DockerRegistry) String() string {
 
 // URLPattern returns the URL validation pattern for this registry
 func (dr DockerRegistry) URLPattern() string {
-	if meta, exists := dockerRegistryMetaMap[dr]; exists {
+	if meta, exists := dockerRegistryMetadata[dr]; exists {
 		return meta.urlPattern
 	}
 	return ""
@@ -93,7 +91,7 @@ func (dr DockerRegistry) URLPattern() string {
 
 // SupportsHTTPSOnly returns true if registry only supports HTTPS
 func (dr DockerRegistry) SupportsHTTPSOnly() bool {
-	if meta, exists := dockerRegistryMetaMap[dr]; exists {
+	if meta, exists := dockerRegistryMetadata[dr]; exists {
 		return meta.supportsHTTPSOnly
 	}
 	return true
@@ -101,7 +99,7 @@ func (dr DockerRegistry) SupportsHTTPSOnly() bool {
 
 // RequiresAuthentication returns true if registry requires authentication
 func (dr DockerRegistry) RequiresAuthentication() bool {
-	if meta, exists := dockerRegistryMetaMap[dr]; exists {
+	if meta, exists := dockerRegistryMetadata[dr]; exists {
 		return meta.requiresAuthentication
 	}
 	return true
@@ -109,22 +107,10 @@ func (dr DockerRegistry) RequiresAuthentication() bool {
 
 // DefaultNamespace returns the default namespace for this registry
 func (dr DockerRegistry) DefaultNamespace() string {
-	if meta, exists := dockerRegistryMetaMap[dr]; exists {
+	if meta, exists := dockerRegistryMetadata[dr]; exists {
 		return meta.defaultNamespace
 	}
 	return ""
-}
-
-// ValidateDockerRegistry validates a Docker registry
-func ValidateDockerRegistry(registry DockerRegistry) error {
-	if !registry.IsValid() {
-		return NewValidationError(
-			ErrInvalidDockerRegistry,
-			"Invalid Docker registry",
-			fmt.Sprintf("'%s' is not a valid Docker registry", registry),
-		)
-	}
-	return nil
 }
 
 // ValidateDockerRegistryURL validates a Docker registry URL
@@ -186,33 +172,10 @@ func ValidateDockerImageName(name string) error {
 	return nil
 }
 
-// GetAllDockerRegistries returns all available Docker registries
-func GetAllDockerRegistries() []DockerRegistry {
-	return []DockerRegistry{
-		DockerRegistryDockerHub, DockerRegistryGitHub, DockerRegistryGitLab,
-		DockerRegistryQuay, DockerRegistryCustom,
+// ValidateDockerRegistry validates a Docker registry
+func ValidateDockerRegistry(registry DockerRegistry) error {
+	if !registry.IsValid() {
+		return fmt.Errorf("invalid Docker registry: %s", registry)
 	}
-}
-
-// GetRecommendedDockerRegistry returns recommended registry (Docker Hub)
-func GetRecommendedDockerRegistry() DockerRegistry {
-	return DockerRegistryDockerHub
-}
-
-// ConvertToDockerRegistry converts string display name to DockerRegistry
-func ConvertToDockerRegistry(displayName string) DockerRegistry {
-	switch strings.ToLower(strings.TrimSpace(displayName)) {
-	case "docker hub", "docker.io":
-		return DockerRegistryDockerHub
-	case "github", "ghcr.io":
-		return DockerRegistryGitHub
-	case "gitlab", "registry.gitlab.com":
-		return DockerRegistryGitLab
-	case "quay", "quay.io":
-		return DockerRegistryQuay
-	case "custom":
-		return DockerRegistryCustom
-	default:
-		return DockerRegistryDockerHub
-	}
+	return nil
 }

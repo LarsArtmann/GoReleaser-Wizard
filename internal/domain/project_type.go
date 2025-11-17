@@ -2,10 +2,9 @@ package domain
 
 import (
 	"fmt"
-	"strings"
 )
 
-// ProjectType represents the type of project being configured
+// ProjectType represents type of project being configured
 // Generated from TypeSpec specification - DO NOT MODIFY MANUALLY
 type ProjectType string
 
@@ -18,7 +17,7 @@ const (
 )
 
 // ProjectType metadata - generated from TypeSpec invariants
-type projectTypeMetadata struct {
+type projectTypeMeta struct {
 	defaultCGOEnabled     bool
 	recommendedPlatforms  []Platform
 	dockerSupported      bool
@@ -26,7 +25,7 @@ type projectTypeMetadata struct {
 	defaultBinaryName    string
 }
 
-var projectTypeMetadata = map[ProjectType]projectTypeMetadata{
+var projectTypeMetaMap = map[ProjectType]projectTypeMeta{
 	ProjectTypeCLI: {
 		defaultCGOEnabled:    false,
 		recommendedPlatforms: []Platform{PlatformLinux, PlatformDarwin, PlatformWindows},
@@ -36,41 +35,41 @@ var projectTypeMetadata = map[ProjectType]projectTypeMetadata{
 	},
 	ProjectTypeWeb: {
 		defaultCGOEnabled:    true,
-		recommendedPlatforms: []Platform{PlatformLinux, PlatformDarwin},
+		recommendedPlatforms: []Platform{PlatformLinux},
 		dockerSupported:     true,
 		requiresMainPath:    true,
-		defaultBinaryName:   "server",
+		defaultBinaryName:   "web-service",
 	},
 	ProjectTypeLibrary: {
 		defaultCGOEnabled:    false,
 		recommendedPlatforms: []Platform{PlatformLinux, PlatformDarwin, PlatformWindows},
 		dockerSupported:     false,
 		requiresMainPath:    false,
-		defaultBinaryName:   "lib-tool",
+		defaultBinaryName:   "library",
 	},
 	ProjectTypeAPI: {
 		defaultCGOEnabled:    true,
-		recommendedPlatforms: []Platform{PlatformLinux, PlatformDarwin},
+		recommendedPlatforms: []Platform{PlatformLinux},
 		dockerSupported:     true,
 		requiresMainPath:    true,
-		defaultBinaryName:   "api",
+		defaultBinaryName:   "api-server",
 	},
 	ProjectTypeDesktop: {
 		defaultCGOEnabled:    true,
-		recommendedPlatforms: []Platform{PlatformWindows, PlatformDarwin, PlatformLinux},
+		recommendedPlatforms: []Platform{PlatformDarwin, PlatformWindows},
 		dockerSupported:     false,
 		requiresMainPath:    true,
-		defaultBinaryName:   "app",
+		defaultBinaryName:   "desktop-app",
 	},
 }
 
-// IsValid returns true if the ProjectType is valid
+// IsValid returns true if ProjectType is valid
 func (pt ProjectType) IsValid() bool {
-	_, exists := projectTypeMetadata[pt]
+	_, exists := projectTypeMetaMap[pt]
 	return exists
 }
 
-// String returns the human-readable display name
+// String returns human-readable display name
 func (pt ProjectType) String() string {
 	switch pt {
 	case ProjectTypeCLI:
@@ -90,7 +89,7 @@ func (pt ProjectType) String() string {
 
 // DefaultCGOEnabled returns the default CGO setting for this project type
 func (pt ProjectType) DefaultCGOEnabled() bool {
-	if meta, exists := projectTypeMetadata[pt]; exists {
+	if meta, exists := projectTypeMetaMap[pt]; exists {
 		return meta.defaultCGOEnabled
 	}
 	return false
@@ -98,7 +97,7 @@ func (pt ProjectType) DefaultCGOEnabled() bool {
 
 // RecommendedPlatforms returns the recommended platforms for this project type
 func (pt ProjectType) RecommendedPlatforms() []Platform {
-	if meta, exists := projectTypeMetadata[pt]; exists {
+	if meta, exists := projectTypeMetaMap[pt]; exists {
 		return meta.recommendedPlatforms
 	}
 	return []Platform{PlatformLinux, PlatformDarwin, PlatformWindows}
@@ -106,7 +105,7 @@ func (pt ProjectType) RecommendedPlatforms() []Platform {
 
 // DockerSupported returns true if Docker is supported for this project type
 func (pt ProjectType) DockerSupported() bool {
-	if meta, exists := projectTypeMetadata[pt]; exists {
+	if meta, exists := projectTypeMetaMap[pt]; exists {
 		return meta.dockerSupported
 	}
 	return false
@@ -114,7 +113,7 @@ func (pt ProjectType) DockerSupported() bool {
 
 // RequiresMainPath returns true if main path is required for this project type
 func (pt ProjectType) RequiresMainPath() bool {
-	if meta, exists := projectTypeMetadata[pt]; exists {
+	if meta, exists := projectTypeMetaMap[pt]; exists {
 		return meta.requiresMainPath
 	}
 	return true
@@ -122,96 +121,29 @@ func (pt ProjectType) RequiresMainPath() bool {
 
 // DefaultBinaryName returns the default binary name for this project type
 func (pt ProjectType) DefaultBinaryName() string {
-	if meta, exists := projectTypeMetadata[pt]; exists {
+	if meta, exists := projectTypeMetaMap[pt]; exists {
 		return meta.defaultBinaryName
 	}
 	return "app"
 }
 
-// ValidateProjectName validates a project name according to TypeSpec rules
-func ValidateProjectName(name string) error {
-	if len(name) < 1 || len(name) > 63 {
-		return fmt.Errorf("project name must be between 1 and 63 characters")
+// ValidateProjectType validates a project type
+func ValidateProjectType(pt ProjectType) error {
+	if !pt.IsValid() {
+		return fmt.Errorf("invalid project type: %s", pt)
 	}
-	
-	if !isAlphaNumeric(name[0]) {
-		return fmt.Errorf("project name must start with a letter")
-	}
-	
-	for _, r := range name {
-		if !isAlphaNumeric(r) && r != '_' && r != '-' {
-			return fmt.Errorf("project name can only contain letters, numbers, hyphens, and underscores")
-		}
-	}
-	
 	return nil
 }
 
-// ValidateBinaryName validates a binary name according to TypeSpec rules
-func ValidateBinaryName(name string) error {
-	if len(name) < 1 || len(name) > 63 {
-		return fmt.Errorf("binary name must be between 1 and 63 characters")
+// GetAllProjectTypes returns all available project types
+func GetAllProjectTypes() []ProjectType {
+	return []ProjectType{
+		ProjectTypeCLI, ProjectTypeWeb, ProjectTypeLibrary,
+		ProjectTypeAPI, ProjectTypeDesktop,
 	}
-	
-	if !isAlphaNumeric(name[0]) {
-		return fmt.Errorf("binary name must start with a letter")
-	}
-	
-	for _, r := range name {
-		if !isAlphaNumeric(r) && r != '_' && r != '-' {
-			return fmt.Errorf("binary name can only contain letters, numbers, hyphens, and underscores")
-		}
-	}
-	
-	// Check for reserved Windows names
-	reservedNames := []string{"con", "prn", "aux", "nul", "com1", "com2", "com3", "com4", "com5", "com6", "com7", "com8", "com9", "lpt1", "lpt2", "lpt3", "lpt4", "lpt5", "lpt6", "lpt7", "lpt8", "lpt9"}
-	lowerName := strings.ToLower(name)
-	for _, reserved := range reservedNames {
-		if lowerName == reserved {
-			return fmt.Errorf("binary name '%s' is reserved", name)
-		}
-	}
-	
-	return nil
 }
 
-// ValidateMainPath validates a main path according to TypeSpec rules
-func ValidateMainPath(path string) error {
-	if len(path) == 0 || len(path) > 255 {
-		return fmt.Errorf("main path must be between 1 and 255 characters")
-	}
-	
-	for _, r := range path {
-		if !isAlphaNumeric(r) && r != '/' && r != '_' && r != '.' && r != '-' {
-			return fmt.Errorf("main path can only contain letters, numbers, slashes, underscores, dots, and hyphens")
-		}
-	}
-	
-	// Prevent path traversal attempts
-	if strings.Contains(path, "..") {
-		return fmt.Errorf("main path cannot contain parent directory references")
-	}
-	
-	return nil
-}
-
-// ValidateProjectDescription validates a project description according to TypeSpec rules
-func ValidateProjectDescription(desc string) error {
-	if len(desc) > 255 {
-		return fmt.Errorf("project description must be 255 characters or less")
-	}
-	
-	// Check for control characters
-	for _, r := range desc {
-		if r < 32 || r == 127 {
-			return fmt.Errorf("project description cannot contain control characters")
-		}
-	}
-	
-	return nil
-}
-
-// Helper function to check if a rune is alphanumeric
-func isAlphaNumeric(r rune) bool {
-	return (r >= 'a' && r <= 'z') || (r >= 'A' && r <= 'Z') || (r >= '0' && r <= '9')
+// GetRecommendedProjectType returns the recommended project type (CLI)
+func GetRecommendedProjectType() ProjectType {
+	return ProjectTypeCLI
 }

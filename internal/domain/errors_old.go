@@ -1,15 +1,5 @@
 package domain
 
-import (
-	"context"
-	"fmt"
-	"io"
-	"os"
-	"path/filepath"
-	"strings"
-	"errors"
-)
-
 // DomainError represents all domain-specific errors
 // Provides type safety and detailed error information
 type DomainError struct {
@@ -222,7 +212,7 @@ func TemplateExecutionFailedError(template string, cause error) *DomainError {
 
 // External service error constructors
 func GitOperationFailedError(operation string, cause error) *DomainError {
-	return NewExternalServiceError(ErrGitOperationFailed, "Git operation failed", fmt.Sprintf("Failed to perform %s", operation), cause)
+	return NewExternalServiceError(ErrGitOperationFailed, "Git operation failed", fmt.Sprintf("Failed to perform %s", operation))
 }
 
 func RegistryAccessDeniedError(registry string) *DomainError {

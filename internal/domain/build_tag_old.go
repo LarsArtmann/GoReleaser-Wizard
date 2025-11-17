@@ -2,95 +2,162 @@ package domain
 
 import (
 	"fmt"
+	"strings"
 )
 
-// BuildTag represents a constrained build tag
-// Generated from TypeSpec specification - DO NOT MODIFY MANUALLY
+// BuildTag represents build tags for conditional compilation
 type BuildTag struct {
 	Name        string `json:"name" yaml:"name"`
-	Description string `json:"description,omitempty" yaml:"description,omitempty"`
+	Description string `json:"description" yaml:"description"`
 }
 
-// ValidateBuildTag validates a build tag according to TypeSpec rules
+// IsValid returns true if BuildTag has valid name
+func (bt BuildTag) IsValid() bool {
+	if len(bt.Name) == 0 {
+		return false
+	}
+	
+	// Build tag pattern: alphanumerics, hyphens, underscores
+	if !isValidBuildTagName(bt.Name) {
+		return false
+	}
+	
+	return true
+}
+
+// String returns string representation of BuildTag
+func (bt BuildTag) String() string {
+	return bt.Name
+}
+
+// isValidBuildTagName validates build tag name format
+func isValidBuildTagName(name string) bool {
+	if len(name) == 0 {
+		return false
+	}
+	
+	for _, char := range name {
+		if !(char == '_' || char == '-' || (char >= 'a' && char <= 'z') || (char >= 'A' && char <= 'Z') || (char >= '0' && char <= '9')) {
+			return false
+		}
+	}
+	
+	return true
+}
+
+// ValidateBuildTag validates a single build tag
 func ValidateBuildTag(tag BuildTag) error {
-	if len(tag.Name) < 1 || len(tag.Name) > 50 {
-		return fmt.Errorf("build tag name must be between 1 and 50 characters")
+	if !tag.IsValid() {
+		return fmt.Errorf("invalid build tag: %s", tag.Name)
 	}
-	
-	// Build tag pattern: letters, numbers, hyphens, underscores only
-	pattern := `^[a-zA-Z0-9_-]+$`
-	if matched, err := regexp.MatchString(pattern, tag.Name); err != nil {
-		return fmt.Errorf("invalid build tag pattern: %v", err)
-	} else if !matched {
-		return fmt.Errorf("build tag name '%s' can only contain letters, numbers, hyphens, and underscores", tag.Name)
-	}
-	
-	if len(tag.Description) > 200 {
-		return fmt.Errorf("build tag description must be 200 characters or less")
-	}
-	
 	return nil
 }
 
 // ValidateBuildTags validates a slice of build tags
 func ValidateBuildTags(tags []BuildTag) error {
-	if len(tags) > 10 {
-		return fmt.Errorf("maximum 10 build tags allowed")
+	if len(tags) > 50 {
+		return fmt.Errorf("too many build tags (max 50)")
 	}
-	
+
 	for _, tag := range tags {
 		if err := ValidateBuildTag(tag); err != nil {
-			return fmt.Errorf("build tag '%s': %w", tag.Name, err)
+			return err
 		}
 	}
-	
-	// Check for duplicate tag names
-	tagNames := make(map[string]bool)
-	for _, tag := range tags {
-		if tagNames[tag.Name] {
-			return fmt.Errorf("duplicate build tag name: %s", tag.Name)
-		}
-		tagNames[tag.Name] = true
-	}
-	
-	return nil
-}
 
-// CreateBuildTag creates a new build tag with validation
-func CreateBuildTag(name, description string) (BuildTag, error) {
-	tag := BuildTag{
-		Name:        name,
-		Description: description,
+	// Check for duplicates
+	seen := make(map[string]bool)
+	for _, tag := range tags {
+		if seen[tag.Name] {
+			return fmt.Errorf("duplicate build tag: %s", tag.Name)
+		}
+		seen[tag.Name] = true
 	}
-	
-	if err := ValidateBuildTag(tag); err != nil {
-		return BuildTag{}, err
-	}
-	
-	return tag, nil
+
+	return nil
 }
 
 // GetCommonBuildTags returns commonly used build tags
 func GetCommonBuildTags() []BuildTag {
 	return []BuildTag{
-		{Name: "netgo", Description: "Enable networking support for Android"},
-		{Name: "sqlite", Description: "Enable SQLite support"},
-		{Name: "sqlite_omit_load_extension", Description: "Omit SQLite load extension support"},
-		{Name: "timetzdata", Description: "Embed timezone database"},
-		{Name: "osusergo", Description: "Enable osusergo support"},
-		{Name: "static_build", Description: "Enable static linking"},
+		{
+			Name:        "netgo",
+			Description: "Use netgo for networking",
+		},
+		{
+			Name:        "osusergo",
+			Description: "Use osusergo for user lookup",
+		},
+		{
+			Name:        "sqlite_omit_load_extension",
+			Description: "Omit SQLite load extension",
+		},
+		{
+			Name:        "sqlite_unlock_notify",
+			Description: "Enable SQLite unlock notify",
+		},
+		{
+			Name:        "inotify",
+			Description: "Enable inotify support",
+		},
+		{
+			Name:        "kqueue",
+			Description: "Enable kqueue support",
+		},
 	}
 }
 
-// FilterBuildTagsByPlatform returns platform-specific build tags
-func FilterBuildTagsByPlatform(tags []BuildTag, platforms []Platform) []BuildTag {
+// FilterBuildTagsByPlatform filters build tags by platform compatibility
+func FilterBuildTagsByPlatform(tags []BuildTag, platform Platform) []BuildTag {
+	// Platform-specific build tag filtering
+	platformTags := make(map[Platform][]string){
+		PlatformLinux:   {"inotify"},
+		PlatformDarwin:  {"kqueue"},
+		PlatformWindows:  {},
+		PlatformFreeBSD: {"kqueue"},
+		PlatformOpenBSD: {"kqueue"},
+		PlatformNetBSD:  {"kqueue"},
+	}
+
 	filtered := []BuildTag{}
+	compatibleTags := platformTags[platform]
 	
 	for _, tag := range tags {
-		// Add platform-specific filtering logic here
-		// For now, return all tags
-		filtered = append(filtered, tag)
+		// Keep tags that are platform-specific and compatible, or general tags
+		isPlatformSpecific := false
+		for _, pt := range GetAllPlatforms() {
+			if contains(platformTags[pt], tag.Name) {
+				isPlatformSpecific = true
+				if contains(compatibleTags, tag.Name) {
+					filtered = append(filtered, tag)
+				}
+				break
+			}
+		}
+		
+		// Keep general tags
+		if !isPlatformSpecific {
+			filtered = append(filtered, tag)
+		}
 	}
 	
 	return filtered
+}
+
+// CreateBuildTag creates a new build tag
+func CreateBuildTag(name, description string) BuildTag {
+	return BuildTag{
+		Name:        name,
+		Description: description,
+	}
+}
+
+// contains checks if slice contains string
+func contains(slice []string, item string) bool {
+	for _, s := range slice {
+		if s == item {
+			return true
+		}
+	}
+	return false
 }

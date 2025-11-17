@@ -37,7 +37,8 @@ func isValidBuildTagName(name string) bool {
 	}
 	
 	for _, char := range name {
-		if !(char == '_' || char == '-' || (char >= 'a' && char <= 'z') || (char >= 'A' && char <= 'Z') || (char >= '0' && char <= '9')) {
+		isValid := (char == '_' || char == '-' || (char >= 'a' && char <= 'z') || (char >= 'A' && char <= 'Z') || (char >= '0' && char <= '9'))
+		if !isValid {
 			return false
 		}
 	}
@@ -110,14 +111,13 @@ func GetCommonBuildTags() []BuildTag {
 // FilterBuildTagsByPlatform filters build tags by platform compatibility
 func FilterBuildTagsByPlatform(tags []BuildTag, platform Platform) []BuildTag {
 	// Platform-specific build tag filtering
-	platformTags := make(map[Platform][]string){
-		PlatformLinux:   {"inotify"},
-		PlatformDarwin:  {"kqueue"},
-		PlatformWindows:  {},
-		PlatformFreeBSD: {"kqueue"},
-		PlatformOpenBSD: {"kqueue"},
-		PlatformNetBSD:  {"kqueue"},
-	}
+	platformTags := make(map[Platform][]string)
+	platformTags[PlatformLinux] = []string{"inotify"}
+	platformTags[PlatformDarwin] = []string{"kqueue"}
+	platformTags[PlatformWindows] = []string{}
+	platformTags[PlatformFreeBSD] = []string{"kqueue"}
+	platformTags[PlatformOpenBSD] = []string{"kqueue"}
+	platformTags[PlatformNetBSD] = []string{"kqueue"}
 
 	filtered := []BuildTag{}
 	compatibleTags := platformTags[platform]
@@ -126,17 +126,28 @@ func FilterBuildTagsByPlatform(tags []BuildTag, platform Platform) []BuildTag {
 		// Keep tags that are platform-specific and compatible, or general tags
 		isPlatformSpecific := false
 		for _, pt := range GetAllPlatforms() {
-			if contains(platformTags[pt], tag.Name) {
-				isPlatformSpecific = true
-				if contains(compatibleTags, tag.Name) {
-					filtered = append(filtered, tag)
+			for _, ptTag := range platformTags[pt] {
+				if tag.Name == ptTag {
+					isPlatformSpecific = true
+					break
 				}
+			}
+			if isPlatformSpecific {
 				break
 			}
 		}
 		
-		// Keep general tags
-		if !isPlatformSpecific {
+		// Check if compatible
+		compatible := false
+		for _, ct := range compatibleTags {
+			if tag.Name == ct {
+				compatible = true
+				break
+			}
+		}
+		
+		// Keep general tags or compatible platform-specific tags
+		if !isPlatformSpecific || compatible {
 			filtered = append(filtered, tag)
 		}
 	}

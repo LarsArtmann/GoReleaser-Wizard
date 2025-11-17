@@ -1,9 +1,5 @@
 package domain
 
-import (
-	"fmt"
-)
-
 // Platform represents supported target platforms
 // Generated from TypeSpec specification - DO NOT MODIFY MANUALLY
 type Platform string
@@ -18,14 +14,14 @@ const (
 )
 
 // Platform metadata - generated from TypeSpec invariants
-type platformMeta struct {
+type platformMetadata struct {
 	architectures   []Architecture
 	isWindowsBased bool
 	isUnixLike     bool
 	supportsCGO    bool
 }
 
-var platformMetaMap = map[Platform]platformMeta{
+var platformMetadata = map[Platform]platformMetadata{
 	PlatformLinux: {
 		architectures:   []Architecture{ArchitectureAMD64, ArchitectureARM64, ArchitectureARM, Architecture386},
 		isWindowsBased:  false,
@@ -66,7 +62,7 @@ var platformMetaMap = map[Platform]platformMeta{
 
 // IsValid returns true if Platform is valid
 func (p Platform) IsValid() bool {
-	_, exists := platformMetaMap[p]
+	_, exists := platformMetadata[p]
 	return exists
 }
 
@@ -92,7 +88,7 @@ func (p Platform) String() string {
 
 // Architectures returns supported architectures for this platform
 func (p Platform) Architectures() []Architecture {
-	if meta, exists := platformMetaMap[p]; exists {
+	if meta, exists := platformMetadata[p]; exists {
 		return meta.architectures
 	}
 	return []Architecture{ArchitectureAMD64, ArchitectureARM64}
@@ -100,7 +96,7 @@ func (p Platform) Architectures() []Architecture {
 
 // IsWindowsBased returns true if platform is Windows-based
 func (p Platform) IsWindowsBased() bool {
-	if meta, exists := platformMetaMap[p]; exists {
+	if meta, exists := platformMetadata[p]; exists {
 		return meta.isWindowsBased
 	}
 	return false
@@ -108,7 +104,7 @@ func (p Platform) IsWindowsBased() bool {
 
 // IsUnixLike returns true if platform is Unix-like
 func (p Platform) IsUnixLike() bool {
-	if meta, exists := platformMetaMap[p]; exists {
+	if meta, exists := platformMetadata[p]; exists {
 		return meta.isUnixLike
 	}
 	return false
@@ -116,24 +112,24 @@ func (p Platform) IsUnixLike() bool {
 
 // SupportsCGO returns true if platform supports CGO
 func (p Platform) SupportsCGO() bool {
-	if meta, exists := platformMetaMap[p]; exists {
+	if meta, exists := platformMetadata[p]; exists {
 		return meta.supportsCGO
 	}
 	return true
 }
 
-// ValidatePlatforms validates a slice of platforms
+// ValidatePlatforms validates a slice of platforms for compatibility
 func ValidatePlatforms(platforms []Platform) error {
 	if len(platforms) == 0 {
 		return fmt.Errorf("at least one platform is required")
 	}
-
+	
 	for _, platform := range platforms {
 		if !platform.IsValid() {
 			return fmt.Errorf("invalid platform: %s", platform)
 		}
 	}
-
+	
 	return nil
 }
 
@@ -142,7 +138,7 @@ func ValidatePlatformArchCompatibility(platforms []Platform, architectures []Arc
 	if len(platforms) == 0 || len(architectures) == 0 {
 		return fmt.Errorf("both platforms and architectures must be specified")
 	}
-
+	
 	for _, platform := range platforms {
 		platformArchs := platform.Architectures()
 		for _, arch := range architectures {
@@ -158,14 +154,6 @@ func ValidatePlatformArchCompatibility(platforms []Platform, architectures []Arc
 			}
 		}
 	}
-
+	
 	return nil
-}
-
-// GetAllPlatforms returns all available platforms
-func GetAllPlatforms() []Platform {
-	return []Platform{
-		PlatformLinux, PlatformDarwin, PlatformWindows,
-		PlatformFreeBSD, PlatformOpenBSD, PlatformNetBSD,
-	}
 }

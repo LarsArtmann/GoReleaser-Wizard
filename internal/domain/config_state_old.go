@@ -13,14 +13,14 @@ const (
 )
 
 // ConfigState metadata - generated from TypeSpec invariants
-type configStateMeta struct {
+type configStateMetadata struct {
 	description       string
 	isFinal           bool
 	allowsValidation  bool
 	allowsGeneration  bool
 }
 
-var configStateMetaMap = map[ConfigState]configStateMeta{
+var configStateMetadata = map[ConfigState]configStateMetadata{
 	ConfigStateDraft: {
 		description:      "Configuration is being created or modified",
 		isFinal:          false,
@@ -55,7 +55,7 @@ var configStateMetaMap = map[ConfigState]configStateMeta{
 
 // IsValid returns true if ConfigState is valid
 func (cs ConfigState) IsValid() bool {
-	_, exists := configStateMetaMap[cs]
+	_, exists := configStateMetadata[cs]
 	return exists
 }
 
@@ -79,7 +79,7 @@ func (cs ConfigState) String() string {
 
 // Description returns the description for this state
 func (cs ConfigState) Description() string {
-	if meta, exists := configStateMetaMap[cs]; exists {
+	if meta, exists := configStateMetadata[cs]; exists {
 		return meta.description
 	}
 	return ""
@@ -87,7 +87,7 @@ func (cs ConfigState) Description() string {
 
 // IsFinal returns true if this is a final state
 func (cs ConfigState) IsFinal() bool {
-	if meta, exists := configStateMetaMap[cs]; exists {
+	if meta, exists := configStateMetadata[cs]; exists {
 		return meta.isFinal
 	}
 	return false
@@ -95,7 +95,7 @@ func (cs ConfigState) IsFinal() bool {
 
 // AllowsValidation returns true if validation is allowed in this state
 func (cs ConfigState) AllowsValidation() bool {
-	if meta, exists := configStateMetaMap[cs]; exists {
+	if meta, exists := configStateMetadata[cs]; exists {
 		return meta.allowsValidation
 	}
 	return false
@@ -103,7 +103,7 @@ func (cs ConfigState) AllowsValidation() bool {
 
 // AllowsGeneration returns true if generation is allowed in this state
 func (cs ConfigState) AllowsGeneration() bool {
-	if meta, exists := configStateMetaMap[cs]; exists {
+	if meta, exists := configStateMetadata[cs]; exists {
 		return meta.allowsGeneration
 	}
 	return false
@@ -112,11 +112,7 @@ func (cs ConfigState) AllowsGeneration() bool {
 // ValidateConfigState validates a configuration state
 func ValidateConfigState(state ConfigState) error {
 	if !state.IsValid() {
-		return NewValidationError(
-			ErrInvalidConfigState,
-			"Invalid configuration state",
-			fmt.Sprintf("'%s' is not a valid configuration state", state),
-		)
+		return fmt.Errorf("invalid configuration state: %s", state)
 	}
 	return nil
 }

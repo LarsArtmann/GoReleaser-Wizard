@@ -1,10 +1,5 @@
 package domain
 
-import (
-	"fmt"
-	"strings"
-)
-
 // Architecture represents supported CPU architectures
 // Generated from TypeSpec specification - DO NOT MODIFY MANUALLY
 type Architecture string
@@ -22,13 +17,13 @@ const (
 )
 
 // Architecture metadata - generated from TypeSpec invariants
-type architectureMeta struct {
+type architectureMetadata struct {
 	supportedByAllPlatforms bool
 	is64Bit               bool
 	goSupport             string
 }
 
-var architectureMetaMap = map[Architecture]architectureMeta{
+var architectureMetadata = map[Architecture]architectureMetadata{
 	ArchitectureAMD64: {
 		supportedByAllPlatforms: true,
 		is64Bit:               true,
@@ -78,7 +73,7 @@ var architectureMetaMap = map[Architecture]architectureMeta{
 
 // IsValid returns true if Architecture is valid
 func (a Architecture) IsValid() bool {
-	_, exists := architectureMetaMap[a]
+	_, exists := architectureMetadata[a]
 	return exists
 }
 
@@ -110,7 +105,7 @@ func (a Architecture) String() string {
 
 // SupportedByAllPlatforms returns true if architecture is supported by all platforms
 func (a Architecture) SupportedByAllPlatforms() bool {
-	if meta, exists := architectureMetaMap[a]; exists {
+	if meta, exists := architectureMetadata[a]; exists {
 		return meta.supportedByAllPlatforms
 	}
 	return false
@@ -118,7 +113,7 @@ func (a Architecture) SupportedByAllPlatforms() bool {
 
 // Is64Bit returns true if architecture is 64-bit
 func (a Architecture) Is64Bit() bool {
-	if meta, exists := architectureMetaMap[a]; exists {
+	if meta, exists := architectureMetadata[a]; exists {
 		return meta.is64Bit
 	}
 	return false
@@ -126,7 +121,7 @@ func (a Architecture) Is64Bit() bool {
 
 // GoSupport returns Go support level for this architecture
 func (a Architecture) GoSupport() string {
-	if meta, exists := architectureMetaMap[a]; exists {
+	if meta, exists := architectureMetadata[a]; exists {
 		return meta.goSupport
 	}
 	return "unknown"
@@ -137,13 +132,13 @@ func ValidateArchitectures(architectures []Architecture) error {
 	if len(architectures) == 0 {
 		return fmt.Errorf("at least one architecture is required")
 	}
-
+	
 	for _, arch := range architectures {
 		if !arch.IsValid() {
 			return fmt.Errorf("invalid architecture: %s", arch)
 		}
 	}
-
+	
 	return nil
 }
 

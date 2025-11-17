@@ -1,10 +1,5 @@
 package domain
 
-import (
-	"fmt"
-	"strings"
-)
-
 // GitProvider represents git hosting providers
 // Generated from TypeSpec specification - DO NOT MODIFY MANUALLY
 type GitProvider string
@@ -18,7 +13,7 @@ const (
 )
 
 // GitProvider metadata - generated from TypeSpec invariants
-type gitProviderMeta struct {
+type gitProviderMetadata struct {
 	defaultRegistry           DockerRegistry
 	actionsSupported         bool
 	apiURL                  string
@@ -26,7 +21,7 @@ type gitProviderMeta struct {
 	requiresPersonalAccessToken bool
 }
 
-var gitProviderMetaMap = map[GitProvider]gitProviderMeta{
+var gitProviderMetadata = map[GitProvider]gitProviderMetadata{
 	GitProviderGitHub: {
 		defaultRegistry:           DockerRegistryGitHub,
 		actionsSupported:         true,
@@ -66,7 +61,7 @@ var gitProviderMetaMap = map[GitProvider]gitProviderMeta{
 
 // IsValid returns true if GitProvider is valid
 func (gp GitProvider) IsValid() bool {
-	_, exists := gitProviderMetaMap[gp]
+	_, exists := gitProviderMetadata[gp]
 	return exists
 }
 
@@ -90,7 +85,7 @@ func (gp GitProvider) String() string {
 
 // DefaultRegistry returns the default Docker registry for this provider
 func (gp GitProvider) DefaultRegistry() DockerRegistry {
-	if meta, exists := gitProviderMetaMap[gp]; exists {
+	if meta, exists := gitProviderMetadata[gp]; exists {
 		return meta.defaultRegistry
 	}
 	return DockerRegistryCustom
@@ -98,7 +93,7 @@ func (gp GitProvider) DefaultRegistry() DockerRegistry {
 
 // ActionsSupported returns true if GitHub Actions are supported
 func (gp GitProvider) ActionsSupported() bool {
-	if meta, exists := gitProviderMetaMap[gp]; exists {
+	if meta, exists := gitProviderMetadata[gp]; exists {
 		return meta.actionsSupported
 	}
 	return false
@@ -106,7 +101,7 @@ func (gp GitProvider) ActionsSupported() bool {
 
 // APIURL returns the API URL for this provider
 func (gp GitProvider) APIURL() string {
-	if meta, exists := gitProviderMetaMap[gp]; exists {
+	if meta, exists := gitProviderMetadata[gp]; exists {
 		return meta.apiURL
 	}
 	return ""
@@ -114,7 +109,7 @@ func (gp GitProvider) APIURL() string {
 
 // WebURL returns the web URL for this provider
 func (gp GitProvider) WebURL() string {
-	if meta, exists := gitProviderMetaMap[gp]; exists {
+	if meta, exists := gitProviderMetadata[gp]; exists {
 		return meta.webURL
 	}
 	return ""
@@ -122,7 +117,7 @@ func (gp GitProvider) WebURL() string {
 
 // RequiresPersonalAccessToken returns true if provider requires personal access token
 func (gp GitProvider) RequiresPersonalAccessToken() bool {
-	if meta, exists := gitProviderMetaMap[gp]; exists {
+	if meta, exists := gitProviderMetadata[gp]; exists {
 		return meta.requiresPersonalAccessToken
 	}
 	return true
@@ -131,42 +126,7 @@ func (gp GitProvider) RequiresPersonalAccessToken() bool {
 // ValidateGitProvider validates a git provider
 func ValidateGitProvider(provider GitProvider) error {
 	if !provider.IsValid() {
-		return NewValidationError(
-			ErrInvalidGitProvider,
-			"Invalid git provider",
-			fmt.Sprintf("'%s' is not a valid git provider", provider),
-		)
+		return fmt.Errorf("invalid git provider: %s", provider)
 	}
 	return nil
-}
-
-// GetAllGitProviders returns all available git providers
-func GetAllGitProviders() []GitProvider {
-	return []GitProvider{
-		GitProviderGitHub, GitProviderGitLab, GitProviderBitbucket,
-		GitProviderGitea, GitProviderSelfHosted,
-	}
-}
-
-// GetRecommendedGitProvider returns recommended git provider (GitHub)
-func GetRecommendedGitProvider() GitProvider {
-	return GitProviderGitHub
-}
-
-// ConvertToGitProvider converts string display name to GitProvider
-func ConvertToGitProvider(displayName string) GitProvider {
-	switch strings.ToLower(strings.TrimSpace(displayName)) {
-	case "github", "🐙  github":
-		return GitProviderGitHub
-	case "gitlab", "🦊  gitlab":
-		return GitProviderGitLab
-	case "bitbucket", "🪣  bitbucket":
-		return GitProviderBitbucket
-	case "gitea", "🕊️  gitea":
-		return GitProviderGitea
-	case "self-hosted", "🏠  self-hosted":
-		return GitProviderSelfHosted
-	default:
-		return GitProviderGitHub
-	}
 }

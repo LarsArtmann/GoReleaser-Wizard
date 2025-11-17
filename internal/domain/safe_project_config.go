@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-// SafeProjectConfig represents the single source of truth for project configuration
+// SafeProjectConfig represents single source of truth for project configuration
 // Generated from TypeSpec specification - DO NOT MODIFY MANUALLY
 type SafeProjectConfig struct {
 	// Basic Information
@@ -18,193 +18,202 @@ type SafeProjectConfig struct {
 	// Build Configuration
 	Platforms     []Platform     `json:"platforms" yaml:"platforms"`
 	Architectures []Architecture `json:"architectures" yaml:"architectures"`
-	CGOEnabled    bool           `json:"cgo_enabled" yaml:"cgo_enabled"`
+	CGOStatus     CGOStatus     `json:"cgo_status" yaml:"cgo_status"`
 	BuildTags     []BuildTag     `json:"build_tags,omitempty" yaml:"build_tags,omitempty"`
 	LDFlags       bool           `json:"ldflags" yaml:"ldflags"`
 
 	// Release Configuration
 	GitProvider    GitProvider    `json:"git_provider" yaml:"git_provider"`
-	DockerEnabled  bool           `json:"docker_enabled" yaml:"docker_enabled"`
+	DockerSupport  DockerSupport  `json:"docker_support" yaml:"docker_support"`
 	DockerRegistry DockerRegistry `json:"docker_registry" yaml:"docker_registry"`
 	DockerImage    string         `json:"docker_image,omitempty" yaml:"docker_image,omitempty"`
-	Signing        bool           `json:"signing" yaml:"signing"`
+	SigningLevel   SigningLevel   `json:"signing_level" yaml:"signing_level"`
 	Homebrew       bool           `json:"homebrew" yaml:"homebrew"`
 	Snap           bool           `json:"snap" yaml:"snap"`
 	SBOM           bool           `json:"sbom" yaml:"sbom"`
 
 	// CI/CD Configuration
-	GenerateActions bool            `json:"generate_actions" yaml:"generate_actions"`
-	ActionsOn       []ActionTrigger `json:"actions_on" yaml:"actions_on"`
+	ActionLevel   ActionLevel    `json:"action_level" yaml:"action_level"`
+	ActionsOn     []ActionTrigger `json:"actions_on" yaml:"actions_on"`
 
 	// Advanced Features
-	ProVersion bool        `json:"pro_version" yaml:"pro_version"`
-	State      ConfigState `json:"state" yaml:"state"`
+	FeatureLevel FeatureLevel `json:"feature_level" yaml:"feature_level"`
+
+	// State Management
+	State ConfigState `json:"state" yaml:"state"`
 }
 
-// NewSafeProjectConfig creates a new configuration with safe defaults
+// NewSafeProjectConfig creates a new safe configuration with smart defaults
 func NewSafeProjectConfig() *SafeProjectConfig {
-	config := &SafeProjectConfig{
-		// Set initial state
-		State: ConfigStateDraft,
-		
-		// Apply smart defaults
-		ProjectType:   ProjectTypeCLI,
-		GitProvider:   GitProviderGitHub,
-		DockerRegistry: DockerRegistryDockerHub,
-		LDFlags:       true,
-		SBOM:          true,
-		GenerateActions: true,
-		ActionsOn:      []ActionTrigger{ActionTriggerVersionTags},
+	return &SafeProjectConfig{
+		// Smart defaults based on project analysis
+		ProjectType:      GetRecommendedProjectType(),
+		Platforms:        GetRecommendedPlatforms(),
+		Architectures:    GetRecommendedArchitectures(),
+		GitProvider:      GetRecommendedGitProvider(),
+		DockerRegistry:   GetRecommendedDockerRegistry(),
+		CGOStatus:        CGOStatusDisabled,
+		ActionLevel:      ActionLevelBasic,
+		SigningLevel:     SigningLevelNone,
+		FeatureLevel:     FeatureLevelBasic,
+		State:            ConfigStateDraft,
+		LDFlags:          true,
+		Homebrew:         false,
+		Snap:             false,
+		SBOM:             false,
 	}
-	
-	// Apply project type specific defaults
-	config.ApplyDefaults()
-	
-	return config
 }
 
-// ApplyDefaults applies intelligent defaults based on project type and context
+// ApplyDefaults applies smart defaults based on project type and context
 func (spc *SafeProjectConfig) ApplyDefaults() {
-	// Apply CGO defaults based on project type
-	if spc.ProjectType.DefaultCGOEnabled() {
-		spc.CGOEnabled = spc.ProjectType.DefaultCGOEnabled()
+	// Apply project type-specific defaults
+	if spc.CGOStatus == CGOStatusDisabled && spc.ProjectType.DefaultCGOEnabled() {
+		spc.CGOStatus = CGOStatusEnabled
 	}
-	
-	// Set recommended platforms if not specified
-	if len(spc.Platforms) == 0 {
+
+	if spc.Platforms == nil || len(spc.Platforms) == 0 {
 		spc.Platforms = spc.ProjectType.RecommendedPlatforms()
 	}
-	
-	// Set recommended architectures if not specified
-	if len(spc.Architectures) == 0 {
-		spc.Architectures = []Architecture{ArchitectureAMD64, ArchitectureARM64}
+
+	if spc.Architectures == nil || len(spc.Architectures) == 0 {
+		spc.Architectures = GetRecommendedArchitectures()
 	}
-	
-	// Set default Docker registry if Docker is enabled
-	if spc.DockerEnabled && spc.DockerRegistry == "" {
-		spc.DockerRegistry = DockerRegistryDockerHub
+
+	if spc.GitProvider == "" {
+		spc.GitProvider = GetRecommendedGitProvider()
 	}
-	
-	// Set default binary name if not specified
-	if spc.BinaryName == "" {
-		spc.BinaryName = spc.ProjectType.DefaultBinaryName()
+
+	// Apply Docker support defaults
+	if spc.DockerSupport == DockerSupportNone && spc.ProjectType.DockerSupported() {
+		spc.DockerSupport = DockerSupportBuild
 	}
-	
-	// Set default main path if not specified
-	if spc.MainPath == "" && spc.ProjectType.RequiresMainPath() {
-		spc.MainPath = "./cmd/" + spc.ProjectType.DefaultBinaryName()
+
+	if spc.DockerRegistry == "" && spc.DockerSupport.IsEnabled() {
+		spc.DockerRegistry = spc.GitProvider.DefaultRegistry()
 	}
-	
-	// Set default image name if not specified
-	if spc.DockerImage == "" {
+
+	// Apply action level defaults
+	if spc.ActionLevel == ActionLevelNone && spc.GitProvider.ActionsSupported() {
+		spc.ActionLevel = ActionLevelBasic
+		if spc.ActionsOn == nil || len(spc.ActionsOn) == 0 {
+			spc.ActionsOn = GetRecommendedTriggers(spc.ProjectType)
+		}
+	}
+
+	// Apply feature level defaults based on project type
+	if spc.FeatureLevel == FeatureLevelBasic {
+		spc.FeatureLevel = GetRecommendedFeatureLevel(spc.ProjectType)
+	}
+
+	// Apply signing level defaults
+	if spc.SigningLevel == SigningLevelNone {
+		spc.SigningLevel = GetRecommendedSigningLevel(spc.ProjectType)
+	}
+
+	// Apply defaults for other fields
+	if spc.BinaryName == "" && spc.ProjectName != "" {
+		spc.BinaryName = spc.ProjectName
+	}
+
+	if spc.DockerImage == "" && spc.ProjectName != "" && spc.DockerSupport.IsEnabled() {
 		spc.DockerImage = strings.ToLower(spc.ProjectName)
 	}
 }
 
-// ValidateInvariants enforces compile-time invariants defined in TypeSpec
+// ValidateInvariants enforces domain invariants and returns any violations
 func (spc *SafeProjectConfig) ValidateInvariants() error {
-	// Basic Information Validation
+	// Basic validation
 	if err := ValidateProjectName(spc.ProjectName); err != nil {
-		return fmt.Errorf("project name validation failed: %w", err)
+		return err
 	}
-	
+
 	if err := ValidateBinaryName(spc.BinaryName); err != nil {
-		return fmt.Errorf("binary name validation failed: %w", err)
+		return err
 	}
-	
-	if err := ValidateProjectDescription(spc.ProjectDescription); err != nil {
-		return fmt.Errorf("project description validation failed: %w", err)
-	}
-	
+
 	if err := ValidateMainPath(spc.MainPath); err != nil {
-		return fmt.Errorf("main path validation failed: %w", err)
+		return err
 	}
-	
-	if err := ValidateGitProvider(spc.GitProvider); err != nil {
-		return fmt.Errorf("git provider validation failed: %w", err)
+
+	if err := ValidateProjectDescription(spc.ProjectDescription); err != nil {
+		return err
 	}
-	
-	// Type Validation
+
+	// Type validation
 	if !spc.ProjectType.IsValid() {
 		return fmt.Errorf("invalid project type: %s", spc.ProjectType)
 	}
-	
+
 	if err := ValidatePlatforms(spc.Platforms); err != nil {
-		return fmt.Errorf("platforms validation failed: %w", err)
+		return err
 	}
-	
+
 	if err := ValidateArchitectures(spc.Architectures); err != nil {
-		return fmt.Errorf("architectures validation failed: %w", err)
+		return err
 	}
-	
-	if err := ValidatePlatformArchCompatibility(spc.Platforms, spc.Architectures); err != nil {
-		return fmt.Errorf("platform-architecture compatibility failed: %w", err)
+
+	if err := ValidateGitProvider(spc.GitProvider); err != nil {
+		return err
 	}
-	
-	if err := ValidateActionTriggers(spc.ActionsOn); err != nil {
-		return fmt.Errorf("action triggers validation failed: %w", err)
-	}
-	
-	// Registry Validation
+
 	if err := ValidateDockerRegistry(spc.DockerRegistry); err != nil {
-		return fmt.Errorf("docker registry validation failed: %w", err)
+		return err
 	}
-	
-	if err := ValidateDockerImageName(spc.DockerImage); err != nil {
-		return fmt.Errorf("docker image name validation failed: %w", err)
+
+	if err := ValidateActionTriggers(spc.ActionsOn); err != nil {
+		return err
 	}
-	
-	if err := ValidateBuildTags(spc.BuildTags); err != nil {
-		return fmt.Errorf("build tags validation failed: %w", err)
+
+	// CGO status validation
+	if err := ValidateCGOStatus(spc.CGOStatus); err != nil {
+		return err
 	}
-	
+
+	// Docker support validation
+	if err := ValidateDockerSupport(spc.DockerSupport); err != nil {
+		return err
+	}
+
+	// Signing level validation
+	if err := ValidateSigningLevel(spc.SigningLevel); err != nil {
+		return err
+	}
+
+	// Action level validation
+	if err := ValidateActionLevel(spc.ActionLevel); err != nil {
+		return err
+	}
+
+	// Feature level validation
+	if err := ValidateFeatureLevel(spc.FeatureLevel); err != nil {
+		return err
+	}
+
+	// Config state validation
 	if err := ValidateConfigState(spc.State); err != nil {
-		return fmt.Errorf("config state validation failed: %w", err)
-	}
-	
-	// Domain-Specific Invariants
-	if err := spc.validateDockerSupportInvariant(); err != nil {
 		return err
 	}
-	
-	if err := spc.validateMainPathRequirementInvariant(); err != nil {
-		return err
-	}
-	
-	if err := spc.validateStateTransitionInvariant(); err != nil {
-		return err
-	}
-	
-	return nil
-}
 
-// validateDockerSupportInvariant ensures Docker is only enabled for supported project types
-func (spc *SafeProjectConfig) validateDockerSupportInvariant() error {
-	if spc.DockerEnabled && !spc.ProjectType.DockerSupported() {
-		return fmt.Errorf("Docker is not supported for %s project type", spc.ProjectType)
+	// Cross-field invariants
+	if spc.DockerSupport.IsEnabled() && !spc.ProjectType.DockerSupported() {
+		return fmt.Errorf("docker support enabled but project type %s does not support docker", spc.ProjectType)
 	}
-	return nil
-}
 
-// validateMainPathRequirementInvariant ensures main path is provided when required
-func (spc *SafeProjectConfig) validateMainPathRequirementInvariant() error {
-	if spc.ProjectType.RequiresMainPath() && spc.MainPath == "" {
-		return fmt.Errorf("main path is required for %s project type", spc.ProjectType)
+	if spc.CGOStatus.IsEnabled() && spc.CGOStatus.IsRequired() {
+		hasCGOSupport := false
+		for _, platform := range spc.Platforms {
+			if platform.SupportsCGO() {
+				hasCGOSupport = true
+				break
+			}
+		}
+		if !hasCGOSupport {
+			return fmt.Errorf("cgo required but no selected platforms support cgo")
+		}
 	}
-	return nil
-}
 
-// validateStateTransitionInvariant ensures state transitions are valid
-func (spc *SafeProjectConfig) validateStateTransitionInvariant() error {
-	if !spc.State.AllowsValidation() {
-		return fmt.Errorf("configuration in state '%s' cannot be validated", spc.State)
-	}
-	
-	if !spc.State.AllowsGeneration() && spc.GenerateActions {
-		return fmt.Errorf("configuration in state '%s' cannot generate actions", spc.State)
-	}
-	
-	return nil
+	// Platform-architecture compatibility
+	return ValidatePlatformArchCompatibility(spc.Platforms, spc.Architectures)
 }
 
 // Clone creates a deep copy of the configuration
@@ -212,22 +221,22 @@ func (spc *SafeProjectConfig) Clone() *SafeProjectConfig {
 	clone := *spc
 	
 	// Deep copy slices
-	if len(spc.Platforms) > 0 {
+	if spc.Platforms != nil {
 		clone.Platforms = make([]Platform, len(spc.Platforms))
 		copy(clone.Platforms, spc.Platforms)
 	}
 	
-	if len(spc.Architectures) > 0 {
+	if spc.Architectures != nil {
 		clone.Architectures = make([]Architecture, len(spc.Architectures))
 		copy(clone.Architectures, spc.Architectures)
 	}
 	
-	if len(spc.BuildTags) > 0 {
+	if spc.BuildTags != nil {
 		clone.BuildTags = make([]BuildTag, len(spc.BuildTags))
 		copy(clone.BuildTags, spc.BuildTags)
 	}
 	
-	if len(spc.ActionsOn) > 0 {
+	if spc.ActionsOn != nil {
 		clone.ActionsOn = make([]ActionTrigger, len(spc.ActionsOn))
 		copy(clone.ActionsOn, spc.ActionsOn)
 	}
@@ -235,97 +244,158 @@ func (spc *SafeProjectConfig) Clone() *SafeProjectConfig {
 	return &clone
 }
 
-// Equal returns true if two configurations are equal (deep comparison)
-func (spc *SafeProjectConfig) Equal(other *SafeProjectConfig) bool {
-	if spc.ProjectName != other.ProjectName ||
-		spc.ProjectDescription != other.ProjectDescription ||
-		spc.ProjectType != other.ProjectType ||
-		spc.BinaryName != other.BinaryName ||
-		spc.MainPath != other.MainPath ||
-		spc.GitProvider != other.GitProvider ||
-		spc.DockerEnabled != other.DockerEnabled ||
-		spc.DockerRegistry != other.DockerRegistry ||
-		spc.DockerImage != other.DockerImage ||
-		spc.Signing != other.Signing ||
-		spc.Homebrew != other.Homebrew ||
-		spc.Snap != other.Snap ||
-		spc.SBOM != other.SBOM ||
-		spc.GenerateActions != other.GenerateActions ||
-		spc.ProVersion != other.ProVersion ||
-		spc.State != other.State ||
-		spc.CGOEnabled != other.CGOEnabled ||
-		spc.LDFlags != other.LDFlags {
-		return false
+// Equals returns true if two configurations are equivalent
+func (spc *SafeProjectConfig) Equals(other *SafeProjectConfig) bool {
+	if spc == nil || other == nil {
+		return spc == other
 	}
 	
-	// Compare slices
-	if !equalStringSlices(spc.Platforms, other.Platforms) ||
-		!equalStringSlices(spc.Architectures, other.Architectures) ||
-		!equalBuildTags(spc.BuildTags, other.BuildTags) ||
-		!equalStringSlices(spc.ActionsOn, other.ActionsOn) {
-		return false
-	}
-	
-	return true
+	return spc.ProjectName == other.ProjectName &&
+		spc.ProjectDescription == other.ProjectDescription &&
+		spc.ProjectType == other.ProjectType &&
+		spc.BinaryName == other.BinaryName &&
+		spc.MainPath == other.MainPath &&
+		spc.LDFlags == other.LDFlags &&
+		spc.GitProvider == other.GitProvider &&
+		spc.DockerRegistry == other.DockerRegistry &&
+		spc.DockerImage == other.DockerImage &&
+		spc.Homebrew == other.Homebrew &&
+		spc.Snap == other.Snap &&
+		spc.SBOM == other.SBOM &&
+		spc.State == other.State
 }
 
-// Helper function to compare string slices
-func equalStringSlices[T ~string](a, b []T) bool {
-	if len(a) != len(b) {
-		return false
+// HasChanged returns true if any critical field has changed
+func (spc *SafeProjectConfig) HasChanged(other *SafeProjectConfig) bool {
+	return !spc.Equals(other)
+}
+
+// IsReadyForGeneration returns true if configuration is ready for file generation
+func (spc *SafeProjectConfig) IsReadyForGeneration() bool {
+	return spc.State.AllowsGeneration() &&
+		spc.ProjectName != "" &&
+		spc.ProjectType.IsValid() &&
+		spc.BinaryName != "" &&
+		len(spc.Platforms) > 0 &&
+		len(spc.Architectures) > 0
+}
+
+// GetDockerImageName returns the full Docker image name
+func (spc *SafeProjectConfig) GetDockerImageName() string {
+	if spc.DockerImage != "" {
+		return spc.DockerImage
 	}
-	for i, v := range a {
-		if b[i] != v {
-			return false
+	return strings.ToLower(spc.ProjectName)
+}
+
+// ShouldGenerateDockerFiles returns true if Docker files should be generated
+func (spc *SafeProjectConfig) ShouldGenerateDockerFiles() bool {
+	return spc.DockerSupport.ShouldBuild() &&
+		spc.ProjectType.DockerSupported() &&
+		spc.DockerRegistry != ""
+}
+
+// ShouldGenerateActionsFiles returns true if Actions files should be generated
+func (spc *SafeProjectConfig) ShouldGenerateActionsFiles() bool {
+	return spc.ActionLevel.IsEnabled() &&
+		spc.GitProvider.ActionsSupported() &&
+		len(spc.ActionsOn) > 0
+}
+
+// ShouldSignReleases returns true if releases should be signed
+func (spc *SafeProjectConfig) ShouldSignReleases() bool {
+	return spc.SigningLevel.IsEnabled() &&
+		spc.SigningLevel != SigningLevelNone
+}
+
+// IsProFeatures returns true if pro features are enabled
+func (spc *SafeProjectConfig) IsProFeatures() bool {
+	return spc.FeatureLevel.IsPro()
+}
+
+// TransitionToState safely transitions configuration to a new state
+func (spc *SafeProjectConfig) TransitionToState(newState ConfigState) error {
+	// Validate state transition
+	if !spc.State.AllowsTransitionTo(newState) {
+		return fmt.Errorf("invalid state transition from %s to %s", spc.State, newState)
+	}
+	
+	spc.State = newState
+	return nil
+}
+
+// AllowsTransitionTo checks if state transition is allowed
+func (cs ConfigState) AllowsTransitionTo(newState ConfigState) bool {
+	// Define allowed state transitions
+	allowedTransitions := map[ConfigState][]ConfigState{
+		ConfigStateDraft:      {ConfigStateValid, ConfigStateInvalid},
+		ConfigStateValid:      {ConfigStateInvalid, ConfigStateProcessing},
+		ConfigStateInvalid:    {ConfigStateValid, ConfigStateProcessing},
+		ConfigStateProcessing: {ConfigStateValid, ConfigStateInvalid, ConfigStateGenerated},
+		ConfigStateGenerated:  {}, // Final state - no transitions allowed
+	}
+	
+	for _, allowed := range allowedTransitions[cs] {
+		if allowed == newState {
+			return true
 		}
 	}
-	return true
-}
-
-// Helper function to compare BuildTag slices
-func equalBuildTags(a, b []BuildTag) bool {
-	if len(a) != len(b) {
-		return false
-	}
-	for i, tag := range a {
-		if b[i].Name != tag.Name || b[i].Description != tag.Description {
-			return false
-		}
-	}
-	return true
-}
-
-// Summary returns a human-readable summary of the configuration
-func (spc *SafeProjectConfig) Summary() string {
-	parts := []string{
-		fmt.Sprintf("Project: %s (%s)", spc.ProjectName, spc.ProjectType),
-		fmt.Sprintf("Binary: %s", spc.BinaryName),
-		fmt.Sprintf("Platforms: %s", spc.joinPlatforms()),
-		fmt.Sprintf("Architectures: %s", spc.joinArchitectures()),
-		fmt.Sprintf("Provider: %s", spc.GitProvider),
-	}
 	
-	if spc.DockerEnabled {
-		parts = append(parts, fmt.Sprintf("Docker: %s", spc.DockerRegistry))
-	}
-	
-	return strings.Join(parts, "\n")
+	return false
 }
 
-// joinPlatforms creates a comma-separated list of platforms
-func (spc *SafeProjectConfig) joinPlatforms() string {
-	platforms := make([]string, len(spc.Platforms))
-	for i, p := range spc.Platforms {
-		platforms[i] = string(p)
-	}
-	return strings.Join(platforms, ", ")
+// Legacy compatibility methods - DEPRECATED but kept for migration
+
+// GetCGOEnabled returns legacy boolean for CGO
+func (spc *SafeProjectConfig) GetCGOEnabled() bool {
+	return spc.CGOStatus.ToBool()
 }
 
-// joinArchitectures creates a comma-separated list of architectures
-func (spc *SafeProjectConfig) joinArchitectures() string {
-	architectures := make([]string, len(spc.Architectures))
-	for i, a := range spc.Architectures {
-		architectures[i] = string(a)
+// SetCGOEnabled sets CGO status from legacy boolean
+func (spc *SafeProjectConfig) SetCGOEnabled(enabled bool) {
+	if enabled {
+		spc.CGOStatus = CGOStatusEnabled
+	} else {
+		spc.CGOStatus = CGOStatusDisabled
 	}
-	return strings.Join(architectures, ", ")
+}
+
+// GetDockerEnabled returns legacy boolean for Docker
+func (spc *SafeProjectConfig) GetDockerEnabled() bool {
+	return spc.DockerSupport.ToBool()
+}
+
+// SetDockerEnabled sets Docker support from legacy boolean
+func (spc *SafeProjectConfig) SetDockerEnabled(enabled bool) {
+	spc.DockerSupport = DockerSupportFromBool(enabled)
+}
+
+// GetSigning returns legacy boolean for Signing
+func (spc *SafeProjectConfig) GetSigning() bool {
+	return spc.SigningLevel.ToBool()
+}
+
+// SetSigning sets signing level from legacy boolean
+func (spc *SafeProjectConfig) SetSigning(enabled bool) {
+	spc.SigningLevel = SigningLevelFromBool(enabled)
+}
+
+// GetGenerateActions returns legacy boolean for Actions
+func (spc *SafeProjectConfig) GetGenerateActions() bool {
+	return spc.ActionLevel.ToBool()
+}
+
+// SetGenerateActions sets action level from legacy boolean
+func (spc *SafeProjectConfig) SetGenerateActions(enabled bool) {
+	spc.ActionLevel = ActionLevelFromBool(enabled)
+}
+
+// GetProVersion returns legacy boolean for Pro features
+func (spc *SafeProjectConfig) GetProVersion() bool {
+	return spc.FeatureLevel.ToBool()
+}
+
+// SetProVersion sets feature level from legacy boolean
+func (spc *SafeProjectConfig) SetProVersion(enabled bool) {
+	spc.FeatureLevel = FeatureLevelFromBool(enabled)
 }

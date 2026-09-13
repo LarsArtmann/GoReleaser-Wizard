@@ -184,12 +184,16 @@ linters:
     ginkgolinter:
       forbid-focus-container: true
       forbid-spec-pollution: true
+    gocognit:
+      min-complexity: 25
     goconst:
       min-len: 5
       min-occurrences: 6
     gocritic:
       disabled-checks:
         - ifElseChain
+    gocyclo:
+      min-complexity: 20
     gomoddirectives:
       replace-local: true
     gosec:
@@ -214,6 +218,8 @@ linters:
         - "1"
         - "2"
         - "100"
+    nestif:
+      min-complexity: 6
     revive:
       rules:
         - disabled: true
@@ -240,6 +246,17 @@ linters:
           name: early-return
         - disabled: true
           name: identical-ifelseif-branches
+    tagalign:
+      align: false
+      order:
+        - binding
+        - json
+        - yaml
+        - xml
+        - toml
+        - validate
+        - mapstructure
+      sort: true
     testifylint:
       disable:
         - go-require
@@ -290,6 +307,10 @@ linters:
           - nestif
           - maintidx
           - testpackage
+          - forcetypeassert
+          - ireturn
+          - recvcheck
+          - exhaustive
       - path: cmd/goreleaser-wizard/main\.go
         linters:
           - gochecknoglobals

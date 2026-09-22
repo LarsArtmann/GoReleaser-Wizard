@@ -40,7 +40,7 @@ linters:
     - errname
     - errorlint
     - exhaustive
-    - exhaustruct
+    - exhaustruct_v5
     - exptostd
     - fatcontext
     - forbidigo
@@ -149,8 +149,8 @@ linters:
         - (*bytes.Buffer).WriteString
     exhaustive:
       default-signifies-exhaustive: true
-    exhaustruct:
-      exclude:
+    exhaustruct_v5:
+      ignore-patterns:
         - ^cobra\.Command$
         - ^github.com/spf13/cobra\.Command$
         - ^omain\.DomainError$
@@ -311,6 +311,7 @@ linters:
           - ireturn
           - recvcheck
           - exhaustive
+          - exhaustruct_v5
       - path: cmd/goreleaser-wizard/main\.go
         linters:
           - gochecknoglobals

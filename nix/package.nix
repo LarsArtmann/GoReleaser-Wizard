@@ -2,6 +2,8 @@
   lib,
   buildGoModule,
   fetchFromGitHub,
+  cosign,
+  gnupg,
 }:
 
 buildGoModule (finalAttrs: {
@@ -15,7 +17,14 @@ buildGoModule (finalAttrs: {
     hash = "sha256-l7mylIZ5iAEkUFEMyqQL5cAvjFBa4gj+n6Qq9fFdUAE=";
   };
 
-  vendorHash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+  vendorHash = "sha256-CTXzZ/yGuuo5T+CtNROah0AIXp5mKwk2OcoZTyfGJnQ=";
+
+  # v0.1.0 validation treats missing gpg/cosign as a hard error (upstream
+  # later downgraded this to a warning); unit tests probe PATH for them.
+  nativeCheckInputs = [
+    gnupg
+    cosign
+  ];
 
   subPackages = [ "cmd/goreleaser-wizard" ];
 

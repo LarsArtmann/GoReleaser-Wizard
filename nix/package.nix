@@ -12,7 +12,7 @@ buildGoModule (finalAttrs: {
     owner = "LarsArtmann";
     repo = "GoReleaser-Wizard";
     rev = "v${finalAttrs.version}";
-    hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+    hash = "sha256-l7mylIZ5iAEkUFEMyqQL5cAvjFBa4gj+n6Qq9fFdUAE=";
   };
 
   vendorHash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";

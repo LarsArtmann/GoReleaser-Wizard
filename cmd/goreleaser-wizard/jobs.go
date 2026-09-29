@@ -331,10 +331,8 @@ type ProjectValidationJob struct {
 // NewProjectValidationJob creates a new project validation job.
 func NewProjectValidationJob(projectDir string, logger *log.Logger) *ProjectValidationJob {
 	return &ProjectValidationJob{
-		noOpRollbackHelper: noOpRollbackHelper{
-			logger: logger,
-			name:   "Project validation",
-		},
+		logger:     logger,
+		name:       "Project validation",
 		id:         "project-validation",
 		projectDir: projectDir,
 	}
@@ -412,10 +410,8 @@ type GenerationPreflightJob struct {
 // repository resolution fell back to placeholders.
 func NewGenerationPreflightJob(force bool, targets []string, logger *log.Logger) *GenerationPreflightJob {
 	return &GenerationPreflightJob{
-		noOpRollbackHelper: noOpRollbackHelper{
-			logger: logger,
-			name:   "Generation preflight",
-		},
+		logger:  logger,
+		name:    "Generation preflight",
 		id:      "generation-preflight",
 		force:   force,
 		targets: targets,
@@ -492,10 +488,8 @@ type DependencyCheckJob struct {
 // NewDependencyCheckJob creates a new dependency check job.
 func NewDependencyCheckJob(dependencies []string, logger *log.Logger) *DependencyCheckJob {
 	return &DependencyCheckJob{
-		noOpRollbackHelper: noOpRollbackHelper{
-			logger: logger,
-			name:   "Dependency check",
-		},
+		logger:       logger,
+		name:         "Dependency check",
 		id:           "dependency-check",
 		dependencies: dependencies,
 	}

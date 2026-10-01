@@ -47,6 +47,24 @@ type (
 	dockerImageBrand   struct{} // Brand for DockerImageID
 )
 
+func (jobBrand) Name() string { return "job" }
+
+func (workflowBrand) Name() string { return "workflow" }
+
+func (executionPlanBrand) Name() string { return "executionPlan" }
+
+func (configBrand) Name() string { return "config" }
+
+func (idBrand) Name() string { return "id" }
+
+func (iDIDBrand) Name() string { return "iD" }
+
+func (keyBrand) Name() string { return "key" }
+
+func (aggregateBrand) Name() string { return "aggregate" }
+
+func (dockerImageBrand) Name() string { return "dockerImage" }
+
 // GitHub entity brands.
 type (
 	gitHubRepoBrand     struct{} // Brand for GitHubRepoID
@@ -55,6 +73,16 @@ type (
 	gitHubWorkflowBrand struct{} // Brand for GitHubWorkflowID
 	gitHubUserBrand     struct{} // Brand for GitHubUserID
 )
+
+func (gitHubRepoBrand) Name() string { return "gitHubRepo" }
+
+func (gitHubReleaseBrand) Name() string { return "gitHubRelease" }
+
+func (gitHubAssetBrand) Name() string { return "gitHubAsset" }
+
+func (gitHubWorkflowBrand) Name() string { return "gitHubWorkflow" }
+
+func (gitHubUserBrand) Name() string { return "gitHubUser" }
 
 // Type aliases for compile-time safety.
 // Using type aliases allows the IDs to be used interchangeably with id.ID

@@ -114,13 +114,43 @@ func (spc *SafeProjectConfig) validateEnums() error {
 		field   string
 	}{
 		{spc.ProjectType.IsValid(), ErrInvalidConfig, "Invalid project type", string(spc.ProjectType), "project_type"},
-		{spc.GitProvider.IsValid(), ErrInvalidGitProvider, "Invalid Git provider", string(spc.GitProvider), "git_provider"},
+		{
+			spc.GitProvider.IsValid(),
+			ErrInvalidGitProvider,
+			"Invalid Git provider",
+			string(spc.GitProvider),
+			"git_provider",
+		},
 		{spc.CGOStatus.IsValid(), ErrInvalidConfig, "Invalid CGO status", string(spc.CGOStatus), "cgo_status"},
-		{spc.DockerSupport.IsValid(), ErrInvalidConfig, "Invalid Docker support", string(spc.DockerSupport), "docker_support"},
-		{spc.DockerRegistry.IsValid(), ErrInvalidDockerRegistry, "Invalid Docker registry", string(spc.DockerRegistry), "docker_registry"},
-		{spc.SigningLevel.IsValid(), ErrInvalidConfig, "Invalid signing level", string(spc.SigningLevel), "signing_level"},
+		{
+			spc.DockerSupport.IsValid(),
+			ErrInvalidConfig,
+			"Invalid Docker support",
+			string(spc.DockerSupport),
+			"docker_support",
+		},
+		{
+			spc.DockerRegistry.IsValid(),
+			ErrInvalidDockerRegistry,
+			"Invalid Docker registry",
+			string(spc.DockerRegistry),
+			"docker_registry",
+		},
+		{
+			spc.SigningLevel.IsValid(),
+			ErrInvalidConfig,
+			"Invalid signing level",
+			string(spc.SigningLevel),
+			"signing_level",
+		},
 		{spc.ActionLevel.IsValid(), ErrInvalidConfig, "Invalid action level", string(spc.ActionLevel), "action_level"},
-		{spc.FeatureLevel.IsValid(), ErrInvalidConfig, "Invalid feature level", string(spc.FeatureLevel), "feature_level"},
+		{
+			spc.FeatureLevel.IsValid(),
+			ErrInvalidConfig,
+			"Invalid feature level",
+			string(spc.FeatureLevel),
+			"feature_level",
+		},
 		{spc.State.IsValid(), ErrInvalidConfigState, "Invalid config state", string(spc.State), "state"},
 	}
 

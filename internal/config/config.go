@@ -71,7 +71,8 @@ func (m *Manager) Load(cfgFile string) error {
 
 	// 3. Load environment variables (higher priority)
 	err = m.k.Load(env.Provider(".", env.Opt{
-		Prefix: "GORELEASER_WIZARD_",
+		Prefix:      "GORELEASER_WIZARD_",
+		EnvironFunc: os.Environ,
 		TransformFunc: func(key, value string) (string, any) {
 			key = strings.ToLower(key)
 			key = strings.ReplaceAll(key, "_", "-")

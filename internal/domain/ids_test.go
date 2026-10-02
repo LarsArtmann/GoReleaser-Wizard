@@ -32,7 +32,7 @@ func TestJobID(t *testing.T) {
 
 	t.Run("string representation", func(t *testing.T) {
 		id := NewJobID("job-123")
-		assert.Equal(t, "job-123", id.String())
+		assert.Equal(t, "job:job-123", id.String())
 	})
 
 	t.Run("json serialization", func(t *testing.T) {

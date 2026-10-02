@@ -69,103 +69,76 @@ func NewSafeProjectConfig() *SafeProjectConfig {
 
 // Validate validates the configuration.
 func (spc *SafeProjectConfig) Validate() error {
-	// Validate basic fields
-	err := ValidateProjectName(spc.ProjectName)
-	if err != nil {
+	if err := spc.validateBasicFields(); err != nil {
 		return err
 	}
 
-	err = ValidateBinaryName(spc.BinaryName)
-	if err != nil {
+	if err := spc.validateEnums(); err != nil {
 		return err
 	}
 
-	err = ValidateMainPath(spc.MainPath)
-	if err != nil {
+	if err := spc.validateCollections(); err != nil {
 		return err
 	}
 
-	if spc.ProjectDescription != "" {
-		err = ValidateProjectDescription(spc.ProjectDescription)
+	// Validate business rules
+	return spc.validateBusinessRules()
+}
+
+// validateBasicFields validates the scalar config fields.
+func (spc *SafeProjectConfig) validateBasicFields() error {
+	for _, err := range []error{
+		ValidateProjectName(spc.ProjectName),
+		ValidateBinaryName(spc.BinaryName),
+		ValidateMainPath(spc.MainPath),
+	} {
 		if err != nil {
 			return err
 		}
 	}
 
-	// Validate enums
-	if !spc.ProjectType.IsValid() {
-		return NewValidationError(
-			ErrInvalidConfig,
-			"Invalid project type",
-			string(spc.ProjectType),
-		).WithField("project_type")
+	if spc.ProjectDescription != "" {
+		return ValidateProjectDescription(spc.ProjectDescription)
 	}
 
-	if !spc.GitProvider.IsValid() {
-		return NewValidationError(
-			ErrInvalidGitProvider,
-			"Invalid Git provider",
-			string(spc.GitProvider),
-		).WithField("git_provider")
+	return nil
+}
+
+// validateEnums validates every enum-typed field.
+func (spc *SafeProjectConfig) validateEnums() error {
+	enumChecks := []struct {
+		valid   bool
+		errType ErrorCode
+		message string
+		value   string
+		field   string
+	}{
+		{spc.ProjectType.IsValid(), ErrInvalidConfig, "Invalid project type", string(spc.ProjectType), "project_type"},
+		{spc.GitProvider.IsValid(), ErrInvalidGitProvider, "Invalid Git provider", string(spc.GitProvider), "git_provider"},
+		{spc.CGOStatus.IsValid(), ErrInvalidConfig, "Invalid CGO status", string(spc.CGOStatus), "cgo_status"},
+		{spc.DockerSupport.IsValid(), ErrInvalidConfig, "Invalid Docker support", string(spc.DockerSupport), "docker_support"},
+		{spc.DockerRegistry.IsValid(), ErrInvalidDockerRegistry, "Invalid Docker registry", string(spc.DockerRegistry), "docker_registry"},
+		{spc.SigningLevel.IsValid(), ErrInvalidConfig, "Invalid signing level", string(spc.SigningLevel), "signing_level"},
+		{spc.ActionLevel.IsValid(), ErrInvalidConfig, "Invalid action level", string(spc.ActionLevel), "action_level"},
+		{spc.FeatureLevel.IsValid(), ErrInvalidConfig, "Invalid feature level", string(spc.FeatureLevel), "feature_level"},
+		{spc.State.IsValid(), ErrInvalidConfigState, "Invalid config state", string(spc.State), "state"},
 	}
 
-	if !spc.CGOStatus.IsValid() {
-		return NewValidationError(
-			ErrInvalidConfig,
-			"Invalid CGO status",
-			string(spc.CGOStatus),
-		).WithField("cgo_status")
+	for _, check := range enumChecks {
+		if !check.valid {
+			return NewValidationError(
+				check.errType,
+				check.message,
+				check.value,
+			).WithField(check.field)
+		}
 	}
 
-	if !spc.DockerSupport.IsValid() {
-		return NewValidationError(
-			ErrInvalidConfig,
-			"Invalid Docker support",
-			string(spc.DockerSupport),
-		).WithField("docker_support")
-	}
+	return nil
+}
 
-	if !spc.DockerRegistry.IsValid() {
-		return NewValidationError(
-			ErrInvalidDockerRegistry,
-			"Invalid Docker registry",
-			string(spc.DockerRegistry),
-		).WithField("docker_registry")
-	}
-
-	if !spc.SigningLevel.IsValid() {
-		return NewValidationError(
-			ErrInvalidConfig,
-			"Invalid signing level",
-			string(spc.SigningLevel),
-		).WithField("signing_level")
-	}
-
-	if !spc.ActionLevel.IsValid() {
-		return NewValidationError(
-			ErrInvalidConfig,
-			"Invalid action level",
-			string(spc.ActionLevel),
-		).WithField("action_level")
-	}
-
-	if !spc.FeatureLevel.IsValid() {
-		return NewValidationError(
-			ErrInvalidConfig,
-			"Invalid feature level",
-			string(spc.FeatureLevel),
-		).WithField("feature_level")
-	}
-
-	if !spc.State.IsValid() {
-		return NewValidationError(
-			ErrInvalidConfigState,
-			"Invalid config state",
-			string(spc.State),
-		).WithField("state")
-	}
-
-	// Validate platforms
+// validateCollections validates the slice-typed fields.
+func (spc *SafeProjectConfig) validateCollections() error {
 	for _, platform := range spc.Platforms {
 		if !platform.IsValid() {
 			return NewValidationError(
@@ -176,7 +149,6 @@ func (spc *SafeProjectConfig) Validate() error {
 		}
 	}
 
-	// Validate architectures
 	for _, arch := range spc.Architectures {
 		if !arch.IsValid() {
 			return NewValidationError(
@@ -187,7 +159,6 @@ func (spc *SafeProjectConfig) Validate() error {
 		}
 	}
 
-	// Validate build tags
 	for _, tag := range spc.BuildTags {
 		if !tag.IsValid() {
 			return NewValidationError(
@@ -198,7 +169,6 @@ func (spc *SafeProjectConfig) Validate() error {
 		}
 	}
 
-	// Validate action triggers
 	for _, trigger := range spc.ActionsOn {
 		if !trigger.IsValid() {
 			return NewValidationError(
@@ -209,8 +179,7 @@ func (spc *SafeProjectConfig) Validate() error {
 		}
 	}
 
-	// Validate business rules
-	return spc.validateBusinessRules()
+	return nil
 }
 
 // validateBusinessRules validates business logic rules.

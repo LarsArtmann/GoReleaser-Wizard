@@ -81,8 +81,8 @@ github.com/knadh/koanf/providers/file v1.2.1 h1:bEWbtQwYrA+W2DtdBrQWyXqJaJSG3KrP
 github.com/knadh/koanf/providers/file v1.2.1/go.mod h1:bp1PM5f83Q+TOUu10J/0ApLBd9uIzg+n9UgthfY+nRA=
 github.com/knadh/koanf/providers/posflag v1.0.2 h1:ky9Yqmoz0EHGfby6/gB6SUXmLs5kjxW/1ekbHRuPwIk=
 github.com/knadh/koanf/providers/posflag v1.0.2/go.mod h1:3Wn3+YG3f4ljzRyCUgIwH7G0sZ1pMjCOsNBovrbKmAk=
-github.com/knadh/koanf/v2 v2.3.7 h1:amceufOeoQcq6VFKjm7/ggJ3t0Dkqaxy5fza4j3YgTA=
-github.com/knadh/koanf/v2 v2.3.7/go.mod h1:gRb40VRAbd4iJMYYD5IxZ6hfuopFcXBpc9bbQpZwo28=
+github.com/knadh/koanf/v2 v2.3.8 h1:NftEOf0Y456FqpLJj31RYYZQnfBQ+DDhsNQPqJ6nuk4=
+github.com/knadh/koanf/v2 v2.3.8/go.mod h1:gRb40VRAbd4iJMYYD5IxZ6hfuopFcXBpc9bbQpZwo28=
 github.com/larsartmann/go-branded-id v0.7.0 h1:k5KT50Kh0WmeniH0rQ3Gvm2RdSAQFZtuRhXWDtQkWhU=
 github.com/larsartmann/go-branded-id v0.7.0/go.mod h1:gM5FhB6d23qZO8hIU/rHpUnm/6dwKy9UGMhgvXDqNsc=
 github.com/lucasb-eyer/go-colorful v1.4.1 h1:1EO+WB73+EH8EVbzlrG3KLAfEypQWVHIBqlTf+2hNss=

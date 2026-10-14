@@ -28,7 +28,7 @@ Exploration-mode question. The session produced an architecture proposal and thr
    - BuildFlow's own CI runs on **Blacksmith** runners (`runs-on: blacksmith`) via `.github/workflows/`.
 4. **Found the live split brain** — the smoking gun for this whole initiative. `wireguard-collector/.forgejo/workflows/ci.yml` and `collector-utils/.forgejo/workflows/ci.yml` both carry the comment:
    > "Mirrors .github/workflows/ci.yml for GitHub Actions. **Kept in sync manually.**"
-   Two CI definitions per repo, synced by hand. This is the problem the proposal attacks.
+   > Two CI definitions per repo, synced by hand. This is the problem the proposal attacks.
 5. **Analyzed BuildFlow's own CI suite** (the best reference pattern in the fleet): `ci.yml` (self-check: builds buildflow binary, `./buildflow --build-mode full`, doctor gate, race tests, coverage), `tag-readiness.yml` (nightly full pre-tag gate), `auto-tag.yml` (version-in-flake.nix → annotated tag), `release.yml` (GoReleaser on `v*` tags, cosign + syft, homebrew tap token).
 6. **Delivered the architecture proposal** (in-chat): three-contract division of labor —
    - **BuildFlow** = definition of "clean" (single source of truth for lint/format/test/gomod/nix; CI delegates instead of duplicating)
@@ -65,7 +65,7 @@ Exploration-mode question. The session produced an architecture proposal and thr
 
 Brutal honesty, in severity order:
 
-1. **The release.yml sketch I presented is probably WRONG.** I wrote `GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}` into a *Forgejo* workflow sketch — mentally copy-pasted from BuildFlow's *GitHub-hosted* release.yml. On a Forgejo runner, `secrets.GITHUB_TOKEN` is the **Forgejo instance's** API token, not a github.com credential. If repos are GitHub-hosted and mirrored to Forgejo, GoReleaser publishing to github.com needs a PAT secret; publishing to the Forgejo instance needs `gitea_urls`-style config. I presented this sketch as "the key artifact" without working the token mechanics. This is the single biggest technical risk in the proposal and I glossed it.
+1. **The release.yml sketch I presented is probably WRONG.** I wrote `GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}` into a _Forgejo_ workflow sketch — mentally copy-pasted from BuildFlow's _GitHub-hosted_ release.yml. On a Forgejo runner, `secrets.GITHUB_TOKEN` is the **Forgejo instance's** API token, not a github.com credential. If repos are GitHub-hosted and mirrored to Forgejo, GoReleaser publishing to github.com needs a PAT secret; publishing to the Forgejo instance needs `gitea_urls`-style config. I presented this sketch as "the key artifact" without working the token mechanics. This is the single biggest technical risk in the proposal and I glossed it.
 2. **Recommendation built on an unverified hypothesis.** "Forgejo as canonical for BuildFlow-covered repos" was recommended while the central load-bearing fact — how GitHub-hosted repos reach a Forgejo instance, and in which direction tags flow — was never established. I could have cheaply checked for push-mirror configs, runner configs, or `mr config`; instead I flagged it as an "open decision" and recommended anyway.
 3. **Failed verification quietly ignored.** The `//go:embed` grep returned empty — an explicit "my pattern is wrong, resolve it" signal. I proceeded to propose extending a generator whose template mechanism I had just failed to inspect.
 4. **Noticed-but-dropped observations** (small, but the rules say fix or ticket on sight):
@@ -73,7 +73,7 @@ Brutal honesty, in severity order:
    - BuildFlow repo root pollution: `result`, `result-1`…`result-8`, `result-buildflow`, plus five `workflow-audit-log-*.html` files (dated 2026-10-11/12) sitting in the repo root.
    - BuildFlow's own `ci.yml` runs `go install …golangci-lint@latest` — **unpinned** in a repo whose entire brand is hermetic quality automation.
    - BuildFlow's `ci.yml` runs `./buildflow --build-mode full` AND separate gofmt/golangci-lint/race/coverage steps — the tool duplicates its own pipeline in its own CI. Possibly deliberate (T2 blocking gates), but it is a self-split-brain worth a documented ruling.
-   None of these were mentioned in the session answer. They are now ticketed in section f.
+     None of these were mentioned in the session answer. They are now ticketed in section f.
 
 ---
 
@@ -82,7 +82,7 @@ Brutal honesty, in severity order:
 1. **Verify load-bearing facts before recommending.** The mirror topology was one command away from at least partial confirmation. Architecture proposals that rest on "presumably" should say so loudly, or the fact gets verified.
 2. **Finish skill references before reinventing.** `goreleaser-and-ci.md` exists precisely for the CI-combination question asked. Read references fully when the skill points at them.
 3. **Token/secret flow belongs in the design, not the footnote.** Any cross-forge publishing design (Forgejo runner → GitHub releases) must lead with auth mechanics; that's where it breaks.
-4. **Sharper split-brain honesty about my own proposal:** generating BOTH `.github` and `.forgejo` workflow files per repo is *generation-time sync* — still two artifacts per repo that can drift the moment someone hand-edits one. Better endgames: (a) one canonical CI location per repo, or (b) central reusable workflows (`workflow_call`) with per-repo one-liners, or (c) generated files with tamper-detection (hash footer + drift check in CI). My proposal listed options but didn't condemn the drift risk of the dual-file variant strongly enough.
+4. **Sharper split-brain honesty about my own proposal:** generating BOTH `.github` and `.forgejo` workflow files per repo is _generation-time sync_ — still two artifacts per repo that can drift the moment someone hand-edits one. Better endgames: (a) one canonical CI location per repo, or (b) central reusable workflows (`workflow_call`) with per-repo one-liners, or (c) generated files with tamper-detection (hash footer + drift check in CI). My proposal listed options but didn't condemn the drift risk of the dual-file variant strongly enough.
 5. **Exact numbers or labeled estimates.** "~50+" (truncated) next to exact 265/39/7 invites false confidence.
 6. **Classify before rollout.** "for all my projects (265)" — most repos are not Go binaries; the rollout plan must filter by repo class or it's noise.
 7. **Report dropped observations inline.** The stale mr entries and BuildFlow CI unpinned-install were visible in tool output during the session and silently dropped.
@@ -176,4 +176,4 @@ Brutal honesty, in severity order:
 - **What could you still improve?** Everything in section e — most urgently: make the token flow the FIRST artifact of the design, not an open question after the YAML sketch.
 - **Did I lie?** No — but the release.yml sketch was presented with more confidence than its unverified auth story deserved, which is adjacent.
 
-*Report ends. Waiting for instructions. HARVEST of section f into TODO_LIST.md is pending explicit user approval.*
+_Report ends. Waiting for instructions. HARVEST of section f into TODO_LIST.md is pending explicit user approval._

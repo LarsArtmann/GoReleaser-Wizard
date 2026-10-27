@@ -39,6 +39,11 @@ type SafeProjectConfig struct {
 	ActionLevel ActionLevel     `json:"action_level" yaml:"action_level"`
 	ActionsOn   []ActionTrigger `json:"actions_on"   yaml:"actions_on"`
 
+	// CIProvider selects the CI system the generated workflows target
+	// (github, forgejo, dual, none). Empty means unset and defaults to
+	// GitHub so pre-existing configurations keep their behavior.
+	CIProvider CIProvider `json:"ci_provider,omitempty" yaml:"ci_provider,omitempty"`
+
 	// Advanced Features
 	FeatureLevel FeatureLevel `json:"feature_level" yaml:"feature_level"`
 
@@ -144,6 +149,13 @@ func (spc *SafeProjectConfig) validateEnums() error {
 			"signing_level",
 		},
 		{spc.ActionLevel.IsValid(), ErrInvalidConfig, "Invalid action level", string(spc.ActionLevel), "action_level"},
+		{
+			spc.CIProvider == "" || spc.CIProvider.IsValid(),
+			ErrInvalidConfig,
+			"Invalid CI provider",
+			string(spc.CIProvider),
+			"ci_provider",
+		},
 		{
 			spc.FeatureLevel.IsValid(),
 			ErrInvalidConfig,

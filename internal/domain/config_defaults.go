@@ -123,6 +123,11 @@ func (spc *SafeProjectConfig) applyGeneralDefaults() {
 		spc.ActionsOn = spc.ActionLevel.GetRecommendedTriggers()
 	}
 
+	// Set default CI provider if not specified
+	if spc.CIProvider == "" {
+		spc.CIProvider = GetRecommendedCIProvider()
+	}
+
 	// Set default build tags based on CGO status
 	if spc.CGOStatus.IsDisabled() &&
 		!slices.Contains(spc.BuildTags, CreateBuildTag("pure", "Pure Go compilation")) {
@@ -193,7 +198,18 @@ func (spc *SafeProjectConfig) GetAzureContainerRegistry() string {
 // ShouldGenerateActionsFiles returns true if actions files should be generated.
 func (spc *SafeProjectConfig) ShouldGenerateActionsFiles() bool {
 	return spc.ActionLevel.IsEnabled() &&
+		spc.CIProvider.GeneratesGitHubWorkflows() &&
 		spc.GitProvider.ActionsSupported() &&
+		len(spc.ActionsOn) > 0
+}
+
+// ShouldGenerateForgejoWorkflows returns true if Forgejo CI workflow files
+// should be generated. Forgejo Actions do not depend on GitProvider (the
+// Forgejo instance is the CI host regardless of where the public mirror
+// lives).
+func (spc *SafeProjectConfig) ShouldGenerateForgejoWorkflows() bool {
+	return spc.ActionLevel.IsEnabled() &&
+		spc.CIProvider.GeneratesForgejoWorkflows() &&
 		len(spc.ActionsOn) > 0
 }
 

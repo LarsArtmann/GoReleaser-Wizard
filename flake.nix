@@ -41,11 +41,10 @@
 
           # go.mod requires go >= 1.27 (encoding/json/v2 is default there, no GOEXPERIMENT needed).
           # Pin explicitly: nixpkgs' default `go` trails at 1.26 and buildGoModule sets GOTOOLCHAIN=local.
-          go = pkgs.go_1_27;
-
-          goreleaser-wizard = pkgs.buildGoModule {
+          # `.override` is required: a `go` attr inside the set is swallowed by mkDerivation, not the builder.
+          goreleaser-wizard = pkgs.buildGoModule.override { go = pkgs.go_1_27; } {
             pname = "goreleaser-wizard";
-            inherit go version vendorHash;
+            inherit version vendorHash;
 
             src = lib.fileset.toSource {
               root = ./.;

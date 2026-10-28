@@ -37,7 +37,7 @@
         let
           version = self.rev or self.dirtyRev or "dev";
 
-          vendorHash = "sha256-AF9+OkAd78fRGvnysacqiyaP5xCArglqg9wr+qHM0y8=";
+          vendorHash = "sha256-U7vpOm89OKdn6P/niqNpGbeXAShy3XLwR1dtGA1jCvQ=";
 
           # go.mod requires go >= 1.27 (encoding/json/v2 is default there, no GOEXPERIMENT needed).
           # Pin explicitly: nixpkgs' default `go` trails at 1.26 and buildGoModule sets GOTOOLCHAIN=local.
@@ -133,6 +133,14 @@
 
             test = config.packages.default.overrideAttrs (_: {
               doCheck = true;
+
+              # E2E tests hard-require git (git init helper); goreleaser and
+              # actionlint are present so the E2E proof runs instead of skipping.
+              nativeCheckInputs = with pkgs; [
+                git
+                goreleaser
+                actionlint
+              ];
             });
           };
 

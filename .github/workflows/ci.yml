@@ -22,21 +22,15 @@ jobs:
           cache: true
 
       - name: Build
-        env:
-          GOEXPERIMENT: jsonv2
         run: go build ./...
 
       - name: Vet
-        env:
-          GOEXPERIMENT: jsonv2
         run: go vet ./...
 
       - name: Lint
         uses: golangci/golangci-lint-action@ba0d7d2ec06a0ea1cb5fa41b2e4a3ab91d21278a # v9.3.0
         with:
           args: ./...
-        env:
-          GOEXPERIMENT: jsonv2
 
   test:
     runs-on: ubuntu-latest
@@ -51,13 +45,9 @@ jobs:
           cache: true
 
       - name: Test
-        env:
-          GOEXPERIMENT: jsonv2
         run: go test -race ./...
 
       - name: Generate golden diff check
-        env:
-          GOEXPERIMENT: jsonv2
         run: go test ./cmd/goreleaser-wizard -run TestGolden -count=1
 
   goreleaser-check:
@@ -80,6 +70,4 @@ jobs:
       # The wizard's product IS its generated config: if this step regresses,
       # every project using the wizard ships broken releases.
       - name: Generated fixture passes goreleaser check
-        env:
-          GOEXPERIMENT: jsonv2
         run: go test ./cmd/goreleaser-wizard -run TestGeneratedConfigPassesGoReleaserCheck -v -count=1

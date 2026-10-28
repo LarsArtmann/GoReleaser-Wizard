@@ -51,6 +51,11 @@ func runGenerate(cmd *cobra.Command, args []string) {
 		projectConfig.CIProvider = domain.ConvertToCIProvider(provider)
 	}
 
+	// Apply defaults before building the workflow: job-list decisions
+	// (GitHub vs Forgejo workflow generation) depend on defaulted fields
+	// such as ActionsOn and CIProvider.
+	projectConfig.ApplyDefaults()
+
 	// Create workflow based on options
 	var workflowType WorkflowType
 	if configOnly {

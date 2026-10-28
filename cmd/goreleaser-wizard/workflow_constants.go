@@ -14,7 +14,9 @@ const (
 // Paths of the artifacts the wizard generates. Workflow paths use forward
 // slashes: git repositories and GitHub Actions require them on every platform.
 const (
-	goreleaserConfigFilename  = ".goreleaser.yaml"
-	dockerfileFilename        = "Dockerfile"
-	releaseWorkflowTargetPath = ".github/workflows/release.yml"
+	goreleaserConfigFilename   = ".goreleaser.yaml"
+	dockerfileFilename         = "Dockerfile"
+	releaseWorkflowTargetPath  = ".github/workflows/release.yml"
+	forgejoCIWorkflowPath      = ".forgejo/workflows/ci.yml"
+	forgejoReleaseWorkflowPath = ".forgejo/workflows/release.yml"
 )

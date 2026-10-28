@@ -1,0 +1,83 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  buildflow:
+    runs-on: native
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install BuildFlow
+        run: |
+          nix --accept-flake-config profile install github:LarsArtmann/BuildFlow/49ced3e0039a5f6e88028697bd779ec2f7f28826
+          echo "$HOME/.nix-profile/bin" >> "$GITHUB_PATH"
+
+      - name: BuildFlow full gate
+        env:
+          BUILDFLOW_TELEMETRY_DISABLED: "true"
+        run: buildflow --build-mode full
+
+---
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  release:
+    runs-on: native
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install BuildFlow
+        run: |
+          nix --accept-flake-config profile install github:LarsArtmann/BuildFlow/49ced3e0039a5f6e88028697bd779ec2f7f28826
+          echo "$HOME/.nix-profile/bin" >> "$GITHUB_PATH"
+
+      - name: BuildFlow full gate
+        env:
+          BUILDFLOW_TELEMETRY_DISABLED: "true"
+        run: buildflow --build-mode full
+
+      - name: Install GoReleaser
+        run: |
+          nix --accept-flake-config profile install github:NixOS/nixpkgs/3ec636362e1816bc2f0888fa0fa2c69f1bc9e504#goreleaser
+          echo "$HOME/.nix-profile/bin" >> "$GITHUB_PATH"
+
+      - name: Run GoReleaser
+        env:
+          GITEA_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: goreleaser release --clean
+
+      - name: Mirror release to GitHub
+        env:
+          FORGEJO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.RELEASE_SHADOW_GITHUB_TOKEN }}
+          FORGEJO_URL: https://forgejo.home.lan
+          FORGEJO_OWNER: lars
+          FORGEJO_REPO: golden-app
+          GITHUB_OWNER: golden-owner
+          GITHUB_REPO: golden-repo
+        run: |
+          if [ -z "${GITHUB_TOKEN:-}" ]; then
+            echo "RELEASE_SHADOW_GITHUB_TOKEN not set; skipping release shadow"
+            exit 0
+          fi
+
+          forgejo-release-shadow

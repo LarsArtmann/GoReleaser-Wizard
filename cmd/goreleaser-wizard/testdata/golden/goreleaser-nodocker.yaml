@@ -70,7 +70,6 @@ release:
   github:
     owner: "golden-owner"
     name: "golden-repo"
-
   draft: false
   prerelease: auto
 

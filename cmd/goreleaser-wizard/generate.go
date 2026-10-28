@@ -47,6 +47,10 @@ func runGenerate(cmd *cobra.Command, args []string) {
 		projectConfig.ProjectType = domain.ProjectType(projType)
 	}
 
+	if provider := getStringFlag(cmd, "ci-provider"); provider != "" {
+		projectConfig.CIProvider = domain.ConvertToCIProvider(provider)
+	}
+
 	// Create workflow based on options
 	var workflowType WorkflowType
 	if configOnly {

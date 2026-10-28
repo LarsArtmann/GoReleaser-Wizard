@@ -104,6 +104,50 @@ func TestGeneratedConfigPassesGoReleaserCheck(t *testing.T) {
 	}
 }
 
+// TestForgejoWorkflowsPassActionLint generates Forgejo workflows for a
+// forgejo-provider project and requires actionlint to accept them. The
+// self-hosted runner label must be declared in an actionlint config, as on
+// the real fleet.
+func TestForgejoWorkflowsPassActionLint(t *testing.T) {
+	actionlintPath, err := exec.LookPath("actionlint")
+	if err != nil {
+		t.Skip("actionlint binary not found in PATH; skipping Forgejo workflow lint")
+	}
+
+	tmpDir := setupTempGoModule(t)
+
+	config := baseTestProjectConfig()
+	config.ProjectName = "e2e-app"
+	config.BinaryName = "e2e-app"
+	config.MainPath = "./cmd/demo"
+	config.CIProvider = domain.CIProviderForgejo
+
+	generateIntoModule(t, tmpDir, &config)
+
+	ciPath := filepath.Join(tmpDir, forgejoCIWorkflowPath)
+	releasePath := filepath.Join(tmpDir, forgejoReleaseWorkflowPath)
+
+	AssertFileExists(t, ciPath, "forgejo provider must generate the CI workflow")
+	AssertFileExists(t, releasePath, "forgejo provider must generate the release workflow")
+
+	actionlintConfigPath := filepath.Join(tmpDir, "actionlint.yaml")
+
+	actionlintConfig := "self-hosted-runner:\n  labels:\n    - native\n"
+	if err := os.WriteFile(actionlintConfigPath, []byte(actionlintConfig), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	for _, path := range []string{ciPath, releasePath} {
+		cmd := exec.Command(actionlintPath, "-config-file", actionlintConfigPath, path)
+		cmd.Dir = tmpDir
+
+		output, err := cmd.CombinedOutput()
+		if err != nil {
+			t.Errorf("actionlint rejected %s:\n%s", path, output)
+		}
+	}
+}
+
 // TestGenerateRefusesToOverwriteWithoutForce proves the atomicity contract:
 // an existing target artifact fails the whole workflow before anything new
 // is written.

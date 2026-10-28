@@ -61,6 +61,7 @@ func TestValidateCIProvider(t *testing.T) {
 func TestGetAllCIProviders(t *testing.T) {
 	all := GetAllCIProviders()
 	assert.Len(t, all, 4)
+
 	for _, provider := range all {
 		assert.True(t, provider.IsValid())
 	}

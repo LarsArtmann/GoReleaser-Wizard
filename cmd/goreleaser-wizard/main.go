@@ -301,6 +301,7 @@ func addCommonFlags(cmd *cobra.Command) {
 	cmd.Flags().String("project-type", "", "override project type (CLI Application, Library)")
 	cmd.Flags().String("github-owner", "", "override GitHub repository owner (detected from git remote by default)")
 	cmd.Flags().String("github-repo", "", "override GitHub repository name (detected from git remote by default)")
+	cmd.Flags().String("ci-provider", "", "override CI provider: github, forgejo, dual, none")
 }
 
 // applyGitHubOverrides forwards explicit --github-owner/--github-repo flags

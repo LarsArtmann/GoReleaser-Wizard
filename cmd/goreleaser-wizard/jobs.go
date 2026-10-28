@@ -250,6 +250,75 @@ func (j *GitHubActionsGenerationJob) Rollback(ctx context.Context) error {
 	return nil
 }
 
+// ForgejoWorkflowsGenerationJob generates Forgejo Actions CI and release
+// workflows.
+type ForgejoWorkflowsGenerationJob struct {
+	id     string
+	config *domain.SafeProjectConfig
+	logger *log.Logger
+}
+
+// NewForgejoWorkflowsGenerationJob creates a new Forgejo workflows generation job.
+func NewForgejoWorkflowsGenerationJob(
+	config *domain.SafeProjectConfig,
+	logger *log.Logger,
+) *ForgejoWorkflowsGenerationJob {
+	return &ForgejoWorkflowsGenerationJob{
+		id:     "forgejo-workflows-generation",
+		config: config,
+		logger: logger,
+	}
+}
+
+func (j *ForgejoWorkflowsGenerationJob) ID() string {
+	return j.id
+}
+
+func (j *ForgejoWorkflowsGenerationJob) Name() string {
+	return "Generate Forgejo Actions Workflows"
+}
+
+func (j *ForgejoWorkflowsGenerationJob) Execute(ctx context.Context) error {
+	j.logger.Info("Generating Forgejo Actions workflows")
+
+	if err := checkContextCancellation(ctx, "context cancelled"); err != nil {
+		return err
+	}
+
+	if !j.config.ShouldGenerateForgejoWorkflows() {
+		j.logger.Info("Forgejo workflows generation is disabled, skipping")
+
+		return nil
+	}
+
+	generator := generators.NewForgejoWorkflowsGenerator(j.config, &LoggerAdapter{logger: j.logger})
+
+	if err := generator.Generate(ctx); err != nil {
+		return fmt.Errorf("failed to generate Forgejo workflows: %w", err)
+	}
+
+	j.logger.Info("Forgejo Actions workflows generated successfully")
+
+	return nil
+}
+
+func (j *ForgejoWorkflowsGenerationJob) Rollback(ctx context.Context) error {
+	j.logger.Info("Rolling back Forgejo workflow generation")
+
+	if err := checkContextCancellation(ctx, "context cancelled"); err != nil {
+		return err
+	}
+
+	generator := generators.NewForgejoWorkflowsGenerator(j.config, &LoggerAdapter{logger: j.logger})
+
+	err := generator.Rollback(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to roll back Forgejo workflows: %w", err)
+	}
+
+	return nil
+}
+
 // DockerfileGenerationJob generates a Dockerfile when Docker support is enabled.
 type DockerfileGenerationJob struct {
 	id     string
@@ -461,13 +530,17 @@ func (j *GenerationPreflightJob) Execute(ctx context.Context) error {
 }
 
 // generationTargets lists every file the wizard may write for the given
-// configuration. includeActions controls whether the GitHub Actions workflow
-// is among the targets (the config-only workflow never writes it).
+// configuration. includeActions controls whether the CI workflow files are
+// among the targets (the config-only workflow never writes them).
 func generationTargets(config *domain.SafeProjectConfig, includeActions bool) []string {
 	targets := []string{goreleaserConfigFilename}
 
-	if includeActions && config.GetGenerateActions() {
+	if includeActions && config.GetGenerateActions() && config.CIProvider.GeneratesGitHubWorkflows() {
 		targets = append(targets, releaseWorkflowTargetPath)
+	}
+
+	if includeActions && config.ShouldGenerateForgejoWorkflows() {
+		targets = append(targets, forgejoCIWorkflowPath, forgejoReleaseWorkflowPath)
 	}
 
 	if config.DockerSupport.IsEnabled() {
@@ -571,9 +644,14 @@ func (jf *JobFactory) CreateFullWizardJobs(config *ProjectConfig, force bool) []
 	// Add config generation job
 	jobs = append(jobs, NewConfigGenerationJob(config, force, jf.logger))
 
-	// Add GitHub Actions generation job
-	if config.GetGenerateActions() {
+	// Add GitHub Actions generation job (skipped for forgejo/none providers)
+	if config.GetGenerateActions() && config.CIProvider.GeneratesGitHubWorkflows() {
 		jobs = append(jobs, NewGitHubActionsGenerationJob(config, jf.logger))
+	}
+
+	// Add Forgejo Actions generation job
+	if config.ShouldGenerateForgejoWorkflows() {
+		jobs = append(jobs, NewForgejoWorkflowsGenerationJob(config, jf.logger))
 	}
 
 	// Add Dockerfile generation job when Docker support is enabled

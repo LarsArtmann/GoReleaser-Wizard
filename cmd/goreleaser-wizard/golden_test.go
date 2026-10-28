@@ -167,6 +167,71 @@ func TestGoldenGitHubActionsWorkflow(t *testing.T) {
 	}
 }
 
+func TestGoldenForgejoWorkflows(t *testing.T) {
+	config := goldenConfig(t, domain.DockerSupportNone, domain.SigningLevelNone, domain.ProjectTypeCLI)
+	config.CIProvider = domain.CIProviderForgejo
+
+	generator := generators.NewForgejoWorkflowsGenerator(config, discardGeneratorLogger{})
+
+	if err := generator.ValidateTemplate(); err != nil {
+		t.Fatalf("template validation failed: %v", err)
+	}
+
+	output, err := generator.GeneratePreview(context.Background())
+	if err != nil {
+		t.Fatalf("GeneratePreview failed: %v", err)
+	}
+
+	assertGolden(t, "forgejo-workflows.yml", output)
+}
+
+// TestGoldenGoReleaserForgejo pins the forgejo-provider GoReleaser config:
+// gitea_urls targeting the Forgejo instance, changelog sourced from git,
+// and no github release block.
+func TestGoldenGoReleaserForgejo(t *testing.T) {
+	config := goldenConfig(t, domain.DockerSupportNone, domain.SigningLevelNone, domain.ProjectTypeCLI)
+	config.CIProvider = domain.CIProviderForgejo
+
+	generator := generators.NewGoReleaserGenerator(config, discardGeneratorLogger{})
+
+	output, err := generator.GeneratePreview(context.Background())
+	if err != nil {
+		t.Fatalf("GeneratePreview failed: %v", err)
+	}
+
+	assertGolden(t, "goreleaser-forgejo.yaml", output)
+}
+
+// TestGoldenDualProvider verifies the transition state: both workflow sets
+// render, while the GoReleaser config targets Forgejo (the GitHub copy is
+// maintained by the release shadow, not goreleaser).
+func TestGoldenDualProvider(t *testing.T) {
+	config := goldenConfig(t, domain.DockerSupportNone, domain.SigningLevelNone, domain.ProjectTypeCLI)
+	config.CIProvider = domain.CIProviderDual
+
+	if !config.CIProvider.GeneratesGitHubWorkflows() || !config.CIProvider.GeneratesForgejoWorkflows() {
+		t.Fatal("dual provider must generate both workflow sets")
+	}
+
+	goreleaserOutput, err := generators.NewGoReleaserGenerator(config, discardGeneratorLogger{}).
+		GeneratePreview(context.Background())
+	if err != nil {
+		t.Fatalf("goreleaser GeneratePreview failed: %v", err)
+	}
+
+	assertGolden(t, "goreleaser-dual.yaml", goreleaserOutput)
+
+	forgejoOutput, err := generators.NewForgejoWorkflowsGenerator(config, discardGeneratorLogger{}).
+		GeneratePreview(context.Background())
+	if err != nil {
+		t.Fatalf("forgejo GeneratePreview failed: %v", err)
+	}
+
+	if forgejoOutput == "" {
+		t.Error("dual provider must render Forgejo workflows")
+	}
+}
+
 func TestGoldenDockerfile(t *testing.T) {
 	tests := []struct {
 		name        string

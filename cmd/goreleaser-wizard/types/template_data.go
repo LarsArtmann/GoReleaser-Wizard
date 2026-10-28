@@ -41,10 +41,10 @@ type GoReleaserTemplateData struct {
 	// Forgejo release target. ForgejoRelease switches the release block and
 	// changelog source from github.com to the self-hosted Forgejo instance
 	// (gitea_urls); the public GitHub copy is maintained by the release shadow.
-	ForgejoRelease    bool
-	GiteaAPIURL       string
-	GiteaDownloadURL  string
-	ChangelogUse      string
+	ForgejoRelease   bool
+	GiteaAPIURL      string
+	GiteaDownloadURL string
+	ChangelogUse     string
 }
 
 // GitHubActionsTemplateData is the strongly typed template data for the
@@ -75,9 +75,9 @@ const (
 // Forgejo CI and release workflow templates (both rendered with [[ ]]
 // delimiters, so ${{ secrets.* }} literals need no escaping).
 type ForgejoWorkflowsTemplateData struct {
-	ProjectName string
-	RunnerLabel string
-	BuildFlowPin string
+	ProjectName   string
+	RunnerLabel   string
+	BuildFlowPin  string
 	GoReleaserPin string
 
 	// Forgejo instance and repository coordinates for the release shadow.

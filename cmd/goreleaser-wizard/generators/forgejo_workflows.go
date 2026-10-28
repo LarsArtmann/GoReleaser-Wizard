@@ -14,9 +14,9 @@ import (
 
 // Forgejo workflow file names under .forgejo/workflows.
 const (
-	forgejoWorkflowDir      = ".forgejo/workflows"
-	forgejoCIWorkflowName   = "ci.yml"
-	forgejoReleaseName      = "release.yml"
+	forgejoWorkflowDir    = ".forgejo/workflows"
+	forgejoCIWorkflowName = "ci.yml"
+	forgejoReleaseName    = "release.yml"
 )
 
 // ForgejoWorkflowsGenerator generates the Forgejo Actions CI and release

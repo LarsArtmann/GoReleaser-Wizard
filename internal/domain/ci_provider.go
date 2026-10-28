@@ -45,8 +45,9 @@ func (p CIProvider) String() string {
 }
 
 // GeneratesGitHubWorkflows reports whether .github/workflows are generated.
+// An unset provider (empty string, pre-migration configs) defaults to GitHub.
 func (p CIProvider) GeneratesGitHubWorkflows() bool {
-	return p == CIProviderGitHub || p == CIProviderDual
+	return p.isGitHubLike()
 }
 
 // GeneratesForgejoWorkflows reports whether .forgejo/workflows are generated.
@@ -54,11 +55,24 @@ func (p CIProvider) GeneratesForgejoWorkflows() bool {
 	return p == CIProviderForgejo || p == CIProviderDual
 }
 
+// isGitHubLike treats the unset provider as GitHub for backward compatibility.
+func (p CIProvider) isGitHubLike() bool {
+	return p == CIProviderGitHub || p == CIProviderDual || p == ""
+}
+
 // ReleasesToForgejo reports whether GoReleaser releases target the Forgejo
 // instance (gitea_urls) instead of github.com. Dual providers also release
 // to Forgejo: the public GitHub copy is maintained by the release shadow.
 func (p CIProvider) ReleasesToForgejo() bool {
 	return p == CIProviderForgejo || p == CIProviderDual
+}
+
+// OrEmpty normalizes an unset provider to GitHub.
+func (p CIProvider) OrEmpty() CIProvider {
+	if p == "" {
+		return CIProviderGitHub
+	}
+	return p
 }
 
 // ValidateCIProvider validates a CI provider value.

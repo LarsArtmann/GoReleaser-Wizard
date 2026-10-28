@@ -67,6 +67,10 @@ func TestGeneratedConfigPassesGoReleaserCheck(t *testing.T) {
 		t.Skip("goreleaser binary not found in PATH; skipping E2E proof")
 	}
 
+	if _, err := exec.LookPath("docker"); err != nil {
+		t.Skip("docker binary not found in PATH; the docker-enabled E2E config requires it")
+	}
+
 	tmpDir := setupTempGoModule(t)
 
 	config := baseTestProjectConfig()

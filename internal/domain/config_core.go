@@ -135,7 +135,9 @@ func (spc *SafeProjectConfig) validateEnums() error {
 			"docker_support",
 		},
 		{
-			spc.DockerRegistry.IsValid(),
+			// A registry is only required when Docker is actually used;
+			// no-docker configs may leave it unset.
+			!spc.DockerSupport.IsEnabled() || spc.DockerRegistry.IsValid(),
 			ErrInvalidDockerRegistry,
 			"Invalid Docker registry",
 			string(spc.DockerRegistry),

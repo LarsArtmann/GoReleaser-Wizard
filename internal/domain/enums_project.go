@@ -133,7 +133,10 @@ func (pt ProjectType) RecommendedArchitectures() []Architecture {
 	case ProjectTypeWebAPI, ProjectTypeGRPCService, ProjectTypeMicroservice:
 		return []Architecture{ArchitectureAMD64, ArchitectureARM64}
 	case ProjectTypeLibrary:
-		return []Architecture{ArchitectureAMD64, ArchitectureARM64, Architecture386}
+		// 386 excluded: it is incompatible with the recommended darwin
+		// platform, so recommending it would produce configs that fail
+		// their own platform/architecture validation.
+		return []Architecture{ArchitectureAMD64, ArchitectureARM64}
 	case ProjectTypeMobile:
 		return []Architecture{ArchitectureARM64}
 	default:

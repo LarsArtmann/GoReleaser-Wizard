@@ -25,8 +25,7 @@ func NewValidationUseCase(logger Logger, repo FileSystemRepository) *ValidationU
 // addValidationError adds an error to the result if err is not nil.
 func addValidationError(result *ValidationResult, err error) {
 	if err != nil {
-		domainErr := &DomainError{}
-		if errors.As(err, &domainErr) {
+		if domainErr, ok := errors.AsType[*DomainError](err); ok {
 			result.Errors = append(result.Errors, domainErr)
 		}
 

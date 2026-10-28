@@ -50,8 +50,8 @@ security fixes.
   `RELEASE_SHADOW_GITHUB_TOKEN`) are provided exclusively through the CI
   secret store and consumed via environment variables in generated workflows.
 - Generated GoReleaser configs reference secrets only through CI-native secret
-  interpolation inside the target CI system (GitHub Actions `${{ secrets.* }}`,
-  Forgejo Actions `${{ secrets.GITHUB_TOKEN }}`).
+  interpolation inside the target CI system (GitHub Actions `secrets.*`,
+  Forgejo Actions `secrets.GITHUB_TOKEN`).
 
 ### Generated output guarantees
 

@@ -1,413 +1,99 @@
 # GoReleaser-Wizard Agent Guide
 
-**Project**: GoReleaser-Wizard - Interactive GoReleaser configuration wizard
+**Project**: GoReleaser-Wizard — interactive GoReleaser configuration wizard
 **Repository**: https://github.com/LarsArtmann/GoReleaser-Wizard
 
----
+Only non-obvious, session-critical context lives here. Full history in git; details in README.md / FEATURES.md / docs/.
 
 ## Overview
 
-GoReleaser-Wizard is an interactive CLI tool that generates production-ready GoReleaser configurations. It follows Domain-Driven Design (DDD) principles with Clean Architecture, using a workflow-based job execution system for configuration generation and validation.
+Interactive CLI that generates production-ready GoReleaser configurations with CI workflows (github/forgejo/dual targets). Clean Architecture + DDD:
 
-**Key Technologies**:
+1. **Domain** (`internal/domain/`): pure business logic, zero external deps. Core: `SafeProjectConfig`, typed enums, `DomainError` system (`internal/errors/domain_errors.go`)
+2. **Application** (`cmd/goreleaser-wizard/`): Cobra CLI, workflow/job execution system, typed generators (`generators/`)
+3. **Infrastructure** (`internal/git/`, `internal/utils/`): git wrappers, utilities
+4. **Templates** (`cmd/goreleaser-wizard/templates/`, embedded in `templates/embedded.go`): THE single source of truth for generated files; rendered only by generators. `types/template_data.go` holds typed template data + owner/repo resolution (flag > git remote > placeholder)
 
-- Go 1.27 (`encoding/json/v2` is the default there — no `GOEXPERIMENT` needed; see Gotchas)
-- Cobra CLI framework
-- Viper for configuration
-- Charm libraries (lipgloss, log) for terminal UI
-- golangci-lint for code quality
-- go-arch-lint for architecture enforcement
-- GoReleaser v2.17 as the target of generated configs
-
----
+**Stack**: Go 1.27, Cobra, Viper, Charm (lipgloss/log), golangci-lint, go-arch-lint, GoReleaser v2.17 as the generation target.
 
 ## Essential Commands
 
-All Go commands need the environment prefixes below while `/mnt/buildcache` is broken.
-
-### Build / Test / Lint
+Export these prefixes for every Go command while `/mnt/buildcache` is broken (gotcha 12):
 
 ```bash
 export GOCACHE=/tmp/gw-cache GOMODCACHE=/tmp/gw-modcache GOLANGCI_LINT_CACHE=/tmp/gw-lint-cache
 
 go build ./...
 go test ./...                            # includes E2E + golden tests
-go test ./cmd/goreleaser-wizard -update-golden   # regenerate golden files
+go test ./cmd/goreleaser-wizard -update-golden   # regenerate goldens (see gotcha 14b)
 golangci-lint run ./...
 go-arch-lint check
 ```
 
-### Verify the product (generated configs)
+Verify the product (generated configs) in a fresh Go module with git init:
 
 ```bash
 go build -o /tmp/gw-bin ./cmd/goreleaser-wizard
-# in a fresh Go module with git init:
 /tmp/gw-bin generate --config <cfg.yaml> --github-owner <owner> --github-repo <repo>
 goreleaser check                        # must exit 0 with zero deprecations
 ```
 
-The E2E test `TestGeneratedConfigPassesGoReleaserCheck` automates exactly this and skips gracefully when `goreleaser` is not in PATH.
+The E2E test `TestGeneratedConfigPassesGoReleaserCheck` automates this; skips gracefully when `goreleaser` is not in PATH.
 
-### Project-Specific Commands
+- `nix flake check`, `nix build`, `nix run .#test`, `nix run .#lint` — never Makefile/justfile
+- BuildFlow pre-commit hook: ~60 tools, auto-fixes files — check `git status` after every commit
 
-- `nix flake check`, `nix build`, `nix run .#test`, `nix run .#lint` (never Makefile/justfile)
-- BuildFlow runs as pre-commit hook: ~60 tools, auto-fixes files — check `git status` after every commit
+## Architecture Enforcement (go-arch-lint)
 
----
-
-## Project Architecture
-
-### Directory Structure
-
-### Architectural Layers
-
-The project implements Clean Architecture with DDD principles:
-
-1. **Domain Layer** (`internal/domain/`)
-   - Pure business logic with zero external dependencies
-   - Core types: `SafeProjectConfig`, enumerations, validation
-   - All business rules and domain constraints
-   - Interfaces for repository and service abstractions
-
-2. **Application Layer** (`cmd/goreleaser-wizard/`)
-   - Workflow orchestration and job execution
-   - CLI commands (Cobra-based)
-   - Template generation
-   - File system operations
-
-3. **Infrastructure Layer** (`internal/git/`, `internal/utils/`)
-   - External system integrations
-   - Git command wrappers
-   - Utility functions
-
-4. **Configuration Layer** (`cmd/goreleaser-wizard/templates/`)
-   - Embedded Go templates — THE single source of truth for all generated files
-   - Rendered exclusively by the typed generators in `cmd/goreleaser-wizard/generators/`
-   - `cmd/goreleaser-wizard/types/` holds the typed template data + GitHub owner/repo resolution (flag overrides > git remote detection > placeholders)
-   - Go templates for file generation
-   - Template data structures
-   - Template escaping utilities
-
-### Architecture Enforcement
-
-The project uses **go-arch-lint** to enforce architectural boundaries:
-
-- **Deep scanning enabled**: AST-based method call analysis (v1.14.0+)
-- **Domain isolation**: Domain layer cannot import application/infrastructure
-- **Test file exclusions**: `*_test.go` files excluded from architecture validation
-- **Vendor support**: Can validate with or without vendor dependencies
-
-**Key rules** (from `.go-arch-lint.yml`):
-
-- Domain components can only depend on other domain components
-- Application layer can depend on domain but not infrastructure
-- Infrastructure implements domain interfaces
-- Test files have no architectural constraints
-
----
-
-## Code Patterns and Conventions
-
-### Domain-Driven Design Patterns
-
-**1. Safe Configuration Types**
-
-```go
-// Single source of truth for configuration
-type SafeProjectConfig struct {
-    ProjectName        string      `json:"project_name" yaml:"project_name"`
-    ProjectType        ProjectType `json:"project_type" yaml:"project_type"`
-    // ... with validation methods
-}
-
-func (spc *SafeProjectConfig) Validate() error { }
-func (spc *SafeProjectConfig) ApplyDefaults() { }
-```
-
-**2. Typed Enumerations**
-
-```go
-type ProjectType string
-
-const (
-    ProjectTypeCLI           ProjectType = "cli"
-    ProjectTypeWebService    ProjectType = "web-service"
-    ProjectTypeLibrary       ProjectType = "library"
-)
-
-func (pt ProjectType) IsValid() bool { }
-```
-
-**3. Smart Defaults**
-
-```go
-func NewSafeProjectConfig() *SafeProjectConfig {
-    return &SafeProjectConfig{
-        ProjectType:    GetRecommendedProjectType(),
-        Platforms:      GetRecommendedPlatforms(),
-        CGOStatus:      CGOStatusDisabled,
-        // ... intelligent defaults based on project analysis
-    }
-}
-```
-
-### Error Handling
-
-**Centralized Error System** (`internal/errors/domain_errors.go`)
-
-All errors use typed error codes for structured error handling:
-
-**Error Usage Pattern**:
-
-**Recovery from Panics**:
-
-### Workflow and Job System
-
-The project uses a sophisticated workflow-based execution system:
-
-**Workflow Pattern**:
-
-**Job Factory Pattern**:
-
-**Job Implementation**:
-
-### Validation Patterns
-
-**Multi-Level Validation**:
-
-### Template Generation Pattern
-
-### Testing Patterns
-
-**Table-Driven Tests**:
-
-**Test Setup Pattern**:
-
-### CLI Pattern (Cobra)
-
----
-
-## Code Style and Conventions
-
-### Naming Conventions
-
-**Packages**: Lowercase, single word when possible
-
-- `domain`, `validation`, `errors`, `generators`, `jobs`
-
-**Types**: PascalCase
-
-- `SafeProjectConfig`, `Workflow`, `JobFactory`, `DomainError`
-
-**Interfaces**: PascalCase, usually end with "er"
-
-- `Logger`, `Job`, `FileSystem`
-
-**Functions**: PascalCase (exported), camelCase (unexported)
-
-- `ValidateProjectName()`, `prepareTemplateData()`, `createBackup()`
-
-**Constants**: PascalCase
-
-- `ErrValidationFailed`, `ProjectTypeCLI`, `JobExecutionStatusRunning`
-
-**Variables**: camelCase
-
-- `projectName`, `templateData`, `jobManager`
-
-**Acronyms**: Capitalized in PascalCase, lowercase in camelCase
-
-- `HTTPResponse` (not HttpResponse)
-- `httpClient` (not HTTPClient)
-- `CGOStatus`, `SBOM`, `LDFlags` (well-known acronyms all caps)
-
-### File Organization
-
-**Keep files under 300 lines** - Split immediately when exceeded
-
-Example file splitting pattern (from workflow.go):
-
-```
-workflow_core.go         - Core Workflow struct and basic methods
-workflow_execution.go    - Execution logic and state management
-workflow_types.go        - Workflow-related types and enums
-workflow_templates.go    - Workflow templates and factories
-workflow_validation.go    - Workflow validation logic
-```
-
-**Related code together** - Group by functionality, not by type
-
-### Import Order
-
-### Function Patterns
-
-**Early returns preferred** over nested conditionals:
-
-**Small, focused functions** - Prefer <30 lines
-
-**Explicit over implicit** - Clear function signatures
-
----
-
-## Testing Guidelines
-
-### Test Structure
-
-- **Unit tests**: `*_test.go` in same package
-- **Integration tests**: `integration_test.go`
-- **Performance tests**: `*_test.go` with `Benchmark*` functions
-
-### Coverage Requirements
-
-- **Minimum 80% coverage** enforced by `just coverage`
-- Test both success and error paths
-- Test edge cases and boundary conditions
-
-### Test Utilities
-
-**Use testify/assert**:
-
-```go
-import "github.com/stretchr/testify/assert"
-
-assert.Equal(t, expected, actual)
-assert.NoError(t, err)
-assert.True(t, condition)
-assert.Error(t, err)
-assert.Contains(t, str, substr)
-```
-
-**Setup/Teardown**:
-
----
+- Domain cannot import application/infrastructure; deep AST scanning enabled
+- `*_test.go` excluded from architecture validation — don't rely on this for production code
+- Cycles are caught by arch-lint and compilation; break them with DI
 
 ## Important Gotchas
 
-### Architecture Constraints
+**1. Domain layer purity** — domain MUST NOT import application/infrastructure; test it in isolation.
 
-**1. Domain Layer Purity**
+**2. Always use typed domain errors** — never `errors.New`/`fmt.Errorf` directly; use the `errors.New*Error()` constructors. Propagate `context.Context` through async ops.
 
-- Domain layer MUST NOT import application or infrastructure
-- Domain cannot use external dependencies (except through interfaces)
-- Test domain layer in isolation - no external services
+**3. Template escaping** — Go template delimiters need `{{"{{"}}` escapes; see `internal/validation/template_escaping.go`. Forgejo templates use `[[ ]]` delims so `${{ secrets.* }}` literals need no escaping.
 
-**2. Test File Exclusions**
+**4. `os.WriteFile` with explicit perms** (`0o644`); always create backups before overwriting existing files (generators' `createBackup()`).
 
-- `*_test.go` files are excluded from architecture validation
-- This allows testing patterns like package imports
-- Don't rely on this for production code
+**5. Nix first** — no justfiles, no Makefile.
 
-**3. Circular Dependencies**
+**11. Go 1.27: `GOEXPERIMENT=jsonv2` no longer needed (2026-10-28)** — `internal/types` imports `encoding/json/v2`; since go.mod bumped to 1.27, jsonv2 is the default. CI no longer sets the flag; a user-level `go env -w GOEXPERIMENT=jsonv2` is harmless.
 
-- go-arch-lint will catch circular dependencies
-- Import cycles prevent compilation
-- Use dependency injection to break cycles
+**12. `/mnt/buildcache` may be broken** — symptom: `failed to initialize build cache at /mnt/buildcache/...`. Fix: the GOCACHE/GOMODCACHE/GOLANGCI_LINT_CACHE exports above.
 
-### Error Handling
+**13. BuildFlow pre-commit can hang on telemetry** — PostHog TLS timeouts block the commit after the pipeline went green. Recovery: kill buildflow/git-commit, verify log shows `0 failed`, commit with `--no-verify` and note why.
 
-**4. Always Use Domain Errors**
+**14. E2E testing gotcha** — `go run github.com/LarsArtmann/GoReleaser-Wizard/cmd/goreleaser-wizard` resolves the PUBLISHED module from the proxy, not local code. Always `go build -o /tmp/gw-bin` first.
 
-- Never use `errors.New()` or `fmt.Errorf()` directly
-- Always create errors with `errors.New*Error()`
-- Provides structured error context and recovery suggestions
+**14b. Golden regeneration flag leaks** — passing `-update-golden` to `go test` makes `TestInitCommand` fail (CLI harness inherits the flag). Tests are green without it.
 
-**5. Context Propagation**
+**15. Domain validation rejects windows+arm64** — test configs must not combine them (`architecture_compat.go`).
 
-- All async operations should accept `context.Context`
-- Check `ctx.Err()` for cancellation
-- Pass context through to downstream operations
+**16. `--ci-provider {github,forgejo,dual,none}` selects workflow + release targets** (2026-10-28)
 
-### Template System
-
-**6. Template Escaping**
-
-- Go templates use `{{` and `}}` delimiters
-- Must escape literal braces with `{{"{{"}}` and `{{"}}"}}`
-- Use `internal/validation/template_escaping.go` utilities
-
-**7. Template Functions**
-
-- Custom template functions registered in `template.FuncMap`
-- Example: `"incpatch": git.IncPatchVersion`
-- Functions must be exported and error-safe
-
-### File Operations
-
-**8. Use `os.WriteFile` with Explicit Permissions**
-
-```go
-// Good
-os.WriteFile("config.yaml", data, 0o644)
-
-// Avoid
-ioutil.WriteFile("config.yaml", data, 0o644)  // Deprecated
-```
-
-**9. Backup Before Overwrite**
-
-- Always create backups before overwriting existing files
-- Pattern used in generators: `createBackup()` method
-
-### Build and Dependencies
-
-**10. Nix First, Never Justfile**
-
-- Prefer `nix` commands (`nix flake check`, `nix run .#test`); never create justfiles
-
-### Environment Gotchas (verified 2026-08-17)
-
-**11. Go 1.27: `GOEXPERIMENT=jsonv2` no longer needed (updated 2026-10-28)**
-
-- `internal/types` imports `encoding/json/v2`/`jsontext`; since go.mod bumped to 1.27, jsonv2 is the DEFAULT and builds work without the flag
-- CI no longer sets `GOEXPERIMENT`; a user-level `go env -w GOEXPERIMENT=jsonv2` (if present) is harmless
-- BuildFlow preflight "redundant GOEXPERIMENT" warnings are now correct, not false positives
-
-**12. `/mnt/buildcache` may be broken**
-
-- Symptom: `failed to initialize build cache at /mnt/buildcache/...`
-- Fix: export `GOCACHE=/tmp/gw-cache GOMODCACHE=/tmp/gw-modcache GOLANGCI_LINT_CACHE=/tmp/gw-lint-cache`
-
-**13. BuildFlow pre-commit hook can hang on telemetry**
-
-- PostHog TLS timeouts (network outage) block the commit AFTER the pipeline finished green
-- Recovery: kill the `buildflow`/`git commit` processes, verify the pipeline log shows `0 failed`, then commit with `--no-verify` and note why in the message
-
-**14. E2E testing gotcha**
-
-- `go run github.com/LarsArtmann/GoReleaser-Wizard/cmd/goreleaser-wizard` resolves the PUBLISHED module from the proxy, not local code — always `go build -o /tmp/gw-bin ./cmd/goreleaser-wizard` first
-
-**15. Domain validation rejects windows+arm64**
-
-- Test configs must not combine them (`architecture_compat.go`); template ignore lists are belt-and-braces, not a license
-
-### Forgejo CI provider (added 2026-10-28)
-
-**16. `--ci-provider {github,forgejo,dual,none}` selects workflow + release targets**
-
-- Default github = byte-identical legacy output; unset CIProvider behaves as github everywhere (`isGitHubLike`), legacy configs need no migration
-- Forgejo templates: `ForgejoCITemplate`/`ForgejoReleaseTemplate` in `templates/embedded.go`, `[[ ]]` delims so `${{ secrets.* }}` literals need no escaping; generator `generators/forgejo_workflows.go` writes both files
+- Default github = byte-identical legacy output; unset CIProvider behaves as github everywhere
+- Forgejo templates: `ForgejoCITemplate`/`ForgejoReleaseTemplate` in `templates/embedded.go`; generator `generators/forgejo_workflows.go` writes both files
 - Forgejo releases: GoReleaser config renders `gitea_urls` + `changelog.use: git`; inside Forgejo Actions `secrets.GITHUB_TOKEN` IS the Forgejo API token (`GITEA_TOKEN`)
 - Release shadow: `forgejo-release-shadow` (SystemNix) copies assets to GitHub; skips when `RELEASE_SHADOW_GITHUB_TOKEN` is absent
 - Pins live in `types/template_data.go`: BuildFlow flake rev + nixpkgs goreleaser v2.17.1 — bump deliberately, never float
-- Goldens: `forgejo-workflows.yml`, `goreleaser-forgejo.yaml`, `goreleaser-dual.yaml` (dual = both workflow sets, goreleaser still targets Forgejo); regenerate with `go test ./cmd/goreleaser-wizard -update-golden` (NOTE: passing that flag makes TestInitCommand fail — the CLI harness inherits the flag; tests are green without it)
+- Goldens: `forgejo-workflows.yml`, `goreleaser-forgejo.yaml`, `goreleaser-dual.yaml` (dual = both workflow sets, goreleaser still targets Forgejo)
 
-**17. actionlint + self-hosted runner labels**
+**17. actionlint + self-hosted runner labels** — generated workflows use `runs-on: native`; actionlint rejects it without a config:
+`actionlint -config-file <(printf 'self-hosted-runner:\n  labels:\n    - native\n') ...` (the E2E test does exactly this)
 
-- Generated workflows use `runs-on: native`; actionlint rejects it without a config: `actionlint -config-file <(printf 'self-hosted-runner:\n  labels:\n    - native\n') ...` (the E2E test does exactly this)
+**18. CLI defaults are applied twice (quirk, not a bug to chase)** — `runGenerate` applies `ApplyDefaults()` after flag overrides; `ConfigGenerationJob` re-applies harmlessly. The docker dependency check still consults pre-override DockerSupport on the CLI path — pass a `docker` shim on hosts without docker when smoke-testing.
 
-**18. CLI defaults are applied twice (quirk, not a bug to chase)**
+**19. Dogfood proof** — dnsblockd's `.forgejo/workflows` + `.goreleaser.yaml` were generated by this binary (`--ci-provider forgejo --project-type library`) and validated with goreleaser check + actionlint before push.
 
-- `runGenerate` applies `ApplyDefaults()` after flag overrides (job-list decisions need defaulted fields); `ConfigGenerationJob` re-applies harmlessly. The docker dependency check still consults pre-override DockerSupport on the CLI path — pass a `docker` shim on hosts without docker when smoke-testing
-
-**19. Dogfood proof**
-
-- dnsblockd's `.forgejo/workflows` + `.goreleaser.yaml` were generated by this binary (`--ci-provider forgejo --project-type library`) and validated with goreleaser check + actionlint before push
-
-**20. Flake Go pin: use `buildGoModule.override`, not a `go` attr (added 2026-10-28)**
+**20. Flake Go pin: use `buildGoModule.override`, not a `go` attr (2026-10-28)**
 
 - go.mod requires 1.27; nixpkgs default `go` trails (1.26) and buildGoModule sets `GOTOOLCHAIN=local` → `go: go.mod requires go >= 1.27`
-- A `go = pkgs.go_1_27;` attr INSIDE the buildGoModule set is silently swallowed by mkDerivation (it is a callPackage-level arg); the working form is `pkgs.buildGoModule.override { go = pkgs.go_1_27; } { ... }`
-- Current nixpkgs buildGoModule defaults `doCheck = true` on the package itself: the plain `nix build .#goreleaser-wizard` RUNS tests and fails in the sandbox (`git` not on PATH). The flake sets `doCheck = false` on the package; tests live in `checks.test` with `git`/`goreleaser`/`actionlint` as `nativeCheckInputs` (E2E proof runs fully there instead of skipping)
-- Symptom when these drift: `nix flake check` fails on `packages...` (not `checks.test`) with `git init failed: exec: "git": executable file not found in $PATH` — check the failing drv is the package, then re-pin
+- A `go = pkgs.go_1_27;` attr INSIDE the buildGoModule set is silently swallowed by mkDerivation (callPackage-level arg); working form: `pkgs.buildGoModule.override { go = pkgs.go_1_27; } { ... }`
+- Current nixpkgs buildGoModule defaults `doCheck = true` on the package: plain `nix build .#goreleaser-wizard` RUNS tests and fails in the sandbox (`git` not on PATH). Flake sets `doCheck = false` on the package; tests live in `checks.test` with `git`/`goreleaser`/`actionlint` as `nativeCheckInputs` (E2E proof runs fully there instead of skipping)
+- Symptom when these drift: `nix flake check` fails on `packages...` (not `checks.test`) with `git init failed: exec: "git": executable file not found in $PATH`
 
 > This file was auto-trimmed. Full history in git.

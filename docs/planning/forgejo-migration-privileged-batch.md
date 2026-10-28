@@ -10,7 +10,7 @@ Run the phases in order. Each phase lists its verification; stop on the first re
 
 ---
 
-## Phase A — Deploy SystemNix (carries: dnsblockd canonicalRepos entry, `forgejo-release-shadow` binary, fixture fixes)
+## Phase A — Deploy SystemNix (carries: dnsblockd canonicalRepos entry, `forgejo-release-shadow` + `forgejo-branch-protect` binaries, fixture fixes)
 
 ```bash
 cd ~/projects/SystemNix
@@ -125,6 +125,6 @@ root/hermes-gated by design).
 ## Later waves (unchanged from master plan §6)
 
 After the pilot verifies: waves of remaining ~260 repos via `forgejo-flip-batch` (design pending,
-T2), branch-protection hardening (T22), runner capacity check (T16: single `native` runner,
+T2), runner capacity check (T16: single `native` runner,
 capacity 2, 16G watermark), GoReleaser-Wizard release (v2 with `--ci-provider`), then per-repo
 wizard regeneration sweeps (`goreleaser-wizard generate --ci-provider forgejo`).

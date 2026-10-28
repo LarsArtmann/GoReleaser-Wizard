@@ -72,6 +72,7 @@ func (p CIProvider) OrEmpty() CIProvider {
 	if p == "" {
 		return CIProviderGitHub
 	}
+
 	return p
 }
 

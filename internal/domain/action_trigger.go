@@ -63,6 +63,11 @@ var actionTriggerMetaMap = map[ActionTrigger]actionTriggerMeta{
 			ProjectTypeDesktop,
 		},
 	},
+	ActionTriggerMainPush: {
+		githubPattern:  "push:\n  branches:\n    - main",
+		description:    "Triggers on pushes to the main branch (explicit trigger name)",
+		recommendedFor: []ProjectType{ProjectTypeCLI, ProjectTypeWebAPI, ProjectTypeGRPCService},
+	},
 }
 
 // IsValid returns true if ActionTrigger is valid.

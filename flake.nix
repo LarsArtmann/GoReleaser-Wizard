@@ -46,6 +46,10 @@
             pname = "goreleaser-wizard";
             inherit version vendorHash;
 
+            # buildGoModule now defaults doCheck=true; tests run in checks.test
+            # (with git/goreleaser/actionlint on PATH), not in the package build.
+            doCheck = false;
+
             src = lib.fileset.toSource {
               root = ./.;
               fileset = lib.fileset.unions [

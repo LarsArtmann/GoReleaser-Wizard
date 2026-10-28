@@ -114,13 +114,13 @@ root/hermes-gated by design).
 
 ## Execution state (2026-10-28, what is ALREADY DONE)
 
-| Piece | State |
-| --- | --- |
-| Wizard `--ci-provider {github,forgejo,dual,none}` (T6–T10) | DONE, committed `9334dc3` (+daemon commits); build/tests/lint/arch-lint green; goldens pinned incl. forgejo+dual; goreleaser 2.17.1 check zero-deprecation; actionlint E2E green |
-| dnsblockd `.forgejo/workflows/{ci,release}.yml` + `.goreleaser.yaml` | DONE, pushed to GitHub master (`411dce43`) |
-| SystemNix `forgejo-release-shadow` + fixture tests | DONE, committed (`4ddc9a84`/`a1ca8384`), fixture check green |
-| SystemNix `canonicalRepos += dnsblockd` + runbook | DONE, committed |
-| Phases A–E above | WAITING ON USER |
+| Piece                                                                | State                                                                                                                                                                            |
+| -------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Wizard `--ci-provider {github,forgejo,dual,none}` (T6–T10)           | DONE, committed `9334dc3` (+daemon commits); build/tests/lint/arch-lint green; goldens pinned incl. forgejo+dual; goreleaser 2.17.1 check zero-deprecation; actionlint E2E green |
+| dnsblockd `.forgejo/workflows/{ci,release}.yml` + `.goreleaser.yaml` | DONE, pushed to GitHub master (`411dce43`)                                                                                                                                       |
+| SystemNix `forgejo-release-shadow` + fixture tests                   | DONE, committed (`4ddc9a84`/`a1ca8384`), fixture check green                                                                                                                     |
+| SystemNix `canonicalRepos += dnsblockd` + runbook                    | DONE, committed                                                                                                                                                                  |
+| Phases A–E above                                                     | WAITING ON USER                                                                                                                                                                  |
 
 ## Later waves (unchanged from master plan §6)
 

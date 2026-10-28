@@ -77,6 +77,7 @@
 ## f) UP TO 50 THINGS TO DO NEXT (ordered by impact)
 
 **Pilot cutover (this week, after user runs Phases A–E)**
+
 1. User: Phase A deploy (carries canonicalRepos, release-shadow, branch-protect, ssh-keys fix).
 2. User: Phase B flip pilot (`forgejo-flip-check@dnsblockd` → `forgejo-flip@dnsblockd`).
 3. Agent: verify flip result via API after Phase B (mirror=false, push mirror attached, workflows present).

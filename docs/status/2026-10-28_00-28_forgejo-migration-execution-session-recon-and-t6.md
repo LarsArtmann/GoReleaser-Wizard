@@ -67,6 +67,7 @@ T2 (SystemNix forgejo-primary module — largely pre-existing, needs deploy-side
 ## f) NEXT — up to 50 tasks (execution order)
 
 **Wizard (autonomous, now):**
+
 1. `types/template_data.go`: `ForgejoCITemplateData`, `ForgejoReleaseTemplateData` + builders; `GoReleaserTemplateData` += `ForgejoRelease/GiteaAPIURL/GiteaDownloadURL`.
 2. `templates/embedded.go`: `ForgejoCITemplate` (checkout → pinned buildflow bootstrap → `buildflow --build-mode full`, telemetry off, `runs-on: native`).
 3. `templates/embedded.go`: `ForgejoReleaseTemplate` (gate → goreleaser `GITEA_TOKEN: secrets.GITHUB_TOKEN` → release-shadow step with runtime secret-presence skip).
@@ -78,12 +79,12 @@ T2 (SystemNix forgejo-primary module — largely pre-existing, needs deploy-side
 9. Golden tests: `forgejo-ci.yml`, `forgejo-release.yml`, `goreleaser-forgejo.yaml`, dual-provider edge (T10.3).
 10. E2E: actionlint on generated workflows when binary present (T10.1/10.2), `goreleaser check` still green.
 11. Commit + push wizard changes.
-**Pilot content (autonomous, now):**
+    **Pilot content (autonomous, now):**
 12. Snapshot dnsblockd pre-state (1.1) into `docs/status/` (tags/releases/mrconfig entry via gh+git).
 13. Author dnsblockd `.forgejo/workflows/ci.yml` + `release.yml` + `.goreleaser.yaml` `gitea_urls` on a branch; push to GitHub master (mirrors propagate; flip-ready).
 14. Mirror-Actions observability experiment (see e.4): watch runner for sync-triggered runs.
 15. Verify dnsblockd `.buildflow.yml` exists / bootstrap path works for it.
-**SystemNix (autonomous authoring, deploy gated):**
+    **SystemNix (autonomous authoring, deploy gated):**
 16. T2-lite: add `dnsblockd` to `services.forgejo.canonicalRepos` (+ wave-1 candidates list staged as comments or a `forgejo-primary.nix` list module).
 17. T3: reconcile flipped-registry skip (read reconcile script namespace handling; skip canonical repos from mirror-recreation; ensure push-mirror reconcile).
 18. T5: `forgejo-release-shadow` script (Forgejo release → GitHub release asset copy, idempotent, checksum-verified) + fixture test + system profile install.
@@ -92,7 +93,7 @@ T2 (SystemNix forgejo-primary module — largely pre-existing, needs deploy-side
 21. T22: monitoring — push-mirror staleness per flipped repo + release-shadow success metric (system-health + Gatus).
 22. `nix flake check` + `nix eval` module evaluation; commit + push SystemNix.
 23. Write the privileged-batch runbook (see e.3) with exact commands: deploy → `forgejo-flip@dnsblockd` → optional `pass insert`.
-**Wave 0 completion (user-gated):**
+    **Wave 0 completion (user-gated):**
 24. User runs deploy (also reconverges my SSH key to the Forgejo account → verify `git ls-remote ssh://git@forgejo.home.lan/lars/dnsblockd.git`).
 25. User runs `sudo systemctl start forgejo-flip@dnsblockd.service` (or `forgejo-flip-check@` first for the dry-run plan).
 26. Verify: native flag, full import counts, push mirror listed + sync-on-push latency (T4.3), tags on both sides.
@@ -102,10 +103,10 @@ T2 (SystemNix forgejo-primary module — largely pre-existing, needs deploy-side
 30. Release-shadow run → GitHub release assets (1.11) — needs the T5 script deployed OR gh-side manual copy first.
 31. External verify: `GOPROXY=proxy.golang.org go get github.com/LarsArtmann/dnsblockd@vNext`, public clone, asset URLs (1.12) — via T14 harness.
 32. Runbook gotchas into SystemNix `docs/services/forgejo.md` (1.13).
-**T14 harness (autonomous):**
+    **T14 harness (autonomous):**
 33. `scripts/verify-public-presence.sh`: public clone + proxy `go get` + GitHub release assets per repo.
 34. Wire post-flip + nightly (Forgejo schedule job or system-health timer).
-**Waves 1–4 (after Wave 0 green):**
+    **Waves 1–4 (after Wave 0 green):**
 35. T11: flip the 7 Forgejo-CI repos; replace "kept in sync manually" workflows with wizard-generated ones (regen via `--ci-provider forgejo`).
 36. T13: mrconfig origin rewrites for flipped repos; fleet `mr status` green.
 37. T12: classify the 39 goreleaser repos (binary vs library); batch flips 5–10; wizard regen; spot-verify 3 releases.
@@ -113,7 +114,7 @@ T2 (SystemNix forgejo-primary module — largely pre-existing, needs deploy-side
 39. T19: long-tail classification + flips.
 40. T20: decommission `.github/workflows` after 2-week green-shadow window per repo.
 41. T17: open issues/PRs inventory (gh API); decision record (full-import default already preserves history at flip time).
-**Hardening/docs/cleanup:**
+    **Hardening/docs/cleanup:**
 42. T16: measure pilot CI duration/memory on evo-x2; Hetzner-runner decision memo; cache-toggle decision in ci template.
 43. T21: PAT scope audit (push-mirror PAT + shadow PAT minimal scopes; rotation policy).
 44. T23: auto-tag forgejo template (CHANGELOG heading version source); pilot on one repo.
@@ -132,4 +133,4 @@ T2 (SystemNix forgejo-primary module — largely pre-existing, needs deploy-side
 
 ---
 
-*Authored by Crush session 2026-10-28. Feeds: master plan §6 (T1/T6–T10 first), privileged-batch runbook (new, see f.23).*
+_Authored by Crush session 2026-10-28. Feeds: master plan §6 (T1/T6–T10 first), privileged-batch runbook (new, see f.23)._

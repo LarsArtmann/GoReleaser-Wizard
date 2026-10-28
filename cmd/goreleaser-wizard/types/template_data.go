@@ -37,6 +37,14 @@ type GoReleaserTemplateData struct {
 	// generated config passes `goreleaser check` without environment variables.
 	GitHubOwner string
 	GitHubRepo  string
+
+	// Forgejo release target. ForgejoRelease switches the release block and
+	// changelog source from github.com to the self-hosted Forgejo instance
+	// (gitea_urls); the public GitHub copy is maintained by the release shadow.
+	ForgejoRelease    bool
+	GiteaAPIURL       string
+	GiteaDownloadURL  string
+	ChangelogUse      string
 }
 
 // GitHubActionsTemplateData is the strongly typed template data for the
@@ -48,6 +56,50 @@ type GitHubActionsTemplateData struct {
 	SigningEnabled bool
 	DockerRegistry string
 	DockerImage    string
+}
+
+// Forgejo workflow generation pins. These are immutable flake refs verified
+// during the Forgejo-primary migration (2026-10-28); bump via a deliberate
+// upgrade pass, never a floating ref (reproducibility + runner bandwidth).
+const (
+	// BuildFlowNixPin is the pinned BuildFlow flake used as the CI gate.
+	BuildFlowNixPin = "github:LarsArtmann/BuildFlow/49ced3e0039a5f6e88028697bd779ec2f7f28826"
+	// GoReleaserNixPin is the pinned nixpkgs revision providing goreleaser
+	// v2.17, the exact GoReleaser target of the generated configs.
+	GoReleaserNixPin = "github:NixOS/nixpkgs/3ec636362e1816bc2f0888fa0fa2c69f1bc9e504#goreleaser"
+	// ForgejoRunnerLabel is the act_runner label of the self-hosted runner.
+	ForgejoRunnerLabel = "native"
+)
+
+// ForgejoWorkflowsTemplateData is the strongly typed template data for the
+// Forgejo CI and release workflow templates (both rendered with [[ ]]
+// delimiters, so ${{ secrets.* }} literals need no escaping).
+type ForgejoWorkflowsTemplateData struct {
+	ProjectName string
+	RunnerLabel string
+	BuildFlowPin string
+	GoReleaserPin string
+
+	// Forgejo instance and repository coordinates for the release shadow.
+	ForgejoURL   string
+	ForgejoOwner string
+	GitHubOwner  string
+	GitHubRepo   string
+}
+
+// NewForgejoWorkflowsTemplateData creates typed template data from
+// SafeProjectConfig.
+func NewForgejoWorkflowsTemplateData(config *domain.SafeProjectConfig) *ForgejoWorkflowsTemplateData {
+	return &ForgejoWorkflowsTemplateData{
+		ProjectName:   config.ProjectName,
+		RunnerLabel:   ForgejoRunnerLabel,
+		BuildFlowPin:  BuildFlowNixPin,
+		GoReleaserPin: GoReleaserNixPin,
+		ForgejoURL:    domain.ForgejoInstanceURL,
+		ForgejoOwner:  domain.ForgejoPrimaryUser,
+		GitHubOwner:   GetGitHubOwner(),
+		GitHubRepo:    GetGitHubRepo(),
+	}
 }
 
 // PlatformIgnored represents platform/architecture combinations to ignore.
@@ -127,6 +179,14 @@ func NewGoReleaserTemplateData(config *domain.SafeProjectConfig) *GoReleaserTemp
 		data.DockerEnabled = true
 		data.DockerRegistry = config.DockerRegistry.GetURL()
 		data.DockerImage = config.GetDockerImageName()
+	}
+
+	data.ChangelogUse = "github"
+	if config.CIProvider.ReleasesToForgejo() {
+		data.ForgejoRelease = true
+		data.GiteaAPIURL = domain.ForgejoAPIURL
+		data.GiteaDownloadURL = domain.ForgejoInstanceURL
+		data.ChangelogUse = "git"
 	}
 
 	return data

@@ -65,7 +65,7 @@ snapshot:
   version_template: "{{"{{"}}incpatch .Version{{"}}"}}-next"
 changelog:
   sort: asc
-  use: github
+  use: {{.ChangelogUse}}
   filters:
     exclude:
       - '^docs:'
@@ -74,12 +74,16 @@ changelog:
       - Merge pull request
       - Merge branch
 
+{{if .ForgejoRelease}}gitea_urls:
+  api: {{.GiteaAPIURL}}
+  download: {{.GiteaDownloadURL}}
+
 release:
+{{else}}release:
   github:
     owner: "{{.GitHubOwner}}"
     name: "{{.GitHubRepo}}"
-
-  draft: false
+{{end}}  draft: false
   prerelease: auto
 
   footer: |
@@ -158,6 +162,98 @@ jobs:
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+`
+
+// ForgejoCITemplate is the Forgejo Actions CI workflow template. It uses
+// [[ ]] delimiters, so GitHub/Forgejo expression literals (${{ ... }}) need
+// no escaping. CI delegates entirely to BuildFlow --build-mode full.
+const ForgejoCITemplate = `name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  buildflow:
+    runs-on: [[.RunnerLabel]]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install BuildFlow
+        run: |
+          nix --accept-flake-config profile install [[.BuildFlowPin]]
+          echo "$HOME/.nix-profile/bin" >> "$GITHUB_PATH"
+
+      - name: BuildFlow full gate
+        env:
+          BUILDFLOW_TELEMETRY_DISABLED: "true"
+        run: buildflow --build-mode full
+`
+
+// ForgejoReleaseTemplate is the Forgejo Actions release workflow template:
+// BuildFlow gate, then GoReleaser against the Forgejo API (GITHUB_TOKEN is
+// the Forgejo API token inside Forgejo Actions), then an optional release
+// shadow that copies assets to the public GitHub mirror.
+const ForgejoReleaseTemplate = `name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  release:
+    runs-on: [[.RunnerLabel]]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install BuildFlow
+        run: |
+          nix --accept-flake-config profile install [[.BuildFlowPin]]
+          echo "$HOME/.nix-profile/bin" >> "$GITHUB_PATH"
+
+      - name: BuildFlow full gate
+        env:
+          BUILDFLOW_TELEMETRY_DISABLED: "true"
+        run: buildflow --build-mode full
+
+      - name: Install GoReleaser
+        run: |
+          nix --accept-flake-config profile install [[.GoReleaserPin]]
+          echo "$HOME/.nix-profile/bin" >> "$GITHUB_PATH"
+
+      - name: Run GoReleaser
+        env:
+          GITEA_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: goreleaser release --clean
+
+      - name: Mirror release to GitHub
+        env:
+          FORGEJO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.RELEASE_SHADOW_GITHUB_TOKEN }}
+          FORGEJO_URL: [[.ForgejoURL]]
+          FORGEJO_OWNER: [[.ForgejoOwner]]
+          FORGEJO_REPO: [[.ProjectName]]
+          GITHUB_OWNER: [[.GitHubOwner]]
+          GITHUB_REPO: [[.GitHubRepo]]
+        run: |
+          if [ -z "${GITHUB_TOKEN:-}" ]; then
+            echo "RELEASE_SHADOW_GITHUB_TOKEN not set; skipping release shadow"
+            exit 0
+          fi
+
+          forgejo-release-shadow
 `
 
 // DockerfileTemplate renders a Dockerfile for use with dockers_v2.

@@ -8,4 +8,7 @@ const (
 	ForgejoInstanceURL = "https://forgejo.home.lan"
 	// ForgejoAPIURL is the v1 API root used by GoReleaser's gitea_urls.
 	ForgejoAPIURL = ForgejoInstanceURL + "/api/v1"
+	// ForgejoPrimaryUser is the Forgejo account that owns migrated fleet
+	// repositories (matches SystemNix flip machinery's primaryUser).
+	ForgejoPrimaryUser = "lars"
 )

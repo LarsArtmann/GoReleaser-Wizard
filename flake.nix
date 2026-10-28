@@ -39,9 +39,13 @@
 
           vendorHash = "sha256-AF9+OkAd78fRGvnysacqiyaP5xCArglqg9wr+qHM0y8=";
 
+          # go.mod requires go >= 1.27 (encoding/json/v2 is default there, no GOEXPERIMENT needed).
+          # Pin explicitly: nixpkgs' default `go` trails at 1.26 and buildGoModule sets GOTOOLCHAIN=local.
+          go = pkgs.go_1_27;
+
           goreleaser-wizard = pkgs.buildGoModule {
             pname = "goreleaser-wizard";
-            inherit version vendorHash;
+            inherit go version vendorHash;
 
             src = lib.fileset.toSource {
               root = ./.;
@@ -90,7 +94,7 @@
               inputsFrom = [ config.packages.default ];
 
               packages = with pkgs; [
-                go
+                go_1_27
                 gotools
                 golangci-lint
                 gofumpt
@@ -109,7 +113,7 @@
               inputsFrom = [ config.packages.default ];
 
               packages = with pkgs; [
-                go
+                go_1_27
                 gotools
                 golangci-lint
                 gofumpt

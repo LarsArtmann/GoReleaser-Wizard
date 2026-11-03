@@ -22,13 +22,13 @@ require (
 
 require (
 	charm.land/bubbles/v2 v2.2.1 // indirect
-	charm.land/bubbletea/v2 v2.1.0 // indirect
+	charm.land/bubbletea/v2 v2.1.1 // indirect
 	github.com/atotto/clipboard v0.1.4 // indirect
 	github.com/catppuccin/go v0.3.0 // indirect
 	github.com/charmbracelet/colorprofile v0.4.3 // indirect
 	github.com/charmbracelet/ultraviolet v0.0.0-20261023060817-a45b7c86333f // indirect
 	github.com/charmbracelet/x/ansi v0.11.9 // indirect
-	github.com/charmbracelet/x/exp/charmtone v0.1.0 // indirect
+	github.com/charmbracelet/x/exp/charmtone v0.1.1 // indirect
 	github.com/charmbracelet/x/exp/ordered v0.1.0 // indirect
 	github.com/charmbracelet/x/exp/strings v0.1.0 // indirect
 	github.com/charmbracelet/x/term v0.2.2 // indirect
@@ -56,9 +56,9 @@ require (
 	github.com/muesli/roff v0.1.0 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/segmentio/asm v1.2.1 // indirect
-	github.com/xo/terminfo v1.2.0 // indirect
+	github.com/xo/terminfo v1.3.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
-	go.yaml.in/yaml/v3 v3.0.5 // indirect
+	go.yaml.in/yaml/v3 v3.0.6 // indirect
 	golang.org/x/exp v0.0.0-20261014143641-f0251eb4aa3e // indirect
 	golang.org/x/sync v0.24.0 // indirect
 	golang.org/x/sys v0.49.0 // indirect

@@ -268,6 +268,7 @@ Parallelism: P2 and P3 run concurrently after P0's M3; owner-gated tasks (M1, M2
 - **Actions-secret API verified 2026-11-04** (go-gitea/gitea source: `CreateOrUpdateSecretOption.Data` plaintext body, server-side sealing in `secret_service`): M21's simple-PUT loop design holds; no client-side libsodium work needed.
 - **depgraph CLI verified via `--help`**: `--dir`/`--format` belong to the `generate` subcommand; the draft's bare `depgraph --dir …` invocation was invalid; workspace-mode builds need `GOFLAGS=` cleared.
 - **Graph ↔ table drift fixed**: the 11-03 graph used stale task numbers (M10/M19x/M20–M28 shifted vs the table) and drew a v2-release task missing from the table; graph rewritten to match table IDs.
+- **Fleet measured 2026-11-04** (M8 executed): depgraph scanned 241 top-level dirs → 110 own projects (85 Go) + 300 own library modules + 977 third-party; 137 nodes mr-tagged. The "~265 unknown repos" figure was never a measurement — the wave pool is 110 projects (wave lists: batch doc Phase F, M9 done 2026-11-04). Also measured: last-commit age is useless as an activity signal (the auto-commit daemon touches every repo daily), so waves were assigned by coupling and blast radius instead.
 
 ## 6. Verschlimmbesser guards
 

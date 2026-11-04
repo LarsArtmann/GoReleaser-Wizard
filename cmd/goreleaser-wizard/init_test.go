@@ -104,6 +104,10 @@ func TestInitCommand(t *testing.T) {
 			defer expectNoPanic(t, tt.expectError)
 
 			// Execute command
+			// Explicit empty args: without SetArgs, Cobra parses
+			// os.Args[1:], so `go test -update-golden` leaked the flag
+			// into the CLI and failed as unknown-flag (gotcha 14b).
+			cmd.SetArgs([]string{})
 			err := cmd.Execute()
 
 			if (err != nil) != tt.expectError {

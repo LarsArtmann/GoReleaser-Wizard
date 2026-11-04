@@ -69,7 +69,7 @@ The E2E test `TestGeneratedConfigPassesGoReleaserCheck` automates this; skips gr
 
 **14. E2E testing gotcha** — `go run github.com/LarsArtmann/GoReleaser-Wizard/cmd/goreleaser-wizard` resolves the PUBLISHED module from the proxy, not local code. Always `go build -o /tmp/gw-bin` first.
 
-**14b. Golden regeneration flag leaks** — passing `-update-golden` to `go test` makes `TestInitCommand` fail (CLI harness inherits the flag). Tests are green without it.
+**14b. Golden regeneration flag leak — FIXED (2026-11-04)** — TestInitCommand now calls `cmd.SetArgs([]string{})` before `Execute()`, so `-update-golden` can no longer leak into the CLI as an unknown flag; update mode is proven green end-to-end with byte-identical goldens (`git status testdata/` stays clean).
 
 **15. Domain validation rejects windows+arm64** — test configs must not combine them (`architecture_compat.go`).
 

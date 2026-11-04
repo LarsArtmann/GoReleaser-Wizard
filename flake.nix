@@ -37,7 +37,7 @@
         let
           version = self.rev or self.dirtyRev or "dev";
 
-          vendorHash = "sha256-U7vpOm89OKdn6P/niqNpGbeXAShy3XLwR1dtGA1jCvQ=";
+          vendorHash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
 
           # go.mod requires go >= 1.27 (encoding/json/v2 is default there, no GOEXPERIMENT needed).
           # Pin explicitly: nixpkgs' default `go` trails at 1.26 and buildGoModule sets GOTOOLCHAIN=local.

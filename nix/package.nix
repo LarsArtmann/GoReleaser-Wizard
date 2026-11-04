@@ -14,10 +14,10 @@ buildGoModule (finalAttrs: {
     owner = "LarsArtmann";
     repo = "GoReleaser-Wizard";
     rev = "v${finalAttrs.version}";
-    hash = "sha256-l7mylIZ5iAEkUFEMyqQL5cAvjFBa4gj+n6Qq9fFdUAE=";
+    hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
   };
 
-  vendorHash = "sha256-CTXzZ/yGuuo5T+CtNROah0AIXp5mKwk2OcoZTyfGJnQ=";
+  vendorHash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
 
   # v0.1.0 validation treats missing gpg/cosign as a hard error (upstream
   # later downgraded this to a warning); unit tests probe PATH for them.

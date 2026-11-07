@@ -15,27 +15,6 @@ import (
 	"github.com/LarsArtmann/GoReleaser-Wizard/internal/domain"
 )
 
-// noOpRollback returns a no-op rollback function for jobs that don't modify state.
-func noOpRollback(logger *log.Logger, jobName string) func(ctx context.Context) error {
-	return func(ctx context.Context) error {
-		logger.Info(jobName + " rollback is a no-op")
-
-		return nil
-	}
-}
-
-// noOpRollbackHelper provides a no-op rollback implementation for validation jobs.
-type noOpRollbackHelper struct {
-	logger *log.Logger
-	name   string
-}
-
-func (h *noOpRollbackHelper) Rollback(ctx context.Context) error {
-	return noOpRollback(h.logger, h.name)(ctx)
-}
-
-const workflowDirPermission = 0o755
-
 // generateGoReleaserConfig generates the GoReleaser configuration file in the
 // current directory via the typed generator (single template source of truth).
 func generateGoReleaserConfig(config *domain.SafeProjectConfig, logger *log.Logger) error {
@@ -415,12 +394,6 @@ func (j *ProjectValidationJob) Name() string {
 	return "Validate Project Structure"
 }
 
-func checkJobContext(ctx context.Context, logger *log.Logger, message string) error {
-	logger.Info(message)
-
-	return checkContextCancellation(ctx, "context cancelled")
-}
-
 func (j *ProjectValidationJob) Execute(ctx context.Context) error {
 	if err := checkJobContext(ctx, j.logger, "Validating project structure"); err != nil {
 		return err
@@ -607,79 +580,3 @@ func (j *DependencyCheckJob) Rollback(ctx context.Context) error {
 }
 
 // JobFactory creates jobs for common wizard operations.
-type JobFactory struct {
-	logger *log.Logger
-}
-
-// NewJobFactory creates a new job factory.
-func NewJobFactory(logger *log.Logger) *JobFactory {
-	return &JobFactory{
-		logger: logger,
-	}
-}
-
-// CreateFullWizardJobs creates all jobs for a complete wizard operation.
-func (jf *JobFactory) CreateFullWizardJobs(config *ProjectConfig, force bool) []Job {
-	var jobs []Job
-
-	// Add project validation job
-	jobs = append(jobs, NewProjectValidationJob(".", jf.logger))
-
-	// Fail before writing anything if a target artifact already exists
-	jobs = append(jobs,
-		NewGenerationPreflightJob(force, generationTargets(config, true), jf.logger))
-
-	// Add dependency check job
-	dependencies := []string{"go"}
-	if config.GetDockerEnabled() {
-		dependencies = append(dependencies, "docker")
-	}
-
-	if config.SigningLevel.RequiresCosign() {
-		dependencies = append(dependencies, "cosign")
-	}
-
-	jobs = append(jobs, NewDependencyCheckJob(dependencies, jf.logger))
-
-	// Add config generation job
-	jobs = append(jobs, NewConfigGenerationJob(config, force, jf.logger))
-
-	// Add GitHub Actions generation job (skipped for forgejo/none providers)
-	if config.GetGenerateActions() && config.CIProvider.GeneratesGitHubWorkflows() {
-		jobs = append(jobs, NewGitHubActionsGenerationJob(config, jf.logger))
-	}
-
-	// Add Forgejo Actions generation job
-	if config.ShouldGenerateForgejoWorkflows() {
-		jobs = append(jobs, NewForgejoWorkflowsGenerationJob(config, jf.logger))
-	}
-
-	// Add Dockerfile generation job when Docker support is enabled
-	if config.DockerSupport.IsEnabled() {
-		jobs = append(jobs, NewDockerfileGenerationJob(config, force, jf.logger))
-	}
-
-	return jobs
-}
-
-// CreateConfigOnlyJobs creates jobs for config generation only.
-func (jf *JobFactory) CreateConfigOnlyJobs(config *ProjectConfig, force bool) []Job {
-	jobs := []Job{
-		NewProjectValidationJob(".", jf.logger),
-		NewGenerationPreflightJob(force, generationTargets(config, false), jf.logger),
-		NewConfigGenerationJob(config, force, jf.logger),
-	}
-
-	// A Docker-enabled config references a Dockerfile; generate it in the
-	// config-only path too so the generated config is actually releasable.
-	if config.DockerSupport.IsEnabled() {
-		jobs = append(jobs, NewDockerfileGenerationJob(config, force, jf.logger))
-	}
-
-	return jobs
-}
-
-// CreateValidationOnlyJob creates a validation-only job.
-func (jf *JobFactory) CreateValidationOnlyJob(projectDir string) *ProjectValidationJob {
-	return NewProjectValidationJob(projectDir, jf.logger)
-}

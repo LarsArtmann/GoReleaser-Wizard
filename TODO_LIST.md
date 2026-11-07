@@ -6,6 +6,7 @@
 
 ## Status legend
 
+<!-- check-rows:ledger -->
 | Status           | Meaning                                                 |
 | ---------------- | ------------------------------------------------------- |
 | 🔴 `TODO`        | Not started. Needs doing.                               |
@@ -14,6 +15,7 @@
 
 ## High Impact
 
+<!-- check-rows:ledger -->
 | Task                                                                                                                                 | Status    | Impact | Effort | Evidence                                                                                                                                                                                     |
 | ------------------------------------------------------------------------------------------------------------------------------------ | --------- | ------ | ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | M17: fix error-discarding sites (`flags.go` helpers, `init.go` glob, `validate_main.go` DirExists, `parseGitHubRemote` placeholders) | 🔴 `TODO` | High   | 1h     | `cmd/goreleaser-wizard/flags.go`, `cmd/goreleaser-wizard/init.go:248`, `cmd/goreleaser-wizard/validate_main.go:167`, `cmd/goreleaser-wizard/types/template_data.go:236` (plan M17 / F61-F64) |
@@ -27,6 +29,7 @@
 
 ## Medium Impact
 
+<!-- check-rows:ledger -->
 | Task                                                                                                                                                                                                              | Status    | Impact  | Effort | Evidence                                                                                                                      |
 | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- | ------- | ------ | ----------------------------------------------------------------------------------------------------------------------------- |
 | M19-M21 coverage lifts: `internal/git`, `internal/config`, `internal/utils`, `generators`, `templates`, `types` (0-5% → solid)                                                                                    | 🔴 `TODO` | Med     | 6h     | `go test -cover ./...`; goldens cover `generators` partially (plan M19/M20, 2026-08-17 01-15 c)                               |
@@ -41,6 +44,7 @@
 
 ## Blocked (external decision or owner action needed)
 
+<!-- check-rows:ledger -->
 | Task                                                                                                                                       | Status       | Blocker                                                                                                               |
 | ------------------------------------------------------------------------------------------------------------------------------------------ | ------------ | --------------------------------------------------------------------------------------------------------------------- |
 | M18: personal defaults — `--forgejo-owner`/`--runner` flags, tap repo pattern, commit author, homebrew casks wiring                        | 🔵 `BLOCKED` | Needs Lars's answers: tap pattern, author email, runner default (2026-08-17 00-04 §e)                                 |
@@ -52,6 +56,7 @@
 
 ## Sweep debts (2026-11-07 docs-health audit follow-ups)
 
+<!-- check-rows:ledger -->
 | Task                                                                                                                                                                                                                                                    | Status    | Impact  | Effort | Evidence                                                                         |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- | ------- | ------ | -------------------------------------------------------------------------------- |
 | Formatter re-gate of annotated corpus: dprint over archived + living docs, then `check-rows --strict` + `bare-rows` + `prose-items` (annotate→check→**format**→check canon was left unfinished)                                                         | 🔴 `TODO` | High    | 30min  | `docs/status/archived/` (18 files, 2fcc8a2); damage class known from skill canon |

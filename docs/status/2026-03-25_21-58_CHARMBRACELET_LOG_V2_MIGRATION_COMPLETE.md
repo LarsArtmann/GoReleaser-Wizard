@@ -397,7 +397,7 @@ ok      github.com/LarsArtmann/GoReleaser-Wizard/internal/validation      (cache
 - [x] Run `go mod tidy`
 - [x] Build project with `go build`
 - [x] Run tests to verify
-- [ ] Check logs visually (optional but recommended) ⏭️ Next
+~~- [ ] Check logs visually (optional but recommended) ⏭️ Next~~ obsolete — charm.land stack fully replaced (2026-11-07)
 
 ---
 

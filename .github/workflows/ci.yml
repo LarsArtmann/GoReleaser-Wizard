@@ -50,8 +50,37 @@ jobs:
       - name: Generate golden diff check
         run: go test ./cmd/goreleaser-wizard -run TestGolden -count=1
 
+      # Golden-churn guard: regenerating goldens must be a no-op. If this
+      # diff is non-empty, generated output changed without the goldens being
+      # regenerated deliberately (or a golden was hand-edited away from what
+      # the generator produces) - either way the byte-exact contract broke.
+      - name: Golden regeneration is a no-op
+        run: |
+          go test ./cmd/goreleaser-wizard -run TestGolden -update-golden -count=1
+          git diff --exit-code -- cmd/goreleaser-wizard/testdata/ \
+            || (echo "::error::golden churn: regenerated goldens differ from committed testdata/; run 'go test ./cmd/goreleaser-wizard -update-golden', review the diff, and commit it deliberately" && exit 1)
+
   goreleaser-check:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # github: the legacy provider, proven by the North Star E2E.
+          - provider: github
+            test: TestGeneratedConfigPassesGoReleaserCheck
+          # forgejo: workflows must actionlint clean with the GENERATED config.
+          - provider: forgejo
+            test: TestForgejoWorkflowsPassActionLint
+          # dual: both workflow sets, goreleaser still targets Forgejo.
+          - provider: dual
+            test: TestDualProviderGeneratedConfigPassesGoReleaserCheck
+          # none: config only, no workflow artifacts at all.
+          - provider: none
+            test: TestNoneProviderGeneratesNoWorkflows
+          # toolchain: the flake's Go pin must satisfy go.mod (gotcha 20).
+          - provider: flake-go-pin
+            test: TestFlakeGoVersionMeetsGoModRequirement
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -63,11 +92,22 @@ jobs:
           cache: true
 
       - name: Install GoReleaser
+        if: matrix.provider != 'none' && matrix.provider != 'flake-go-pin'
         uses: goreleaser/goreleaser-action@a4f02ab5355a589de60d917a659ce617ed19b3de # v7.3.0
         with:
           install-only: true
 
-      # The wizard's product IS its generated config: if this step regresses,
-      # every project using the wizard ships broken releases.
-      - name: Generated fixture passes goreleaser check
-        run: go test ./cmd/goreleaser-wizard -run TestGeneratedConfigPassesGoReleaserCheck -v -count=1
+      # The wizard's product IS its generated config: if any provider variant
+      # regresses, every project using the wizard ships broken releases.
+      # This CI is itself dogfood: it is the github-provider workflow the
+      # wizard generates (see the golden release.yml).
+      - name: Provider proof (${{ matrix.provider }})
+        run: go test ./cmd/goreleaser-wizard -run '^${{ matrix.test }}$' -v -count=1
+
+  # nix flake check intentionally does NOT run on GitHub-hosted runners:
+  # this repo pins every third-party action to a commit SHA, and the nix
+  # install action's SHA cannot be verified offline when editing CI. The
+  # full nix proof (package build + treefmt + checks incl. the E2E) runs
+  # locally via `nix flake check` and on the self-hosted Forgejo runner,
+  # which has nix on PATH; the flake-go-pin matrix entry guards the most
+  # likely drift (toolchain pin vs go.mod) inside the plain Go CI.

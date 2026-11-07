@@ -151,6 +151,33 @@ func TestDualProviderGeneratedConfigPassesGoReleaserCheck(t *testing.T) {
 	}
 }
 
+// TestNoneProviderGeneratesNoWorkflows proves --ci-provider none writes the
+// goreleaser config and nothing else: no .github, no .forgejo artifacts.
+func TestNoneProviderGeneratesNoWorkflows(t *testing.T) {
+	tmpDir := setupTempGoModule(t)
+
+	config := baseTestProjectConfig()
+	config.ProjectName = "e2e-app"
+	config.BinaryName = "e2e-app"
+	config.MainPath = "./cmd/demo"
+	config.CIProvider = domain.CIProviderNone
+
+	generateIntoModule(t, tmpDir, &config)
+
+	AssertFileExists(t, ".goreleaser.yaml", "none provider must still generate the goreleaser config")
+
+	for _, forbidden := range []string{
+		releaseWorkflowTargetPath,
+		forgejoCIWorkflowPath,
+		forgejoReleaseWorkflowPath,
+		forgejoActionlintConfigPath,
+	} {
+		if _, err := os.Stat(filepath.Join(tmpDir, forbidden)); !os.IsNotExist(err) {
+			t.Errorf("none provider must not generate %s", forbidden)
+		}
+	}
+}
+
 // TestForgejoWorkflowsPassActionLint generates Forgejo workflows for a
 // forgejo-provider project and requires actionlint to accept them. The
 // self-hosted runner label must be declared in an actionlint config, as on

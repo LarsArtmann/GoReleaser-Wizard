@@ -8,14 +8,14 @@
 
 ## Executive Summary
 
-| Metric                  | Value            | Target | Status |
-| ----------------------- | ---------------- | ------ | ------ |
-| ~~Build~~ done — verified 2026-11-07 | ~~✅ PASS~~ | ~~PASS~~ | ~~✅~~ |
-| ~~Tests~~ done at `9bae006` | ~~❌ FAIL (1 test)~~ | ~~PASS~~ | ~~🔴~~ |
-| ~~Lint Warnings~~ done at `9703270` | ~~28~~ | ~~0~~ | ~~🟡~~ |
-| ~~Files >300 lines~~ **Superseded — TODO_LIST.md (split-oversized-files / 9f4bd71 for map).** | ~~14~~ | ~~0~~ | ~~🔴~~ |
-| ~~`map[string]any` usages~~ **Superseded — TODO_LIST.md (split-oversized-files / 9f4bd71 for map).** | ~~33~~ | ~~0~~ | ~~🔴~~ |
-| ~~Overall Completion~~ **Superseded — point-in-time estimate.** | ~~~92%~~ | ~~100%~~ | ~~🟡~~ |
+| Metric                                                                                               | Value                | Target   | Status |
+| ---------------------------------------------------------------------------------------------------- | -------------------- | -------- | ------ |
+| ~~Build~~ done — verified 2026-11-07                                                                 | ~~✅ PASS~~          | ~~PASS~~ | ~~✅~~ |
+| ~~Tests~~ done at `9bae006`                                                                          | ~~❌ FAIL (1 test)~~ | ~~PASS~~ | ~~🔴~~ |
+| ~~Lint Warnings~~ done at `9703270`                                                                  | ~~28~~               | ~~0~~    | ~~🟡~~ |
+| ~~Files >300 lines~~ **Superseded — TODO_LIST.md (split-oversized-files / 9f4bd71 for map).**        | ~~14~~               | ~~0~~    | ~~🔴~~ |
+| ~~`map[string]any` usages~~ **Superseded — TODO_LIST.md (split-oversized-files / 9f4bd71 for map).** | ~~33~~               | ~~0~~    | ~~🔴~~ |
+| ~~Overall Completion~~ **Superseded — point-in-time estimate.**                                      | ~~~92%~~             | ~~100%~~ | ~~🟡~~ |
 
 ---
 
@@ -53,12 +53,12 @@
 
 ### Code Quality
 
-| Item             | Current | Target | Gap                     |
-| ---------------- | ------- | ------ | ----------------------- |
-| ~~Files >300 lines~~ **Superseded — TODO_LIST.md (split-oversized-files).** | ~~14~~ | ~~0~~ | ~~14 files need splitting~~ |
-| ~~`map[string]any`~~ done at `9f4bd71` | ~~33~~ | ~~0~~ | ~~Need typed structs~~ |
-| ~~Test coverage~~ **Superseded — TODO_LIST.md (M19-M21).** | ~~~80%~~ | ~~95%+~~ | ~~Need more tests~~ |
-| ~~Lint warnings~~ done at `9703270` | ~~28~~ | ~~0~~ | ~~Various issues~~ |
+| Item                                                                        | Current  | Target   | Gap                         |
+| --------------------------------------------------------------------------- | -------- | -------- | --------------------------- |
+| ~~Files >300 lines~~ **Superseded — TODO_LIST.md (split-oversized-files).** | ~~14~~   | ~~0~~    | ~~14 files need splitting~~ |
+| ~~`map[string]any`~~ done at `9f4bd71`                                      | ~~33~~   | ~~0~~    | ~~Need typed structs~~      |
+| ~~Test coverage~~ **Superseded — TODO_LIST.md (M19-M21).**                  | ~~~80%~~ | ~~95%+~~ | ~~Need more tests~~         |
+| ~~Lint warnings~~ done at `9703270`                                         | ~~28~~   | ~~0~~    | ~~Various issues~~          |
 
 ### Package Manager Integration
 
@@ -81,18 +81,20 @@
 #### High Priority
 
 ~~1. **File Splitting** - 14 files exceed 300 lines~~ **Superseded — TODO_LIST.md (split-oversized-files).**
-   - `internal/types/validation.go` (857 lines)
-   - `cmd/goreleaser-wizard/jobs.go` (833 lines)
-   - `internal/domain/validation.go` (659 lines)
-   - `internal/validation/business_rules.go` (626 lines)
-   - `internal/validation/basic.go` (617 lines)
-   - And 9 more...
+
+- `internal/types/validation.go` (857 lines)
+- `cmd/goreleaser-wizard/jobs.go` (833 lines)
+- `internal/domain/validation.go` (659 lines)
+- `internal/validation/business_rules.go` (626 lines)
+- `internal/validation/basic.go` (617 lines)
+- And 9 more...
 
 ~~2. **Type Safety** - Replace all `map[string]any` with typed structs~~ done at `9f4bd71`
-   - `GoReleaserTemplateData` struct
-   - `GitHubActionsTemplateData` struct
-   - `ValidationResult` struct
-   - `JobExecutionResult` struct
+
+- `GoReleaserTemplateData` struct
+- `GitHubActionsTemplateData` struct
+- `ValidationResult` struct
+- `JobExecutionResult` struct
 
 ~~3. **Error Types** - Implement proper `DomainError` with error codes~~ done at `9c8cb3f`
 
@@ -138,22 +140,22 @@ Key issues in `cmd/goreleaser-wizard/main.go`:
 
 ### Files Exceeding 300 Lines (14 files)
 
-| File                                              | Lines | Severity    |
-| ------------------------------------------------- | ----- | ----------- |
-| ~~`internal/types/validation.go`~~ **Superseded — point-in-time sizes; splitting tracked in TODO_LIST.md.** | ~~857~~ | ~~🔴 CRITICAL~~ |
-| ~~`cmd/goreleaser-wizard/jobs.go`~~ **Superseded — point-in-time sizes; splitting tracked in TODO_LIST.md.** | ~~833~~ | ~~🔴 CRITICAL~~ |
-| ~~`internal/domain/validation.go`~~ **Superseded — point-in-time sizes; splitting tracked in TODO_LIST.md.** | ~~659~~ | ~~🔴 HIGH~~ |
-| ~~`internal/validation/business_rules.go`~~ **Superseded — point-in-time sizes; splitting tracked in TODO_LIST.md.** | ~~626~~ | ~~🔴 HIGH~~ |
-| ~~`internal/validation/basic.go`~~ **Superseded — point-in-time sizes; splitting tracked in TODO_LIST.md.** | ~~617~~ | ~~🔴 HIGH~~ |
-| ~~`cmd/goreleaser-wizard/jobs/implementations.go`~~ **Superseded — point-in-time sizes; splitting tracked in TODO_LIST.md.** | ~~573~~ | ~~🔴 HIGH~~ |
-| ~~`cmd/goreleaser-wizard/validate_test.go`~~ **Superseded — point-in-time sizes; splitting tracked in TODO_LIST.md.** | ~~556~~ | ~~🟡 MEDIUM~~ |
-| ~~`cmd/goreleaser-wizard/generate_extended_test.go`~~ **Superseded — point-in-time sizes; splitting tracked in TODO_LIST.md.** | ~~521~~ | ~~🟡 MEDIUM~~ |
-| ~~`internal/domain/interfaces.go`~~ **Superseded — point-in-time sizes; splitting tracked in TODO_LIST.md.** | ~~490~~ | ~~🔴 HIGH~~ |
-| ~~`cmd/goreleaser-wizard/workflow.go`~~ **Superseded — point-in-time sizes; splitting tracked in TODO_LIST.md.** | ~~467~~ | ~~🔴 HIGH~~ |
-| ~~`cmd/goreleaser-wizard/architecture_test.go`~~ **Superseded — point-in-time sizes; splitting tracked in TODO_LIST.md.** | ~~440~~ | ~~🟡 MEDIUM~~ |
-| ~~`internal/domain/config_core.go`~~ **Superseded — point-in-time sizes; splitting tracked in TODO_LIST.md.** | ~~427~~ | ~~🔴 HIGH~~ |
-| ~~`cmd/goreleaser-wizard/performance_test.go`~~ **Superseded — point-in-time sizes; splitting tracked in TODO_LIST.md.** | ~~422~~ | ~~🟡 MEDIUM~~ |
-| ~~`cmd/goreleaser-wizard/integration_test.go`~~ **Superseded — point-in-time sizes; splitting tracked in TODO_LIST.md.** | ~~420~~ | ~~🟡 MEDIUM~~ |
+| File                                                                                                                           | Lines   | Severity        |
+| ------------------------------------------------------------------------------------------------------------------------------ | ------- | --------------- |
+| ~~`internal/types/validation.go`~~ **Superseded — point-in-time sizes; splitting tracked in TODO_LIST.md.**                    | ~~857~~ | ~~🔴 CRITICAL~~ |
+| ~~`cmd/goreleaser-wizard/jobs.go`~~ **Superseded — point-in-time sizes; splitting tracked in TODO_LIST.md.**                   | ~~833~~ | ~~🔴 CRITICAL~~ |
+| ~~`internal/domain/validation.go`~~ **Superseded — point-in-time sizes; splitting tracked in TODO_LIST.md.**                   | ~~659~~ | ~~🔴 HIGH~~     |
+| ~~`internal/validation/business_rules.go`~~ **Superseded — point-in-time sizes; splitting tracked in TODO_LIST.md.**           | ~~626~~ | ~~🔴 HIGH~~     |
+| ~~`internal/validation/basic.go`~~ **Superseded — point-in-time sizes; splitting tracked in TODO_LIST.md.**                    | ~~617~~ | ~~🔴 HIGH~~     |
+| ~~`cmd/goreleaser-wizard/jobs/implementations.go`~~ **Superseded — point-in-time sizes; splitting tracked in TODO_LIST.md.**   | ~~573~~ | ~~🔴 HIGH~~     |
+| ~~`cmd/goreleaser-wizard/validate_test.go`~~ **Superseded — point-in-time sizes; splitting tracked in TODO_LIST.md.**          | ~~556~~ | ~~🟡 MEDIUM~~   |
+| ~~`cmd/goreleaser-wizard/generate_extended_test.go`~~ **Superseded — point-in-time sizes; splitting tracked in TODO_LIST.md.** | ~~521~~ | ~~🟡 MEDIUM~~   |
+| ~~`internal/domain/interfaces.go`~~ **Superseded — point-in-time sizes; splitting tracked in TODO_LIST.md.**                   | ~~490~~ | ~~🔴 HIGH~~     |
+| ~~`cmd/goreleaser-wizard/workflow.go`~~ **Superseded — point-in-time sizes; splitting tracked in TODO_LIST.md.**               | ~~467~~ | ~~🔴 HIGH~~     |
+| ~~`cmd/goreleaser-wizard/architecture_test.go`~~ **Superseded — point-in-time sizes; splitting tracked in TODO_LIST.md.**      | ~~440~~ | ~~🟡 MEDIUM~~   |
+| ~~`internal/domain/config_core.go`~~ **Superseded — point-in-time sizes; splitting tracked in TODO_LIST.md.**                  | ~~427~~ | ~~🔴 HIGH~~     |
+| ~~`cmd/goreleaser-wizard/performance_test.go`~~ **Superseded — point-in-time sizes; splitting tracked in TODO_LIST.md.**       | ~~422~~ | ~~🟡 MEDIUM~~   |
+| ~~`cmd/goreleaser-wizard/integration_test.go`~~ **Superseded — point-in-time sizes; splitting tracked in TODO_LIST.md.**       | ~~420~~ | ~~🟡 MEDIUM~~   |
 
 ---
 

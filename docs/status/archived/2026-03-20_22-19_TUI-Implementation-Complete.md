@@ -170,53 +170,60 @@ The GoReleaser-Wizard project has successfully implemented a Terminal User Inter
 ### Code Quality Improvements
 
 ~~1. **Large Files (>350 lines)**~~ **Superseded — TODO_LIST.md (split-oversized-files).**
-   - `jobs.go` (833 lines) - SPLIT REQUIRED
-   - `validation.go` (659 lines) - SPLIT REQUIRED
-   - `business_rules.go` (626 lines) - SPLIT REQUIRED
-   - `basic.go` (599 lines) - SPLIT REQUIRED
-   - `validate_test.go` (556 lines) - SPLIT REQUIRED
-   - `generate_extended_test.go` (521 lines) - Review
-   - `interfaces.go` (490 lines) - Review
 
-~~2. **Unused Code**~~ done at `3cb91da`, ` 9f4bd71`
-   - `generators/constants.go`: 3 unused constants
-   - `workflow_constants.go`: 2 unused constants
-   - Multiple unused functions detected by gopls
+- `jobs.go` (833 lines) - SPLIT REQUIRED
+- `validation.go` (659 lines) - SPLIT REQUIRED
+- `business_rules.go` (626 lines) - SPLIT REQUIRED
+- `basic.go` (599 lines) - SPLIT REQUIRED
+- `validate_test.go` (556 lines) - SPLIT REQUIRED
+- `generate_extended_test.go` (521 lines) - Review
+- `interfaces.go` (490 lines) - Review
+
+~~2. **Unused Code**~~ done at `3cb91da`, `9f4bd71`
+
+- `generators/constants.go`: 3 unused constants
+- `workflow_constants.go`: 2 unused constants
+- Multiple unused functions detected by gopls
 
 ~~3. **Linting Issues**~~ done at `9703270`
-   - 203 warnings in project
-   - `depguard` violations (expected in cmd package)
-   - `forbidigo` violations (fmt.Print\* in display code)
-   - `gosec` G304 warnings (file path variables)
+
+- 203 warnings in project
+- `depguard` violations (expected in cmd package)
+- `forbidigo` violations (fmt.Print\* in display code)
+- `gosec` G304 warnings (file path variables)
 
 ### Architecture Improvements
 
 ~~4. **Test Coverage**~~ **Superseded — TODO_LIST.md (M19-M21).**
-   - `cmd/goreleaser-wizard/generators` - NO TEST FILES
-   - `cmd/goreleaser-wizard/jobs` - NO TEST FILES
-   - `cmd/goreleaser-wizard/templates` - NO TEST FILES
-   - `cmd/goreleaser-wizard/types` - NO TEST FILES
-   - `internal/errors` - NO TEST FILES
-   - `internal/git` - NO TEST FILES
-   - `internal/utils` - NO TEST FILES
 
-~~5. **Documentation**~~ done at `ed01089`, ` 969259e`
-   - README.md last modified 2256 hours ago (~94 days)
-   - FEATURES.md needs TUI feature update
-   - No inline code documentation for TUI
+- `cmd/goreleaser-wizard/generators` - NO TEST FILES
+- `cmd/goreleaser-wizard/jobs` - NO TEST FILES
+- `cmd/goreleaser-wizard/templates` - NO TEST FILES
+- `cmd/goreleaser-wizard/types` - NO TEST FILES
+- `internal/errors` - NO TEST FILES
+- `internal/git` - NO TEST FILES
+- `internal/utils` - NO TEST FILES
+
+~~5. **Documentation**~~ done at `ed01089`, `969259e`
+
+- README.md last modified 2256 hours ago (~94 days)
+- FEATURES.md needs TUI feature update
+- No inline code documentation for TUI
 
 ### Feature Improvements
 
 ~~6. **TUI Enhancements**~~ **Superseded — ROADMAP.md (TUI polish).**
-   - Add accessible mode support (`--accessible` flag)
-   - Add configuration preview before confirmation
-   - Add progress indicator during generation
-   - Add keyboard shortcuts help
+
+- Add accessible mode support (`--accessible` flag)
+- Add configuration preview before confirmation
+- Add progress indicator during generation
+- Add keyboard shortcuts help
 
 ~~7. **Error Handling**~~ done at `6898ba1`
-   - Improve error messages for non-technical users
-   - Add recovery suggestions to all domain errors
-   - Add error codes documentation
+
+- Improve error messages for non-technical users
+- Add recovery suggestions to all domain errors
+- Add error codes documentation
 
 ---
 
@@ -226,116 +233,140 @@ The GoReleaser-Wizard project has successfully implemented a Terminal User Inter
 
 ~~1. **Fix Disk Space** - Clean Go cache to unblock builds~~ **Superseded — environment-era.**
 
-   ```bash
-   go clean -cache -modcache
-   ```
+```bash
+go clean -cache -modcache
+```
 
 ~~2. **Commit Staged Changes** - Finalize current work~~ done — committed (7e85f9e era)
-   - Review `.github/workflows/release.yml` changes
-   - Review `.goreleaser.yaml` changes
-   - Review `tui_wizard.go` formatting changes
+
+- Review `.github/workflows/release.yml` changes
+- Review `.goreleaser.yaml` changes
+- Review `tui_wizard.go` formatting changes
 
 ~~3. **Update FEATURES.md** - Mark TUI as complete~~ done at `c2be290`
-   - Change "Interactive TUI Interface" from PLANNED to COMPLETE
+
+- Change "Interactive TUI Interface" from PLANNED to COMPLETE
 
 ~~4. **Push to Remote** - 5 commits ahead of origin~~ done — pushed
-   ```bash
-   git push origin master
-   ```
+
+```bash
+git push origin master
+```
 
 ### Priority 2: High (This Week)
 
 ~~5. **Split Large Files**~~ **Superseded — TODO_LIST.md (split-oversized-files).**
-   - `jobs.go` (833 lines) into `jobs_core.go`, `jobs_validation.go`, etc.
-   - `validation.go` (659 lines) into focused validators
+
+- `jobs.go` (833 lines) into `jobs_core.go`, `jobs_validation.go`, etc.
+- `validation.go` (659 lines) into focused validators
 
 ~~6. **Add Missing Tests**~~ **Superseded — TODO_LIST.md (M19-M21).**
-   - Generator tests
-   - Job tests
-   - Template tests
+
+- Generator tests
+- Job tests
+- Template tests
 
 ~~7. **Fix Unused Code**~~ done at `3cb91da`
-   - Remove or use constants in `generators/constants.go`
-   - Remove or use constants in `workflow_constants.go`
+
+- Remove or use constants in `generators/constants.go`
+- Remove or use constants in `workflow_constants.go`
 
 ~~8. **Clean Lint Warnings**~~ done at `9703270`
-   - Address depguard violations properly
-   - Fix or suppress forbidigo violations
+
+- Address depguard violations properly
+- Fix or suppress forbidigo violations
 
 ### Priority 3: Medium (Next 2 Weeks)
 
 ~~9. **TUI Documentation**~~ done — README demo + docs/
-   - Add screenshots to README
-   - Document keyboard shortcuts
-   - Add TUI usage examples
+
+- Add screenshots to README
+- Document keyboard shortcuts
+- Add TUI usage examples
 
 ~~10. **Accessible Mode**~~ **Superseded — ROADMAP.md.**
-    - Add `--accessible` flag
-    - Test with screen readers
+
+- Add `--accessible` flag
+- Test with screen readers
 
 ~~11. **Configuration Preview**~~ **Superseded — ROADMAP.md.**
-    - Add final review screen in TUI
-    - Show generated file previews
+
+- Add final review screen in TUI
+- Show generated file previews
 
 ~~12. **Progress Indicators**~~ **Superseded — ROADMAP.md.**
-    - Add spinner during generation
-    - Show job progress in TUI
+
+- Add spinner during generation
+- Show job progress in TUI
 
 ~~13. **Error Documentation**~~ done — displayError What/Why/Fix/Escape
-    - Document all error codes
-    - Add troubleshooting guide
+
+- Document all error codes
+- Add troubleshooting guide
 
 ~~14. **Integration Tests**~~ done at `8edf0b1`
-    - End-to-end TUI tests
-    - Configuration generation tests
+
+- End-to-end TUI tests
+- Configuration generation tests
 
 ### Priority 4: Low (Backlog)
 
 ~~15. **Performance Benchmarks**~~ done — performance_test.go
-    - Add benchmark tests
-    - Profile generation speed
+
+- Add benchmark tests
+- Profile generation speed
 
 ~~16. **Plugin System**~~ **Superseded — ROADMAP.md.**
-    - Design extensibility points
-    - Add plugin hooks
+
+- Design extensibility points
+- Add plugin hooks
 
 ~~17. **Multi-project Support**~~ **Superseded — ROADMAP.md.**
-    - Monorepo configurations
-    - Workspace support
+
+- Monorepo configurations
+- Workspace support
 
 ~~18. **Custom Templates**~~ **Superseded — ROADMAP.md.**
-    - User-provided templates
-    - Template inheritance
+
+- User-provided templates
+- Template inheritance
 
 ~~19. **GoReleaser Pro**~~ **Superseded — ROADMAP.md (Pro integration).**
-    - Pro feature detection
-    - Pro configuration options
+
+- Pro feature detection
+- Pro configuration options
 
 ~~20. **Package Managers**~~ **Superseded — ROADMAP.md (package managers).**
-    - Snap package generation
-    - Scoop manifest generation
-    - AUR package support
+
+- Snap package generation
+- Scoop manifest generation
+- AUR package support
 
 ~~21. **CI/CD Templates**~~ **Superseded — ROADMAP.md (CI-provider families).**
-    - GitLab CI templates
-    - CircleCI templates
-    - Jenkins pipeline
+
+- GitLab CI templates
+- CircleCI templates
+- Jenkins pipeline
 
 ~~22. **Configuration Migration**~~ **Superseded — ROADMAP.md (migration system).**
-    - Version upgrade system
-    - Migration jobs
+
+- Version upgrade system
+- Migration jobs
 
 ~~23. **Advanced Validation**~~ **Superseded — ROADMAP.md.**
-    - Cross-field validation
-    - External tool validation
+
+- Cross-field validation
+- External tool validation
 
 ~~24. **Internationalization**~~ **Won't implement — rejected: non-goal.**
-    - i18n support
-    - Multiple languages
+
+- i18n support
+- Multiple languages
 
 ~~25. **Web Interface**~~ **Won't implement — rejected: non-goal.**
-    - Optional web UI
-    - REST API
+
+- Optional web UI
+- REST API
 
 ---
 
@@ -413,17 +444,17 @@ goreleaser-wizard                (binary - should be gitignored)
 
 ## Session Statistics
 
-| Metric             | Value                               |
-| ------------------ | ----------------------------------- |
-| ~~Lines Added~~ done — recorded | ~~+416~~ |
-| ~~Lines Deleted~~ done — recorded | ~~-620~~ |
-| ~~Net Change~~ done — recorded | ~~-204~~ |
-| ~~Files Modified~~ done — recorded | ~~6~~ |
-| ~~Files Created~~ done — recorded | ~~1 (`tui_wizard.go`)~~ |
-| ~~Files Deleted~~ done — recorded | ~~1 (`interactive.go`)~~ |
-| ~~Dependencies Added~~ done — recorded | ~~3 (`huh`, `bubbletea`, `bubbles`)~~ |
-| ~~Test Status~~ done — recorded | ~~Domain: PASS, CMD: FAIL (env issue)~~ |
-| ~~Build Status~~ done — recorded | ~~SUCCESS~~ |
+| Metric                                 | Value                                   |
+| -------------------------------------- | --------------------------------------- |
+| ~~Lines Added~~ done — recorded        | ~~+416~~                                |
+| ~~Lines Deleted~~ done — recorded      | ~~-620~~                                |
+| ~~Net Change~~ done — recorded         | ~~-204~~                                |
+| ~~Files Modified~~ done — recorded     | ~~6~~                                   |
+| ~~Files Created~~ done — recorded      | ~~1 (`tui_wizard.go`)~~                 |
+| ~~Files Deleted~~ done — recorded      | ~~1 (`interactive.go`)~~                |
+| ~~Dependencies Added~~ done — recorded | ~~3 (`huh`, `bubbletea`, `bubbles`)~~   |
+| ~~Test Status~~ done — recorded        | ~~Domain: PASS, CMD: FAIL (env issue)~~ |
+| ~~Build Status~~ done — recorded       | ~~SUCCESS~~                             |
 
 ---
 

@@ -18,50 +18,50 @@ GoReleaser-Wizard is an interactive CLI tool for generating GoReleaser configura
 
 ### A) FULLY DONE ✅
 
-| Item                        | Status | Notes                                                    |
-| --------------------------- | ------ | -------------------------------------------------------- |
-| ~~Project builds successfully~~ done — verified 2026-11-07 | ~~✅~~ | ~~Binary compiles without errors~~ |
-| ~~Basic CLI commands work~~ done — verified 2026-11-07 | ~~✅~~ | ~~init, generate, validate, version commands exist~~ |
-| ~~Domain layer architecture~~ done — verified 2026-11-07 | ~~✅~~ | ~~Clean architecture with proper separation~~ |
-| ~~Error handling system~~ done — verified 2026-11-07 | ~~✅~~ | ~~Comprehensive domain error types~~ |
-| ~~Validation framework~~ done — verified 2026-11-07 | ~~✅~~ | ~~Multi-level validation (basic, business rules, security)~~ |
-| ~~Template system~~ done — verified 2026-11-07 | ~~✅~~ | ~~Go templates for config generation~~ |
-| ~~Git operations~~ done — verified 2026-11-07 | ~~✅~~ | ~~Git commands wrapper~~ |
-| ~~Logging system~~ done — verified 2026-11-07 | ~~✅~~ | ~~Charm log integration~~ |
+| Item                                                       | Status | Notes                                                        |
+| ---------------------------------------------------------- | ------ | ------------------------------------------------------------ |
+| ~~Project builds successfully~~ done — verified 2026-11-07 | ~~✅~~ | ~~Binary compiles without errors~~                           |
+| ~~Basic CLI commands work~~ done — verified 2026-11-07     | ~~✅~~ | ~~init, generate, validate, version commands exist~~         |
+| ~~Domain layer architecture~~ done — verified 2026-11-07   | ~~✅~~ | ~~Clean architecture with proper separation~~                |
+| ~~Error handling system~~ done — verified 2026-11-07       | ~~✅~~ | ~~Comprehensive domain error types~~                         |
+| ~~Validation framework~~ done — verified 2026-11-07        | ~~✅~~ | ~~Multi-level validation (basic, business rules, security)~~ |
+| ~~Template system~~ done — verified 2026-11-07             | ~~✅~~ | ~~Go templates for config generation~~                       |
+| ~~Git operations~~ done — verified 2026-11-07              | ~~✅~~ | ~~Git commands wrapper~~                                     |
+| ~~Logging system~~ done — verified 2026-11-07              | ~~✅~~ | ~~Charm log integration~~                                    |
 
 ### B) PARTIALLY DONE 🔄
 
-| Item                    | Status | Details                                                  |
-| ----------------------- | ------ | -------------------------------------------------------- |
-| ~~Validation Tests~~ done at `b767071` | ~~🔄 60%~~ | ~~2 failing tests out of 5 (DockerRegistry, SanitizeInput)~~ |
-| ~~Config Generation Tests~~ done at `e85bb4f` | ~~🔄 50%~~ | ~~Docker, signing, homebrew sections not generating~~ |
-| ~~Project Detection~~ done at `b767071`, ` a7680ac` | ~~🔄 70%~~ | ~~Returns wrong project type strings~~ |
-| ~~End-to-End Tests~~ done at `b767071`, ` a7680ac` | ~~🔄 40%~~ | ~~Multiple integration tests failing~~ |
-| ~~Templates~~ done at `e85bb4f` | ~~🔄 80%~~ | ~~Missing signing, homebrew sections~~ |
-| ~~Test Infrastructure~~ done at `b767071` | ~~🔄 70%~~ | ~~Tests exist but have incorrect expectations~~ |
+| Item                                               | Status     | Details                                                      |
+| -------------------------------------------------- | ---------- | ------------------------------------------------------------ |
+| ~~Validation Tests~~ done at `b767071`             | ~~🔄 60%~~ | ~~2 failing tests out of 5 (DockerRegistry, SanitizeInput)~~ |
+| ~~Config Generation Tests~~ done at `e85bb4f`      | ~~🔄 50%~~ | ~~Docker, signing, homebrew sections not generating~~        |
+| ~~Project Detection~~ done at `b767071`, `a7680ac` | ~~🔄 70%~~ | ~~Returns wrong project type strings~~                       |
+| ~~End-to-End Tests~~ done at `b767071`, `a7680ac`  | ~~🔄 40%~~ | ~~Multiple integration tests failing~~                       |
+| ~~Templates~~ done at `e85bb4f`                    | ~~🔄 80%~~ | ~~Missing signing, homebrew sections~~                       |
+| ~~Test Infrastructure~~ done at `b767071`          | ~~🔄 70%~~ | ~~Tests exist but have incorrect expectations~~              |
 
 ### C) NOT STARTED ❌
 
-| Item                                            | Status                   |
-| ----------------------------------------------- | ------------------------ |
-| ~~Interactive wizard flow~~ done at `7e85f9e` | ~~❌ Not fully implemented~~ |
-| ~~Configuration file generation (goreleaser.yaml)~~ done at `e85bb4f` | ~~❌ Incomplete templates~~ |
-| ~~GitHub Actions workflow generation~~ done at `e85bb4f` | ~~❌ Templates missing~~ |
-| ~~Dockerfile generation~~ done at `9f4bd71` | ~~❌ Not wired up~~ |
-| ~~Homebrew formula generation~~ **Superseded — TODO_LIST.md (M18).** | ~~❌ Not wired up~~ |
-| ~~CI/CD integration tests~~ done at `8edf0b1` | ~~❌ Not written~~ |
-| ~~Documentation updates~~ done at `ed01089` | ~~❌ Not updated~~ |
+| Item                                                                  | Status                       |
+| --------------------------------------------------------------------- | ---------------------------- |
+| ~~Interactive wizard flow~~ done at `7e85f9e`                         | ~~❌ Not fully implemented~~ |
+| ~~Configuration file generation (goreleaser.yaml)~~ done at `e85bb4f` | ~~❌ Incomplete templates~~  |
+| ~~GitHub Actions workflow generation~~ done at `e85bb4f`              | ~~❌ Templates missing~~     |
+| ~~Dockerfile generation~~ done at `9f4bd71`                           | ~~❌ Not wired up~~          |
+| ~~Homebrew formula generation~~ **Superseded — TODO_LIST.md (M18).**  | ~~❌ Not wired up~~          |
+| ~~CI/CD integration tests~~ done at `8edf0b1`                         | ~~❌ Not written~~           |
+| ~~Documentation updates~~ done at `ed01089`                           | ~~❌ Not updated~~           |
 
 ### D) CRITICAL ISSUES 🔴
 
-| Issue                               | Severity | Description                                                                 |
-| ----------------------------------- | -------- | --------------------------------------------------------------------------- |
-| ~~Template generation incomplete~~ done at `e85bb4f` | ~~CRITICAL~~ | ~~Docker, signing, homebrew sections missing from output~~ |
-| ~~Project type mismatch~~ done at `b767071` | ~~HIGH~~ | ~~`ProjectType.String()` returns "CLI Application" but tests expect "Unknown"~~ |
-| ~~Docker registry validation~~ done at `b767071` | ~~HIGH~~ | ~~Empty string should error but returns nil~~ |
-| ~~SanitizeInput tab handling~~ done at `b767071` | ~~MEDIUM~~ | ~~Test expects tabs to become spaces, current impl preserves tabs~~ |
-| ~~Test expectations vs implementation~~ done at `b767071` | ~~HIGH~~ | ~~Tests have wrong expected values~~ |
-| ~~Missing constant definitions~~ done at `6e91b43`, ` a698119` | ~~MEDIUM~~ | ~~Multiple "constants.go" files created but not populated~~ |
+| Issue                                                         | Severity     | Description                                                                     |
+| ------------------------------------------------------------- | ------------ | ------------------------------------------------------------------------------- |
+| ~~Template generation incomplete~~ done at `e85bb4f`          | ~~CRITICAL~~ | ~~Docker, signing, homebrew sections missing from output~~                      |
+| ~~Project type mismatch~~ done at `b767071`                   | ~~HIGH~~     | ~~`ProjectType.String()` returns "CLI Application" but tests expect "Unknown"~~ |
+| ~~Docker registry validation~~ done at `b767071`              | ~~HIGH~~     | ~~Empty string should error but returns nil~~                                   |
+| ~~SanitizeInput tab handling~~ done at `b767071`              | ~~MEDIUM~~   | ~~Test expects tabs to become spaces, current impl preserves tabs~~             |
+| ~~Test expectations vs implementation~~ done at `b767071`     | ~~HIGH~~     | ~~Tests have wrong expected values~~                                            |
+| ~~Missing constant definitions~~ done at `6e91b43`, `a698119` | ~~MEDIUM~~   | ~~Multiple "constants.go" files created but not populated~~                     |
 
 ---
 
@@ -107,33 +107,40 @@ GoReleaser-Wizard is an interactive CLI tool for generating GoReleaser configura
 ### Priority 1 - CRITICAL (Must Fix)
 
 ~~1. **Fix template generation**~~ done at `e85bb4f`
-   - Add missing `signs:` section for signing
-   - Add missing `brews:` section for homebrew
-   - Ensure Docker section generates correctly
+
+- Add missing `signs:` section for signing
+- Add missing `brews:` section for homebrew
+- Ensure Docker section generates correctly
 
 ~~2. **Fix validation tests**~~ done at `b767071`
-   - Docker registry: Make empty string return error
-   - Project detection: Return correct type strings
+
+- Docker registry: Make empty string return error
+- Project detection: Return correct type strings
 
 ~~3. **Fix config validation**~~ done at `b767071`
-   - Ensure missing project/binary name returns errors properly
+
+- Ensure missing project/binary name returns errors properly
 
 ### Priority 2 - HIGH (Should Fix)
 
 ~~4. **Fix project type detection**~~ done at `b767071`
-   - `detectMainStructure()` should return `"CLI Application"` not `"cli"`
+
+- `detectMainStructure()` should return `"CLI Application"` not `"cli"`
 
 ~~5. **Fix SanitizeInput**~~ done at `b767071`
-   - Convert tabs to spaces per test expectation
+
+- Convert tabs to spaces per test expectation
 
 ~~6. **Wire up all generators**~~ done at `9f4bd71`
-   - Docker, GitHub Actions, Dockerfile, Homebrew
+
+- Docker, GitHub Actions, Dockerfile, Homebrew
 
 ### Priority 3 - MEDIUM (Nice to Have)
 
 ~~7. **Update test expectations**~~ done at `b767071`
-   - Align tests with actual implementation
-   - Or fix implementation to match tests
+
+- Align tests with actual implementation
+- Or fix implementation to match tests
 
 ~~8. **Add more integration tests**~~ done at `8edf0b1`
 
@@ -197,13 +204,13 @@ This seems like the test expectation is wrong, OR the implementation should retu
 
 ## RECOMMENDED NEXT STEPS
 
-~~1. **Fix the 3 remaining validation tests** (DockerRegistry empty/invalid, SanitizeInput)~~ done at `b767071`, ` e85bb4f`, ` 9f4bd71`, ` a7680ac`, ` 8edf0b1`
-~~2. **Update the templates** to include all required sections~~ done at `b767071`, ` e85bb4f`, ` 9f4bd71`, ` a7680ac`, ` 8edf0b1`
-~~3. **Fix project type detection** to return consistent strings~~ done at `b767071`, ` e85bb4f`, ` 9f4bd71`, ` a7680ac`, ` 8edf0b1`
-~~4. **Wire up all generators** properly~~ done at `b767071`, ` e85bb4f`, ` 9f4bd71`, ` a7680ac`, ` 8edf0b1`
-~~5. **Run full test suite** and fix remaining failures~~ done at `b767071`, ` e85bb4f`, ` 9f4bd71`, ` a7680ac`, ` 8edf0b1`
-~~6. **Test end-to-end** with a real Go project~~ done at `b767071`, ` e85bb4f`, ` 9f4bd71`, ` a7680ac`, ` 8edf0b1`
-~~7. **Update documentation** with accurate usage~~ done at `b767071`, ` e85bb4f`, ` 9f4bd71`, ` a7680ac`, ` 8edf0b1`
+~~1. **Fix the 3 remaining validation tests** (DockerRegistry empty/invalid, SanitizeInput)~~ done at `b767071`, `e85bb4f`, `9f4bd71`, `a7680ac`, `8edf0b1`
+~~2. **Update the templates** to include all required sections~~ done at `b767071`, `e85bb4f`, `9f4bd71`, `a7680ac`, `8edf0b1`
+~~3. **Fix project type detection** to return consistent strings~~ done at `b767071`, `e85bb4f`, `9f4bd71`, `a7680ac`, `8edf0b1`
+~~4. **Wire up all generators** properly~~ done at `b767071`, `e85bb4f`, `9f4bd71`, `a7680ac`, `8edf0b1`
+~~5. **Run full test suite** and fix remaining failures~~ done at `b767071`, `e85bb4f`, `9f4bd71`, `a7680ac`, `8edf0b1`
+~~6. **Test end-to-end** with a real Go project~~ done at `b767071`, `e85bb4f`, `9f4bd71`, `a7680ac`, `8edf0b1`
+~~7. **Update documentation** with accurate usage~~ done at `b767071`, `e85bb4f`, `9f4bd71`, `a7680ac`, `8edf0b1`
 
 ---
 
@@ -236,13 +243,13 @@ This seems like the test expectation is wrong, OR the implementation should retu
 
 ## METRICS
 
-| Metric         | Value                   |
-| -------------- | ----------------------- |
-| ~~Go Files~~ done — point-in-time metrics | ~~70+~~ |
-| ~~Test Files~~ done — point-in-time metrics | ~~10+~~ |
-| ~~Build Status~~ done — point-in-time metrics | ~~✅ PASSING~~ |
+| Metric                                          | Value                       |
+| ----------------------------------------------- | --------------------------- |
+| ~~Go Files~~ done — point-in-time metrics       | ~~70+~~                     |
+| ~~Test Files~~ done — point-in-time metrics     | ~~10+~~                     |
+| ~~Build Status~~ done — point-in-time metrics   | ~~✅ PASSING~~              |
 | ~~Test Pass Rate~~ done — point-in-time metrics | ~~~30% (need improvement)~~ |
-| ~~Test Coverage~~ done — point-in-time metrics | ~~Unknown (not measured)~~ |
+| ~~Test Coverage~~ done — point-in-time metrics  | ~~Unknown (not measured)~~  |
 
 ---
 

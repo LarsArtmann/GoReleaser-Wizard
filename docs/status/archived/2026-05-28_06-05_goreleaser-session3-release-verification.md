@@ -147,14 +147,14 @@ not found directories for 'pkg/errors/**'
 
 ### Critical: Test Coverage Catastrophically Low
 
-| Package                 | Coverage | Status       |
-| ----------------------- | -------- | ------------ |
-| ~~`internal/domain`~~ **Superseded — point-in-time; lifts tracked in TODO_LIST.md (M19-M21); goldens cover generators.** | ~~0.7%~~ | ~~Catastrophic~~ |
-| ~~`internal/config`~~ **Superseded — point-in-time; lifts tracked in TODO_LIST.md (M19-M21); goldens cover generators.** | ~~0.0%~~ | ~~None~~ |
-| ~~`generators`~~ **Superseded — point-in-time; lifts tracked in TODO_LIST.md (M19-M21); goldens cover generators.** | ~~0.0%~~ | ~~None~~ |
-| ~~`internal/git`~~ **Superseded — point-in-time; lifts tracked in TODO_LIST.md (M19-M21); goldens cover generators.** | ~~0.0%~~ | ~~None~~ |
-| ~~`internal/utils`~~ **Superseded — point-in-time; lifts tracked in TODO_LIST.md (M19-M21); goldens cover generators.** | ~~0.0%~~ | ~~None~~ |
-| ~~`cmd/goreleaser-wizard`~~ **Superseded — point-in-time; lifts tracked in TODO_LIST.md (M19-M21); goldens cover generators.** | ~~52.0%~~ | ~~Marginal~~ |
+| Package                                                                                                                        | Coverage  | Status           |
+| ------------------------------------------------------------------------------------------------------------------------------ | --------- | ---------------- |
+| ~~`internal/domain`~~ **Superseded — point-in-time; lifts tracked in TODO_LIST.md (M19-M21); goldens cover generators.**       | ~~0.7%~~  | ~~Catastrophic~~ |
+| ~~`internal/config`~~ **Superseded — point-in-time; lifts tracked in TODO_LIST.md (M19-M21); goldens cover generators.**       | ~~0.0%~~  | ~~None~~         |
+| ~~`generators`~~ **Superseded — point-in-time; lifts tracked in TODO_LIST.md (M19-M21); goldens cover generators.**            | ~~0.0%~~  | ~~None~~         |
+| ~~`internal/git`~~ **Superseded — point-in-time; lifts tracked in TODO_LIST.md (M19-M21); goldens cover generators.**          | ~~0.0%~~  | ~~None~~         |
+| ~~`internal/utils`~~ **Superseded — point-in-time; lifts tracked in TODO_LIST.md (M19-M21); goldens cover generators.**        | ~~0.0%~~  | ~~None~~         |
+| ~~`cmd/goreleaser-wizard`~~ **Superseded — point-in-time; lifts tracked in TODO_LIST.md (M19-M21); goldens cover generators.** | ~~52.0%~~ | ~~Marginal~~     |
 
 The domain layer — the heart of the application's business logic — is effectively untested. A refactor here is high-risk.
 
@@ -220,33 +220,33 @@ Verify `nix build` and `nix flake check` work. The Nix support is a differentiat
 
 ## f) Top #25 Things We Should Get Done Next
 
-| #  | Task                                                                   | Priority | Est. Effort | Impact                     |
-| -- | ---------------------------------------------------------------------- | -------- | ----------- | -------------------------- |
-| ~~1~~ done at `c6d0ec1` | ~~Fix `.go-arch-lint.yml` stale `internal/errors` and `pkg/errors` refs~~ | ~~P0~~ | ~~5 min~~ | ~~Unblocks CI~~ |
-| ~~2~~ done at `969259e` | ~~Run `goreleaser check` and fix any issues~~ | ~~P0~~ | ~~15 min~~ | ~~Validates release config~~ |
-| ~~3~~ done at `969259e` | ~~Run `goreleaser release --snapshot --clean`~~ | ~~P0~~ | ~~10 min~~ | ~~Verifies pipeline~~ |
-| ~~4~~ **Superseded — TODO_LIST.md (M21).** | ~~Add table-driven tests for all domain enums (`internal/domain`)~~ | ~~P1~~ | ~~2-3 hrs~~ | ~~+40% coverage~~ |
-| ~~5~~ done at `8edf0b1` | ~~Add tests for `generators` package (golden files or output validation)~~ | ~~P1~~ | ~~3-4 hrs~~ | ~~Tests core feature~~ |
-| ~~6~~ done at `969259e` | ~~Verify Docker build works: `docker build -f Dockerfile .`~~ | ~~P1~~ | ~~10 min~~ | ~~Validates containerization~~ |
-| ~~7~~ done at `969259e` | ~~Update `AGENTS.md` — remove justfile refs, fix directory listing~~ | ~~P1~~ | ~~30 min~~ | ~~Docs accuracy~~ |
-| ~~8~~ done at `969259e` | ~~Update `FEATURES.md` — honest status, remove contradictions~~ | ~~P1~~ | ~~1 hr~~ | ~~Docs accuracy~~ |
-| ~~9~~ **Superseded — TODO_LIST.md (split-oversized-files).** | ~~Split `cmd/goreleaser-wizard/jobs.go` into focused files~~ | ~~P1~~ | ~~2-3 hrs~~ | ~~Maintainability~~ |
-| ~~10~~ done at `9f4bd71` | ~~Replace `map[string]any` in `jobs.go` with typed structs~~ | ~~P1~~ | ~~3-4 hrs~~ | ~~Type safety~~ |
-| ~~11~~ **Superseded — TODO_LIST.md (M19).** | ~~Add tests for `internal/config` package~~ | ~~P2~~ | ~~1-2 hrs~~ | ~~Coverage~~ |
-| ~~12~~ **Superseded — TODO_LIST.md (M19).** | ~~Add tests for `internal/git` package~~ | ~~P2~~ | ~~1-2 hrs~~ | ~~Coverage~~ |
-| ~~13~~ **Superseded — TODO_LIST.md (M19).** | ~~Add tests for `internal/utils` package~~ | ~~P2~~ | ~~1-2 hrs~~ | ~~Coverage~~ |
-| ~~14~~ **Superseded — TODO_LIST.md (split-oversized-files).** | ~~Split `workflow.go` (415 lines)~~ | ~~P2~~ | ~~2-3 hrs~~ | ~~Maintainability~~ |
-| ~~15~~ **Superseded — TODO_LIST.md (split-oversized-files).** | ~~Split `validate_test.go` (489 lines)~~ | ~~P2~~ | ~~2-3 hrs~~ | ~~Maintainability~~ |
-| ~~16~~ **Superseded — govulncheck-in-CI gap noted 2026-10-28.** | ~~Run `govulncheck ./...` and address findings~~ | ~~P2~~ | ~~30 min~~ | ~~Security~~ |
-| ~~17~~ done — golangci security linters active, 0 issues since 9703270 | ~~Run `gosec ./...` and address findings~~ | ~~P2~~ | ~~30 min~~ | ~~Security~~ |
-| ~~18~~ done — nix build green in flake checks (2026-10-28) | ~~Verify `nix build` succeeds~~ | ~~P2~~ | ~~15 min~~ | ~~Nix support~~ |
-| ~~19~~ done at `8edf0b1` | ~~Add integration test: full `init` → `generate` → `validate` flow~~ | ~~P2~~ | ~~4-6 hrs~~ | ~~E2E coverage~~ |
-| ~~20~~ done — performance_test.go | ~~Add benchmark for template generation~~ | ~~P3~~ | ~~1 hr~~ | ~~Performance baseline~~ |
-| ~~21~~ done — validate_test.go suite | ~~Add `goreleaser-wizard validate` tests with real configs~~ | ~~P3~~ | ~~2 hrs~~ | ~~Validation coverage~~ |
-| ~~22~~ **Superseded — unwired by design; TODO_LIST.md (M18).** | ~~Generate and inspect Homebrew formula output~~ | ~~P3~~ | ~~30 min~~ | ~~Distribution verification~~ |
-| ~~23~~ **Won't implement — scoop generation removed from scope.** | ~~Generate and inspect Scoop manifest output~~ | ~~P3~~ | ~~30 min~~ | ~~Distribution verification~~ |
-| ~~24~~ **Superseded — ROADMAP.md.** | ~~Add property-based tests for validation rules~~ | ~~P3~~ | ~~3-4 hrs~~ | ~~Robustness~~ |
-| ~~25~~ done at `ed01089` | ~~Add README section for Nix usage~~ | ~~P3~~ | ~~15 min~~ | ~~Documentation~~ |
+| #                                                                      | Task                                                                       | Priority | Est. Effort | Impact                         |
+| ---------------------------------------------------------------------- | -------------------------------------------------------------------------- | -------- | ----------- | ------------------------------ |
+| ~~1~~ done at `c6d0ec1`                                                | ~~Fix `.go-arch-lint.yml` stale `internal/errors` and `pkg/errors` refs~~  | ~~P0~~   | ~~5 min~~   | ~~Unblocks CI~~                |
+| ~~2~~ done at `969259e`                                                | ~~Run `goreleaser check` and fix any issues~~                              | ~~P0~~   | ~~15 min~~  | ~~Validates release config~~   |
+| ~~3~~ done at `969259e`                                                | ~~Run `goreleaser release --snapshot --clean`~~                            | ~~P0~~   | ~~10 min~~  | ~~Verifies pipeline~~          |
+| ~~4~~ **Superseded — TODO_LIST.md (M21).**                             | ~~Add table-driven tests for all domain enums (`internal/domain`)~~        | ~~P1~~   | ~~2-3 hrs~~ | ~~+40% coverage~~              |
+| ~~5~~ done at `8edf0b1`                                                | ~~Add tests for `generators` package (golden files or output validation)~~ | ~~P1~~   | ~~3-4 hrs~~ | ~~Tests core feature~~         |
+| ~~6~~ done at `969259e`                                                | ~~Verify Docker build works: `docker build -f Dockerfile .`~~              | ~~P1~~   | ~~10 min~~  | ~~Validates containerization~~ |
+| ~~7~~ done at `969259e`                                                | ~~Update `AGENTS.md` — remove justfile refs, fix directory listing~~       | ~~P1~~   | ~~30 min~~  | ~~Docs accuracy~~              |
+| ~~8~~ done at `969259e`                                                | ~~Update `FEATURES.md` — honest status, remove contradictions~~            | ~~P1~~   | ~~1 hr~~    | ~~Docs accuracy~~              |
+| ~~9~~ **Superseded — TODO_LIST.md (split-oversized-files).**           | ~~Split `cmd/goreleaser-wizard/jobs.go` into focused files~~               | ~~P1~~   | ~~2-3 hrs~~ | ~~Maintainability~~            |
+| ~~10~~ done at `9f4bd71`                                               | ~~Replace `map[string]any` in `jobs.go` with typed structs~~               | ~~P1~~   | ~~3-4 hrs~~ | ~~Type safety~~                |
+| ~~11~~ **Superseded — TODO_LIST.md (M19).**                            | ~~Add tests for `internal/config` package~~                                | ~~P2~~   | ~~1-2 hrs~~ | ~~Coverage~~                   |
+| ~~12~~ **Superseded — TODO_LIST.md (M19).**                            | ~~Add tests for `internal/git` package~~                                   | ~~P2~~   | ~~1-2 hrs~~ | ~~Coverage~~                   |
+| ~~13~~ **Superseded — TODO_LIST.md (M19).**                            | ~~Add tests for `internal/utils` package~~                                 | ~~P2~~   | ~~1-2 hrs~~ | ~~Coverage~~                   |
+| ~~14~~ **Superseded — TODO_LIST.md (split-oversized-files).**          | ~~Split `workflow.go` (415 lines)~~                                        | ~~P2~~   | ~~2-3 hrs~~ | ~~Maintainability~~            |
+| ~~15~~ **Superseded — TODO_LIST.md (split-oversized-files).**          | ~~Split `validate_test.go` (489 lines)~~                                   | ~~P2~~   | ~~2-3 hrs~~ | ~~Maintainability~~            |
+| ~~16~~ **Superseded — govulncheck-in-CI gap noted 2026-10-28.**        | ~~Run `govulncheck ./...` and address findings~~                           | ~~P2~~   | ~~30 min~~  | ~~Security~~                   |
+| ~~17~~ done — golangci security linters active, 0 issues since 9703270 | ~~Run `gosec ./...` and address findings~~                                 | ~~P2~~   | ~~30 min~~  | ~~Security~~                   |
+| ~~18~~ done — nix build green in flake checks (2026-10-28)             | ~~Verify `nix build` succeeds~~                                            | ~~P2~~   | ~~15 min~~  | ~~Nix support~~                |
+| ~~19~~ done at `8edf0b1`                                               | ~~Add integration test: full `init` → `generate` → `validate` flow~~       | ~~P2~~   | ~~4-6 hrs~~ | ~~E2E coverage~~               |
+| ~~20~~ done — performance_test.go                                      | ~~Add benchmark for template generation~~                                  | ~~P3~~   | ~~1 hr~~    | ~~Performance baseline~~       |
+| ~~21~~ done — validate_test.go suite                                   | ~~Add `goreleaser-wizard validate` tests with real configs~~               | ~~P3~~   | ~~2 hrs~~   | ~~Validation coverage~~        |
+| ~~22~~ **Superseded — unwired by design; TODO_LIST.md (M18).**         | ~~Generate and inspect Homebrew formula output~~                           | ~~P3~~   | ~~30 min~~  | ~~Distribution verification~~  |
+| ~~23~~ **Won't implement — scoop generation removed from scope.**      | ~~Generate and inspect Scoop manifest output~~                             | ~~P3~~   | ~~30 min~~  | ~~Distribution verification~~  |
+| ~~24~~ **Superseded — ROADMAP.md.**                                    | ~~Add property-based tests for validation rules~~                          | ~~P3~~   | ~~3-4 hrs~~ | ~~Robustness~~                 |
+| ~~25~~ done at `ed01089`                                               | ~~Add README section for Nix usage~~                                       | ~~P3~~   | ~~15 min~~  | ~~Documentation~~              |
 
 ---
 
@@ -335,11 +335,11 @@ $ /tmp/gw --help
 
 ## Appendix B: File Size Audit (Lines of Code)
 
-| Metric                 | Count           |
-| ---------------------- | --------------- |
-| ~~Total `.go` files~~ done — point-in-time audit figures | ~~73~~ |
-| ~~Total `_test.go` files~~ done — point-in-time audit figures | ~~12~~ |
-| ~~Test ratio~~ done — point-in-time audit figures | ~~~16% (very low)~~ |
+| Metric                                                        | Count               |
+| ------------------------------------------------------------- | ------------------- |
+| ~~Total `.go` files~~ done — point-in-time audit figures      | ~~73~~              |
+| ~~Total `_test.go` files~~ done — point-in-time audit figures | ~~12~~              |
+| ~~Test ratio~~ done — point-in-time audit figures             | ~~~16% (very low)~~ |
 
 **Largest files flagged for splitting:**
 

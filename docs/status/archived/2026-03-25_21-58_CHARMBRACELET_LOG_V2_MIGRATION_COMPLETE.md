@@ -16,13 +16,13 @@ Successfully completed migration from `charmbracelet/log` v1 and `charmbracelet/
 
 ### 1. Charmbracelet Log v2 Migration (JUST COMPLETED)
 
-| Component           | Status      | Details                             |
-| ------------------- | ----------- | ----------------------------------- |
-| ~~Import path updates~~ done at `c99a279` | ~~✅ Complete~~ | ~~All 9 files updated~~ |
+| Component                                 | Status          | Details                                 |
+| ----------------------------------------- | --------------- | --------------------------------------- |
+| ~~Import path updates~~ done at `c99a279` | ~~✅ Complete~~ | ~~All 9 files updated~~                 |
 | ~~go.mod dependencies~~ done at `c99a279` | ~~✅ Complete~~ | ~~v2.0.0 for log, v2.0.1 for lipgloss~~ |
-| ~~go.sum updates~~ done at `c99a279` | ~~✅ Complete~~ | ~~All checksums present~~ |
-| ~~Build verification~~ done at `c99a279` | ~~✅ Complete~~ | ~~`go build ./...` passes~~ |
-| ~~Test verification~~ done at `c99a279` | ~~✅ Complete~~ | ~~All tests pass~~ |
+| ~~go.sum updates~~ done at `c99a279`      | ~~✅ Complete~~ | ~~All checksums present~~               |
+| ~~Build verification~~ done at `c99a279`  | ~~✅ Complete~~ | ~~`go build ./...` passes~~             |
+| ~~Test verification~~ done at `c99a279`   | ~~✅ Complete~~ | ~~All tests pass~~                      |
 
 **Files Modified:**
 
@@ -39,52 +39,52 @@ Successfully completed migration from `charmbracelet/log` v1 and `charmbracelet/
 
 ### 2. Core CLI Infrastructure
 
-| Feature             | Status                                 |
-| ------------------- | -------------------------------------- |
-| ~~Cobra CLI framework~~ done — verified 2026-11-07 | ~~✅ Complete with 4 commands~~ |
-| ~~Command: `init`~~ done — verified 2026-11-07 | ~~✅ Interactive wizard fully functional~~ |
-| ~~Command: `generate`~~ done — verified 2026-11-07 | ~~✅ Non-interactive generation works~~ |
-| ~~Command: `validate`~~ done — verified 2026-11-07 | ~~✅ Configuration validation works~~ |
-| ~~Command: `version`~~ done — verified 2026-11-07 | ~~✅ Version display working~~ |
-| ~~Global flags~~ done — verified 2026-11-07 | ~~✅ `--config`, `--debug`~~ |
+| Feature                                            | Status                                     |
+| -------------------------------------------------- | ------------------------------------------ |
+| ~~Cobra CLI framework~~ done — verified 2026-11-07 | ~~✅ Complete with 4 commands~~            |
+| ~~Command: `init`~~ done — verified 2026-11-07     | ~~✅ Interactive wizard fully functional~~ |
+| ~~Command: `generate`~~ done — verified 2026-11-07 | ~~✅ Non-interactive generation works~~    |
+| ~~Command: `validate`~~ done — verified 2026-11-07 | ~~✅ Configuration validation works~~      |
+| ~~Command: `version`~~ done — verified 2026-11-07  | ~~✅ Version display working~~             |
+| ~~Global flags~~ done — verified 2026-11-07        | ~~✅ `--config`, `--debug`~~               |
 
 ### 3. TUI (Terminal User Interface)
 
-| Component               | Status                                              |
-| ----------------------- | --------------------------------------------------- |
-| ~~Huh-based forms~~ done — huh/v2 since 52a5a96 (2026-03-26) | ~~✅ 5 form groups implemented~~ |
-| ~~Project info collection~~ done — huh/v2 since 52a5a96 (2026-03-26) | ~~✅ Name, description, type~~ |
-| ~~Build configuration~~ done — huh/v2 since 52a5a96 (2026-03-26) | ~~✅ Binary name, main path, platforms, architectures~~ |
-| ~~Feature selection~~ done — huh/v2 since 52a5a96 (2026-03-26) | ~~✅ Docker, Homebrew, SBOM, signing~~ |
-| ~~Git provider selection~~ done — huh/v2 since 52a5a96 (2026-03-26) | ~~✅ GitHub, GitLab, Gitea, Codeberg~~ |
-| ~~Validation~~ done — huh/v2 since 52a5a96 (2026-03-26) | ~~✅ Real-time with error display~~ |
+| Component                                                            | Status                                                  |
+| -------------------------------------------------------------------- | ------------------------------------------------------- |
+| ~~Huh-based forms~~ done — huh/v2 since 52a5a96 (2026-03-26)         | ~~✅ 5 form groups implemented~~                        |
+| ~~Project info collection~~ done — huh/v2 since 52a5a96 (2026-03-26) | ~~✅ Name, description, type~~                          |
+| ~~Build configuration~~ done — huh/v2 since 52a5a96 (2026-03-26)     | ~~✅ Binary name, main path, platforms, architectures~~ |
+| ~~Feature selection~~ done — huh/v2 since 52a5a96 (2026-03-26)       | ~~✅ Docker, Homebrew, SBOM, signing~~                  |
+| ~~Git provider selection~~ done — huh/v2 since 52a5a96 (2026-03-26)  | ~~✅ GitHub, GitLab, Gitea, Codeberg~~                  |
+| ~~Validation~~ done — huh/v2 since 52a5a96 (2026-03-26)              | ~~✅ Real-time with error display~~                     |
 
 ### 4. Template Generation System
 
-| Template                | Status                          |
-| ----------------------- | ------------------------------- |
-| ~~GoReleaser config~~ **Superseded — dockers_v2 prebuilt pattern e85bb4f; single source 9f4bd71.** | ~~✅ Complete with all sections~~ |
-| ~~GitHub Actions workflow~~ **Superseded — dockers_v2 prebuilt pattern e85bb4f; single source 9f4bd71.** | ~~✅ Multi-trigger support~~ |
-| ~~Dockerfile~~ **Superseded — dockers_v2 prebuilt pattern e85bb4f; single source 9f4bd71.** | ~~✅ Multi-stage builds~~ |
-| ~~Homebrew formula~~ **Superseded — dockers_v2 prebuilt pattern e85bb4f; single source 9f4bd71.** | ~~✅ Tap and core formula support~~ |
+| Template                                                                                                 | Status                              |
+| -------------------------------------------------------------------------------------------------------- | ----------------------------------- |
+| ~~GoReleaser config~~ **Superseded — dockers_v2 prebuilt pattern e85bb4f; single source 9f4bd71.**       | ~~✅ Complete with all sections~~   |
+| ~~GitHub Actions workflow~~ **Superseded — dockers_v2 prebuilt pattern e85bb4f; single source 9f4bd71.** | ~~✅ Multi-trigger support~~        |
+| ~~Dockerfile~~ **Superseded — dockers_v2 prebuilt pattern e85bb4f; single source 9f4bd71.**              | ~~✅ Multi-stage builds~~           |
+| ~~Homebrew formula~~ **Superseded — dockers_v2 prebuilt pattern e85bb4f; single source 9f4bd71.**        | ~~✅ Tap and core formula support~~ |
 
 ### 5. Domain Layer Architecture
 
-| Component          | Status                                       |
-| ------------------ | -------------------------------------------- |
-| ~~SafeProjectConfig~~ done — verified 2026-11-07 | ~~✅ Core configuration type~~ |
+| Component                                         | Status                                           |
+| ------------------------------------------------- | ------------------------------------------------ |
+| ~~SafeProjectConfig~~ done — verified 2026-11-07  | ~~✅ Core configuration type~~                   |
 | ~~Typed enumerations~~ done — verified 2026-11-07 | ~~✅ ProjectType, Platform, Architecture, etc.~~ |
-| ~~Validation logic~~ done — verified 2026-11-07 | ~~✅ Field and business rule validation~~ |
-| ~~Domain errors~~ done — verified 2026-11-07 | ~~✅ Structured error system~~ |
+| ~~Validation logic~~ done — verified 2026-11-07   | ~~✅ Field and business rule validation~~        |
+| ~~Domain errors~~ done — verified 2026-11-07      | ~~✅ Structured error system~~                   |
 
 ### 6. Workflow Engine
 
-| Component        | Status                             |
-| ---------------- | ---------------------------------- |
-| ~~Job interface~~ done — verified 2026-11-07 | ~~✅ Execute + Rollback~~ |
-| ~~JobManager~~ done — verified 2026-11-07 | ~~✅ Sequential + parallel execution~~ |
-| ~~JobFactory~~ done — verified 2026-11-07 | ~~✅ Job creation pattern~~ |
-| ~~Rollback support~~ done — verified 2026-11-07 | ~~✅ Automatic on failure~~ |
+| Component                                       | Status                                 |
+| ----------------------------------------------- | -------------------------------------- |
+| ~~Job interface~~ done — verified 2026-11-07    | ~~✅ Execute + Rollback~~              |
+| ~~JobManager~~ done — verified 2026-11-07       | ~~✅ Sequential + parallel execution~~ |
+| ~~JobFactory~~ done — verified 2026-11-07       | ~~✅ Job creation pattern~~            |
+| ~~Rollback support~~ done — verified 2026-11-07 | ~~✅ Automatic on failure~~            |
 
 ---
 
@@ -92,12 +92,12 @@ Successfully completed migration from `charmbracelet/log` v1 and `charmbracelet/
 
 ### 1. Test Coverage (CRITICAL GAP)
 
-| Package                 | Current | Target | Gap      |
-| ----------------------- | ------- | ------ | -------- |
-| ~~`cmd/goreleaser-wizard`~~ **Superseded — point-in-time; lifts tracked in TODO_LIST.md (M19-M21).** | ~~51.9%~~ | ~~80%~~ | ~~-28.1%~~ |
-| ~~`internal/domain`~~ **Superseded — point-in-time; lifts tracked in TODO_LIST.md (M19-M21).** | ~~0.7%~~ | ~~80%~~ | ~~-79.3% ⚠️~~ |
-| ~~`internal/types`~~ **Superseded — point-in-time; lifts tracked in TODO_LIST.md (M19-M21).** | ~~1.7%~~ | ~~80%~~ | ~~-78.3% ⚠️~~ |
-| ~~`internal/validation`~~ **Superseded — point-in-time; lifts tracked in TODO_LIST.md (M19-M21).** | ~~56.3%~~ | ~~80%~~ | ~~-23.7%~~ |
+| Package                                                                                              | Current   | Target  | Gap          |
+| ---------------------------------------------------------------------------------------------------- | --------- | ------- | ------------ |
+| ~~`cmd/goreleaser-wizard`~~ **Superseded — point-in-time; lifts tracked in TODO_LIST.md (M19-M21).** | ~~51.9%~~ | ~~80%~~ | ~~-28.1%~~   |
+| ~~`internal/domain`~~ **Superseded — point-in-time; lifts tracked in TODO_LIST.md (M19-M21).**       | ~~0.7%~~  | ~~80%~~ | ~~-79.3% ⚠️~~ |
+| ~~`internal/types`~~ **Superseded — point-in-time; lifts tracked in TODO_LIST.md (M19-M21).**        | ~~1.7%~~  | ~~80%~~ | ~~-78.3% ⚠️~~ |
+| ~~`internal/validation`~~ **Superseded — point-in-time; lifts tracked in TODO_LIST.md (M19-M21).**   | ~~56.3%~~ | ~~80%~~ | ~~-23.7%~~   |
 
 **Untested Packages (0% coverage):**
 
@@ -112,33 +112,33 @@ Successfully completed migration from `charmbracelet/log` v1 and `charmbracelet/
 
 ### 2. File Size Management
 
-| File                                         | Lines | Limit | Status      |
-| -------------------------------------------- | ----- | ----- | ----------- |
-| ~~`cmd/goreleaser-wizard/jobs.go`~~ **Superseded — superseded by 2026-08 modernization; sizes tracked in TODO_LIST.md.** | ~~848~~ | ~~300~~ | ~~⚠️ 283% over~~ |
-| ~~`internal/types/validation.go`~~ **Superseded — superseded by 2026-08 modernization; sizes tracked in TODO_LIST.md.** | ~~857~~ | ~~300~~ | ~~⚠️ 286% over~~ |
-| ~~`cmd/goreleaser-wizard/workflow.go`~~ **Superseded — superseded by 2026-08 modernization; sizes tracked in TODO_LIST.md.** | ~~467~~ | ~~300~~ | ~~⚠️ 56% over~~ |
-| ~~`cmd/goreleaser-wizard/architecture_test.go`~~ **Superseded — superseded by 2026-08 modernization; sizes tracked in TODO_LIST.md.** | ~~412~~ | ~~300~~ | ~~⚠️ 37% over~~ |
-| ~~`internal/domain/enums.go`~~ **Superseded — superseded by 2026-08 modernization; sizes tracked in TODO_LIST.md.** | ~~429~~ | ~~300~~ | ~~⚠️ 43% over~~ |
-| ~~`internal/domain/validation.go`~~ **Superseded — superseded by 2026-08 modernization; sizes tracked in TODO_LIST.md.** | ~~434~~ | ~~300~~ | ~~⚠️ 45% over~~ |
-| ~~`internal/domain/interfaces.go`~~ **Superseded — superseded by 2026-08 modernization; sizes tracked in TODO_LIST.md.** | ~~450~~ | ~~300~~ | ~~⚠️ 50% over~~ |
+| File                                                                                                                                  | Lines   | Limit   | Status          |
+| ------------------------------------------------------------------------------------------------------------------------------------- | ------- | ------- | --------------- |
+| ~~`cmd/goreleaser-wizard/jobs.go`~~ **Superseded — superseded by 2026-08 modernization; sizes tracked in TODO_LIST.md.**              | ~~848~~ | ~~300~~ | ~~⚠️ 283% over~~ |
+| ~~`internal/types/validation.go`~~ **Superseded — superseded by 2026-08 modernization; sizes tracked in TODO_LIST.md.**               | ~~857~~ | ~~300~~ | ~~⚠️ 286% over~~ |
+| ~~`cmd/goreleaser-wizard/workflow.go`~~ **Superseded — superseded by 2026-08 modernization; sizes tracked in TODO_LIST.md.**          | ~~467~~ | ~~300~~ | ~~⚠️ 56% over~~  |
+| ~~`cmd/goreleaser-wizard/architecture_test.go`~~ **Superseded — superseded by 2026-08 modernization; sizes tracked in TODO_LIST.md.** | ~~412~~ | ~~300~~ | ~~⚠️ 37% over~~  |
+| ~~`internal/domain/enums.go`~~ **Superseded — superseded by 2026-08 modernization; sizes tracked in TODO_LIST.md.**                   | ~~429~~ | ~~300~~ | ~~⚠️ 43% over~~  |
+| ~~`internal/domain/validation.go`~~ **Superseded — superseded by 2026-08 modernization; sizes tracked in TODO_LIST.md.**              | ~~434~~ | ~~300~~ | ~~⚠️ 45% over~~  |
+| ~~`internal/domain/interfaces.go`~~ **Superseded — superseded by 2026-08 modernization; sizes tracked in TODO_LIST.md.**              | ~~450~~ | ~~300~~ | ~~⚠️ 50% over~~  |
 
 ### 3. Architecture Enforcement
 
-| Component               | Status                    |
-| ----------------------- | ------------------------- |
-| ~~go-arch-lint configured~~ done — verified 2026-11-07; BuildFlow pre-commit since reworked | ~~✅~~ |
-| ~~Deep scanning enabled~~ done — verified 2026-11-07; BuildFlow pre-commit since reworked | ~~✅~~ |
-| ~~CI integration~~ done — verified 2026-11-07; BuildFlow pre-commit since reworked | ~~⚠️ Works but slow~~ |
-| ~~Pre-commit hooks~~ done — verified 2026-11-07; BuildFlow pre-commit since reworked | ~~⚠️ 1+ minute timeout issue~~ |
+| Component                                                                                   | Status                        |
+| ------------------------------------------------------------------------------------------- | ----------------------------- |
+| ~~go-arch-lint configured~~ done — verified 2026-11-07; BuildFlow pre-commit since reworked | ~~✅~~                        |
+| ~~Deep scanning enabled~~ done — verified 2026-11-07; BuildFlow pre-commit since reworked   | ~~✅~~                        |
+| ~~CI integration~~ done — verified 2026-11-07; BuildFlow pre-commit since reworked          | ~~⚠️ Works but slow~~          |
+| ~~Pre-commit hooks~~ done — verified 2026-11-07; BuildFlow pre-commit since reworked        | ~~⚠️ 1+ minute timeout issue~~ |
 
 ### 4. Code Quality
 
-| Aspect              | Status                                 |
-| ------------------- | -------------------------------------- |
-| ~~golangci-lint~~ done — verified 2026-11-07 | ~~✅ 100+ linters enabled~~ |
-| ~~Error wrapping~~ done — verified 2026-11-07 | ~~⚠️ Partial - some `fmt.Errorf` remain~~ |
+| Aspect                                             | Status                                     |
+| -------------------------------------------------- | ------------------------------------------ |
+| ~~golangci-lint~~ done — verified 2026-11-07       | ~~✅ 100+ linters enabled~~                |
+| ~~Error wrapping~~ done — verified 2026-11-07      | ~~⚠️ Partial - some `fmt.Errorf` remain~~   |
 | ~~Context propagation~~ done — verified 2026-11-07 | ~~⚠️ Partial - some functions missing ctx~~ |
-| ~~Type safety~~ done at `9f4bd71` | ~~⚠️ Some `map[string]any` remain~~ |
+| ~~Type safety~~ done at `9f4bd71`                  | ~~⚠️ Some `map[string]any` remain~~         |
 
 ---
 
@@ -374,12 +374,12 @@ ok      github.com/LarsArtmann/GoReleaser-Wizard/internal/validation      (cache
 
 ### Direct Dependencies (Updated)
 
-| Package                           | Old    | New      |
-| --------------------------------- | ------ | -------- |
-| ~~charm.land/lipgloss/v2~~ done — verified via go.mod 2026-11-07 | ~~-~~ | ~~v2.0.1~~ |
-| ~~charm.land/log/v2~~ done — verified via go.mod 2026-11-07 | ~~-~~ | ~~v2.0.0~~ |
+| Package                                                                     | Old        | New          |
+| --------------------------------------------------------------------------- | ---------- | ------------ |
+| ~~charm.land/lipgloss/v2~~ done — verified via go.mod 2026-11-07            | ~~-~~      | ~~v2.0.1~~   |
+| ~~charm.land/log/v2~~ done — verified via go.mod 2026-11-07                 | ~~-~~      | ~~v2.0.0~~   |
 | ~~github.com/charmbracelet/lipgloss~~ done — verified via go.mod 2026-11-07 | ~~v1.1.0~~ | ~~indirect~~ |
-| ~~github.com/charmbracelet/log~~ done — verified via go.mod 2026-11-07 | ~~v1.0.0~~ | ~~removed~~ |
+| ~~github.com/charmbracelet/log~~ done — verified via go.mod 2026-11-07      | ~~v1.0.0~~ | ~~removed~~  |
 
 ### Key Indirect Dependencies
 
@@ -397,7 +397,7 @@ ok      github.com/LarsArtmann/GoReleaser-Wizard/internal/validation      (cache
 - [x] Run `go mod tidy`
 - [x] Build project with `go build`
 - [x] Run tests to verify
-~~- [ ] Check logs visually (optional but recommended) ⏭️ Next~~ obsolete — charm.land stack fully replaced (2026-11-07)
+      ~~- [ ] Check logs visually (optional but recommended) ⏭️ Next~~ obsolete — charm.land stack fully replaced (2026-11-07)
 
 ---
 

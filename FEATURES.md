@@ -204,14 +204,14 @@ GoReleaser-Wizard is a CLI tool that generates production-ready GoReleaser v2.17
 
 Computed from the rows above on 2026-11-07.
 
-| Category       | Fully Functional | Partially Functional | Planned | Broken |
-| -------------- | ---------------- | -------------------- | ------- | ------ |
-| Core Features  | 5                | 0                    | 0       | 0      |
-| Configuration  | 2                | 2                    | 0       | 0      |
-| Validation     | 3                | 0                    | 0       | 0      |
-| Architecture   | 3                | 0                    | 0       | 0      |
-| Planned        | 0                | 0                    | 3       | 0      |
-| **TOTAL**      | **13**           | **2**                | **3**   | **0**  |
+| Category      | Fully Functional | Partially Functional | Planned | Broken |
+| ------------- | ---------------- | -------------------- | ------- | ------ |
+| Core Features | 5                | 0                    | 0       | 0      |
+| Configuration | 2                | 2                    | 0       | 0      |
+| Validation    | 3                | 0                    | 0       | 0      |
+| Architecture  | 3                | 0                    | 0       | 0      |
+| Planned       | 0                | 0                    | 3       | 0      |
+| **TOTAL**     | **13**           | **2**                | **3**   | **0**  |
 
 ---
 

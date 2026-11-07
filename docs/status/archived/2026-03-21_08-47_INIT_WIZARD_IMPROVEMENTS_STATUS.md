@@ -166,8 +166,8 @@ This session focused on improving the `goreleaser-wizard init` command with smar
 
 ~~1. **Split large files** - Many files exceed 300-line guideline~~ **Superseded — TODO_LIST.md (split-oversized-files).**
 ~~2. **Fix test suite** - Comprehensive test review and repair needed~~ done at `a7680ac`
-~~3. **Address linting warnings** - 223+ warnings need triage~~ done at `9703270`, ` 3cb91da`
-~~4. **Remove unused code** - Several unused functions/constants detected~~ done at `9703270`, ` 3cb91da`
+~~3. **Address linting warnings** - 223+ warnings need triage~~ done at `9703270`, `3cb91da`
+~~4. **Remove unused code** - Several unused functions/constants detected~~ done at `9703270`, `3cb91da`
 
 ### Architecture
 
@@ -281,17 +281,17 @@ I cannot decide this autonomously because it's a product/design decision that af
 
 ## Session Statistics
 
-| Metric             | Value                            |
-| ------------------ | -------------------------------- |
-| ~~Files Modified~~ done — recorded | ~~3 committed, 2 uncommitted~~ |
-| ~~Lines Added~~ done — recorded | ~~~50~~ |
-| ~~Lines Removed~~ done — recorded | ~~~20~~ |
-| ~~Functions Added~~ done — recorded | ~~1 (`GetGitHubRepoDescription`)~~ |
-| ~~Functions Modified~~ done — recorded | ~~1 (`detectMainStructure`)~~ |
-| ~~Features Completed~~ done — recorded | ~~4~~ |
-| ~~Tests Fixed~~ done — recorded | ~~0 (pre-existing failures)~~ |
-| ~~Commits Made~~ done — recorded | ~~1~~ |
-| ~~Time to Complete~~ done — recorded | ~~~2 hours (with context recovery)~~ |
+| Metric                                 | Value                                |
+| -------------------------------------- | ------------------------------------ |
+| ~~Files Modified~~ done — recorded     | ~~3 committed, 2 uncommitted~~       |
+| ~~Lines Added~~ done — recorded        | ~~~50~~                              |
+| ~~Lines Removed~~ done — recorded      | ~~~20~~                              |
+| ~~Functions Added~~ done — recorded    | ~~1 (`GetGitHubRepoDescription`)~~   |
+| ~~Functions Modified~~ done — recorded | ~~1 (`detectMainStructure`)~~        |
+| ~~Features Completed~~ done — recorded | ~~4~~                                |
+| ~~Tests Fixed~~ done — recorded        | ~~0 (pre-existing failures)~~        |
+| ~~Commits Made~~ done — recorded       | ~~1~~                                |
+| ~~Time to Complete~~ done — recorded   | ~~~2 hours (with context recovery)~~ |
 
 ---
 
@@ -350,7 +350,7 @@ The codebase has a solid foundation but needs attention to:
 
 ~~1. Test suite reliability~~ done at `a7680ac`
 ~~2. File size management~~ **Superseded — TODO_LIST.md (split-oversized-files).**
-~~3. Documentation updates~~ done at `ed01089`, ` 969259e`
+~~3. Documentation updates~~ done at `ed01089`, `969259e`
 ~~4. Linting warning cleanup~~ done at `9703270`
 
 The top priority for the next session should be **fixing the test suite** to enable reliable CI/CD.

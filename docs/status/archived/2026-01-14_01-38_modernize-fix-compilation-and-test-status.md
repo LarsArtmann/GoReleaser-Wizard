@@ -230,67 +230,79 @@ just build
 #### FormValidator Tests (5 failures)
 
 ~~1. **TestFormValidatorValidateProjectName**~~ done at `b767071`
-   - Should error for reserved name ❌
-   - Should have errors for invalid input ❌
-   - Should set project_name error ❌
+
+- Should error for reserved name ❌
+- Should have errors for invalid input ❌
+- Should set project_name error ❌
 
 ~~2. **TestFormValidatorValidateProjectDescription**~~ done at `b767071`
-   - Should error for script injection ❌
-   - Should set project_description error ❌
+
+- Should error for script injection ❌
+- Should set project_description error ❌
 
 ~~3. **TestFormValidatorValidateDockerRegistry**~~ done at `b767071`
-   - Valid input incorrectly rejected ❌
-   - Error: "Invalid Docker registry URL format"
+
+- Valid input incorrectly rejected ❌
+- Error: "Invalid Docker registry URL format"
 
 ~~4. **TestFormValidatorErrorSummary**~~ done at `b767071`
-   - Missing binary_name error in summary ❌
+
+- Missing binary_name error in summary ❌
 
 ~~5. **TestFormValidatorSanitizeAndValidate**~~ done at `b767071`
-   - Should error for invalid input ❌
+
+- Should error for invalid input ❌
 
 #### Validator Tests (17 failures)
 
 ~~1. **TestValidateProjectName** (7 failures)~~ done at `b767071`
-   - `my.project` (dots) ❌ - Invalid format
-   - `my-project.v2` (mixed) ❌ - Invalid format
-   - `project-` (ends with hyphen) ❌ - Should fail
-   - `project--name` (consecutive hyphens) ❌ - Should fail
-   - `go` (reserved) ❌ - Should fail
-   - `con` (reserved) ❌ - Should fail
-   - `aux` (reserved) ❌ - Should fail
+
+- `my.project` (dots) ❌ - Invalid format
+- `my-project.v2` (mixed) ❌ - Invalid format
+- `project-` (ends with hyphen) ❌ - Should fail
+- `project--name` (consecutive hyphens) ❌ - Should fail
+- `go` (reserved) ❌ - Should fail
+- `con` (reserved) ❌ - Should fail
+- `aux` (reserved) ❌ - Should fail
 
 ~~2. **TestValidateBinaryName** (3 failures)~~ done at `b767071`
-   - `test123` (starts with number) ❌ - Should fail
-   - `con` (reserved) ❌ - Should fail
-   - `aux` (reserved) ❌ - Should fail
+
+- `test123` (starts with number) ❌ - Should fail
+- `con` (reserved) ❌ - Should fail
+- `aux` (reserved) ❌ - Should fail
 
 ~~3. **TestValidateMainPath** (6 failures)~~ done at `b767071`
-   - `/absolute/path` ❌ - Should fail
-   - `rm -rf /` (shell metacharacters) ❌ - Should fail
-   - `$(evil)` (script injection) ❌ - Should fail
-   - `/bin` (reserved directory) ❌ - Should fail
-   - `/usr` (reserved directory) ❌ - Should fail
+
+- `/absolute/path` ❌ - Should fail
+- `rm -rf /` (shell metacharacters) ❌ - Should fail
+- `$(evil)` (script injection) ❌ - Should fail
+- `/bin` (reserved directory) ❌ - Should fail
+- `/usr` (reserved directory) ❌ - Should fail
 
 ~~4. **TestValidateProjectDescription** (4 failures)~~ done at `b767071`
-   - Length 501 (too long) ❌ - Should fail
-   - `<script>alert()</script>` (script injection) ❌ - Should fail
-   - `javascript:alert(1)` (JS injection) ❌ - Should fail
-   - With newlines ❌ - Invalid characters
+
+- Length 501 (too long) ❌ - Should fail
+- `<script>alert()</script>` (script injection) ❌ - Should fail
+- `javascript:alert(1)` (JS injection) ❌ - Should fail
+- With newlines ❌ - Invalid characters
 
 ~~5. **TestValidateBuildTags** (1 failure)~~ done at `b767071`
-   - Invalid characters ❌ - Should fail
+
+- Invalid characters ❌ - Should fail
 
 ~~6. **TestValidateDockerRegistry** (7 failures)~~ done at `b767071`
-   - `docker.io` ❌ - Invalidly rejected
-   - `ghcr.io/user/repo` ❌ - Invalidly rejected
-   - `registry.gitlab.com/user/repo` ❌ - Invalidly rejected
-   - `localhost:5000` ❌ - Invalidly rejected
-   - `127.0.0.1:5000` ❌ - Invalidly rejected
-   - `docker.io:443` ❌ - Invalidly rejected
-   - Empty string ❌ - Should fail
+
+- `docker.io` ❌ - Invalidly rejected
+- `ghcr.io/user/repo` ❌ - Invalidly rejected
+- `registry.gitlab.com/user/repo` ❌ - Invalidly rejected
+- `localhost:5000` ❌ - Invalidly rejected
+- `127.0.0.1:5000` ❌ - Invalidly rejected
+- `docker.io:443` ❌ - Invalidly rejected
+- Empty string ❌ - Should fail
 
 ~~7. **TestSanitizeInput** (1 failure)~~ done at `b767071`
-   - Tab character handling ❌ - Expected behavior mismatch
+
+- Tab character handling ❌ - Expected behavior mismatch
 
 ### 2. Integration Test Coverage
 
@@ -372,9 +384,10 @@ just build
 ~~1. Check git history to see if file was tracked~~ done at `8edf0b1`
 ~~2. Review original functionality~~ done at `8edf0b1`
 ~~3. Decide whether to:~~ done at `8edf0b1`
-   - Restore and fix properly
-   - Recreate as structured test suite
-   - Accept loss (if not critical)
+
+- Restore and fix properly
+- Recreate as structured test suite
+- Accept loss (if not critical)
 
 #### 2. Validation Pattern Over-Strictness 🚨
 
@@ -385,40 +398,41 @@ just build
 
 ~~1. **Reserved Name Logic Not Implemented**~~ done at `b767071`
 
-   ```go
-   // Expected: These should fail validation
-   "go", "test", "con", "aux", "nul", "prn"
-   // Actual: These pass validation
-   ```
+```go
+// Expected: These should fail validation
+"go", "test", "con", "aux", "nul", "prn"
+// Actual: These pass validation
+```
 
 ~~2. **Docker Registry Pattern Too Restrictive**~~ done at `b767071`
 
-   ```go
-   // Pattern: ^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$
-   // Issues:
-   - Rejects valid IP addresses (127.0.0.1)
-   - Rejects localhost
-   - Rejects port numbers
-   - Rejects registry paths with subdirectories
-   ```
+```go
+// Pattern: ^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$
+// Issues:
+- Rejects valid IP addresses (127.0.0.1)
+- Rejects localhost
+- Rejects port numbers
+- Rejects registry paths with subdirectories
+```
 
 ~~3. **Project Name Pattern Too Strict**~~ done at `b767071`
 
-   ```go
-   // Pattern: ^[a-zA-Z0-9][a-zA-Z0-9_-]{0,49}$
-   // Issues:
-   - Rejects dots (my.project)
-   - Rejects version numbers (project-v2.0)
-   ```
+```go
+// Pattern: ^[a-zA-Z0-9][a-zA-Z0-9_-]{0,49}$
+// Issues:
+- Rejects dots (my.project)
+- Rejects version numbers (project-v2.0)
+```
 
 ~~4. **Main Path Validation Missing Security Checks**~~ done at `b767071`
-   ```go
-   // Expected to reject:
-   - Absolute paths (/bin, /usr)
-   - Shell metacharacters (rm, ;, |, >)
-   - Command substitution ($(), `)
-   // Actual: These pass validation
-   ```
+
+```go
+// Expected to reject:
+- Absolute paths (/bin, /usr)
+- Shell metacharacters (rm, ;, |, >)
+- Command substitution ($(), `)
+// Actual: These pass validation
+```
 
 ---
 
@@ -468,134 +482,159 @@ Binary Generated:  ✅ goreleaser-wizard
 ### 🔥 URGENT (1-5)
 
 ~~1. **Investigate Integration Test Loss**~~ done at `8edf0b1`
-   - Check git status for test_integration.go
-   - Determine if file was tracked
-   - Assess impact of deletion
+
+- Check git status for test_integration.go
+- Determine if file was tracked
+- Assess impact of deletion
 
 ~~2. **Fix TestValidateProjectName**~~ done at `b767071`
-   - Add reserved name validation logic
-   - Update pattern to allow dots
-   - Add consecutive character checks
+
+- Add reserved name validation logic
+- Update pattern to allow dots
+- Add consecutive character checks
 
 ~~3. **Fix TestValidateBinaryName**~~ done at `b767071`
-   - Implement reserved name validation
-   - Add "starts with number" check
+
+- Implement reserved name validation
+- Add "starts with number" check
 
 ~~4. **Fix TestValidateMainPath**~~ done at `b767071`
-   - Add absolute path detection
-   - Add shell metacharacter detection
-   - Add command substitution detection
-   - Add reserved directory checks (/bin, /usr, /etc, /dev)
+
+- Add absolute path detection
+- Add shell metacharacter detection
+- Add command substitution detection
+- Add reserved directory checks (/bin, /usr, /etc, /dev)
 
 ~~5. **Fix TestValidateProjectDescription**~~ done at `b767071`
-   - Add length validation (> 500 chars)
-   - Add script injection pattern detection
-   - Add JavaScript injection detection
+
+- Add length validation (> 500 chars)
+- Add script injection pattern detection
+- Add JavaScript injection detection
 
 ### ⚡ HIGH PRIORITY (6-10)
 
 ~~6. **Fix TestValidateDockerRegistry**~~ done at `b767071`
-   - Update pattern to accept IP addresses
-   - Add localhost support
-   - Add port number support
-   - Fix empty string validation
+
+- Update pattern to accept IP addresses
+- Add localhost support
+- Add port number support
+- Fix empty string validation
 
 ~~7. **Fix TestValidateBuildTags**~~ done at `b767071`
-   - Add invalid character validation
-   - Implement tag format rules
+
+- Add invalid character validation
+- Implement tag format rules
 
 ~~8. **Fix TestSanitizeInput**~~ done at `b767071`
-   - Fix tab character handling
-   - Ensure proper whitespace trimming
+
+- Fix tab character handling
+- Ensure proper whitespace trimming
 
 ~~9. **Fix TestFormValidator Suite**~~ done at `b767071`
-   - Implement reserved name checks
-   - Add script injection detection
-   - Fix error summary generation
+
+- Implement reserved name checks
+- Add script injection detection
+- Fix error summary generation
 
 ~~10. **Analyze Modernize Output**~~ **Superseded — moot: modernize superseded by toolchain upgrades.**
-    - Run `git diff` to see actual changes
-    - Check if files were modified
-    - Review modernize documentation
+
+- Run `git diff` to see actual changes
+- Check if files were modified
+- Review modernize documentation
 
 ### 📋 MEDIUM PRIORITY (11-18)
 
 ~~11. **Review Validation Pattern Strategy**~~ done — patterns aligned (b767071)
-    - Document current validation rules
-    - Assess pattern strictness vs usability
-    - Consider whitelist vs blacklist approaches
+
+- Document current validation rules
+- Assess pattern strictness vs usability
+- Consider whitelist vs blacklist approaches
 
 ~~12. **Recreate Integration Test Suite**~~ done at `8edf0b1`
-    - Design proper test structure
-    - Implement generator tests
-    - Implement job factory tests
+
+- Design proper test structure
+- Implement generator tests
+- Implement job factory tests
 
 ~~13. **Update Validation Error Messages**~~ done at `6898ba1`
-    - Make messages more helpful
-    - Include suggestions in errors
-    - Add examples of valid inputs
+
+- Make messages more helpful
+- Include suggestions in errors
+- Add examples of valid inputs
 
 ~~14. **Add Validation Documentation**~~ done at `969259e`
-    - Document all validation rules
-    - Provide examples
-    - Create validation guidelines
+
+- Document all validation rules
+- Provide examples
+- Create validation guidelines
 
 ~~15. **Run Tests with Verbose Output**~~ done — suite green in gates
-    - `go test -v ./...`
-    - Identify exact failure points
-    - Debug validation logic
+
+- `go test -v ./...`
+- Identify exact failure points
+- Debug validation logic
 
 ~~16. **Review Error Code Completeness**~~ done — error codes complete (12 codes)
-    - Check if all needed error codes exist
-    - Verify error code consistency
-    - Update error code documentation
+
+- Check if all needed error codes exist
+- Verify error code consistency
+- Update error code documentation
 
 ~~17. **Check Git Diff for Modernize Changes**~~ done — moot: superseded
-    - `git diff HEAD`
-    - Review all modifications
-    - Verify intended changes were made
+
+- `git diff HEAD`
+- Review all modifications
+- Verify intended changes were made
 
 ~~18. **Improve Test Coverage**~~ **Superseded — TODO_LIST.md (M19-M21).**
-    - Run `go test -cover ./...`
-    - Identify untested code
-    - Add missing tests
+
+- Run `go test -cover ./...`
+- Identify untested code
+- Add missing tests
 
 ### 🔨 LOW PRIORITY (19-25)
 
 ~~19. **Update README.md**~~ done at `ed01089`
-    - Document modernization changes
-    - Update build instructions
-    - Add troubleshooting section
+
+- Document modernization changes
+- Update build instructions
+- Add troubleshooting section
 
 ~~20. **Create CHANGELOG Entry**~~ done — CHANGELOG.md rebuilt 2026-11-07
-    - Document today's changes
-    - List fixes applied
-    - Note known issues
+
+- Document today's changes
+- List fixes applied
+- Note known issues
 
 ~~21. **Create Git Commit**~~ done — committed
-    - Stage all changes
-    - Write comprehensive commit message
-    - Create proper commit
+
+- Stage all changes
+- Write comprehensive commit message
+- Create proper commit
 
 ~~22. **Review Project Dependencies**~~ done — dependencies healthy (2026-11-07)
-    - Check for security vulnerabilities
-    - Update outdated packages
-    - Review dependency licenses
+
+- Check for security vulnerabilities
+- Update outdated packages
+- Review dependency licenses
 
 ~~23. **Add CI/CD Pipeline Tests**~~ done at `8edf0b1`
-    - Add modernize check to CI
-    - Add test suite to CI
-    - Add code quality checks
+
+- Add modernize check to CI
+- Add test suite to CI
+- Add code quality checks
 
 ~~24. **Implement Linting**~~ done at `9703270`
-    - Add golangci-lint
-    - Configure linting rules
-    - Fix linting issues
+
+- Add golangci-lint
+- Configure linting rules
+- Fix linting issues
 
 ~~25. **Create Developer Documentation**~~ done — README/AGENTS/DEVELOPMENT docs
-    - Document validation rules
-    - Provide contribution guidelines
-    - Create architecture diagrams
+
+- Document validation rules
+- Provide contribution guidelines
+- Create architecture diagrams
 
 ---
 
@@ -679,7 +718,7 @@ The `modernize --fix --test ./...` task has been **technically completed** but w
 ~~1. Restore or recreate integration test coverage~~ done at `8edf0b1`
 ~~2. Fix validation pattern issues~~ done at `b767071`
 ~~3. Analyze modernize changes~~ **Superseded — moot: modernize superseded by toolchain upgrades.**
-~~4. Resolve test failures~~ done at `b767071`, ` a7680ac`
+~~4. Resolve test failures~~ done at `b767071`, `a7680ac`
 
 ### Overall Status
 

@@ -89,16 +89,16 @@ Guides you through creating a complete configuration with a rich terminal UI:
 goreleaser-wizard init
 ```
 
-| Flag             | Default       | Description                                   |
-| ---------------- | ------------- | --------------------------------------------- |
-| `--force`        | `false`       | Overwrite existing configuration              |
-| `--interactive`  | `true`        | Run the TUI wizard (set `false` for headless) |
-| `--project-name` | auto-detected | Override project name                         |
-| `--binary-name`  | auto-detected | Override binary name                          |
-| `--main-path`    | auto-detected | Override main package path                    |
-| `--project-type` | auto-detected | Override project type                         |
-| `--github-owner` | git remote    | Override GitHub repository owner              |
-| `--github-repo`  | git remote    | Override GitHub repository name               |
+| Flag             | Default       | Description                                                                                      |
+| ---------------- | ------------- | ------------------------------------------------------------------------------------------------ |
+| `--force`        | `false`       | Overwrite existing configuration                                                                 |
+| `--interactive`  | `true`        | Run the TUI wizard (set `false` for headless)                                                    |
+| `--project-name` | auto-detected | Override project name                                                                            |
+| `--binary-name`  | auto-detected | Override binary name                                                                             |
+| `--main-path`    | auto-detected | Override main package path                                                                       |
+| `--project-type` | auto-detected | Override project type                                                                            |
+| `--github-owner` | git remote    | Override GitHub repository owner                                                                 |
+| `--github-repo`  | git remote    | Override GitHub repository name                                                                  |
 | `--ci-provider`  | `github`      | `github`, `forgejo`, `dual`, or `none` -- selects the generated workflow set and release targets |
 
 When stdout is not a terminal, `init` prints a helpful message with the non-interactive flag.
@@ -115,16 +115,16 @@ goreleaser-wizard generate \
   --config-only=false
 ```
 
-| Flag             | Default       | Description                                          |
-| ---------------- | ------------- | ---------------------------------------------------- |
-| `--force`        | `false`       | Overwrite existing configuration                     |
-| `--config-only`  | `false`       | Generate only `.goreleaser.yaml` (no GitHub Actions) |
-| `--project-name` | auto-detected | Override project name                                |
-| `--binary-name`  | auto-detected | Override binary name                                 |
-| `--main-path`    | auto-detected | Override main package path                           |
-| `--project-type` | auto-detected | Override project type                                |
-| `--github-owner` | git remote    | Override GitHub repository owner                     |
-| `--github-repo`  | git remote    | Override GitHub repository name                      |
+| Flag             | Default       | Description                                                                                      |
+| ---------------- | ------------- | ------------------------------------------------------------------------------------------------ |
+| `--force`        | `false`       | Overwrite existing configuration                                                                 |
+| `--config-only`  | `false`       | Generate only `.goreleaser.yaml` (no GitHub Actions)                                             |
+| `--project-name` | auto-detected | Override project name                                                                            |
+| `--binary-name`  | auto-detected | Override binary name                                                                             |
+| `--main-path`    | auto-detected | Override main package path                                                                       |
+| `--project-type` | auto-detected | Override project type                                                                            |
+| `--github-owner` | git remote    | Override GitHub repository owner                                                                 |
+| `--github-repo`  | git remote    | Override GitHub repository name                                                                  |
 | `--ci-provider`  | `github`      | `github`, `forgejo`, `dual`, or `none` -- selects the generated workflow set and release targets |
 
 Forgejo example:
@@ -214,14 +214,14 @@ Supported registries: GitHub Container Registry (ghcr.io), Docker Hub, GitLab Re
 
 ## Git Providers
 
-| Provider    | Generated CI/CD                                    |
-| ----------- | -------------------------------------------------- |
-| GitHub      | GitHub Actions release workflow                    |
+| Provider    | Generated CI/CD                                     |
+| ----------- | --------------------------------------------------- |
+| GitHub      | GitHub Actions release workflow                     |
 | Forgejo     | Forgejo Actions workflows (`--ci-provider forgejo`) |
-| Gitea       | Manual (config only)                               |
-| GitLab      | Config only (CI templates not generated)           |
-| Bitbucket   | Config only (CI templates not generated)           |
-| Self-hosted | Manual                                             |
+| Gitea       | Manual (config only)                                |
+| GitLab      | Config only (CI templates not generated)            |
+| Bitbucket   | Config only (CI templates not generated)            |
+| Self-hosted | Manual                                              |
 
 ## Architecture
 

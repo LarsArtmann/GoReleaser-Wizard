@@ -16,20 +16,20 @@ This session successfully resolved all failing tests and conducted a comprehensi
 
 ### Test Fixes Completed This Session
 
-| Test                                            | Issue                                                                       | Resolution                                             | Commit    |
-| ----------------------------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------ | --------- |
-| ~~`TestConcurrentOperations`~~ done at `a7680ac` | ~~Race condition - `os.Chdir()` is process-wide, cannot be used in goroutines~~ | ~~Converted to sequential test with proper documentation~~ | ~~`a7680ac`~~ |
-| ~~`TestPerformanceCharacteristics/simple_project`~~ done at `a7680ac` | ~~Threshold too strict (100ms) for CI/CD variability~~ | ~~Increased to 500ms/1s/3s thresholds~~ | ~~`a7680ac`~~ |
-| ~~`TestValidateOutputFormatting`~~ done at `a7680ac` | ~~Missing `cmd/` directory in test setup~~ | ~~Added proper project structure with `cmd/main.go`~~ | ~~`a7680ac`~~ |
-| ~~`TestRunValidate`~~ done at `a7680ac` | ~~Same as above + called `os.Exit()` in test~~ | ~~Refactored `performValidation()` from `runValidate()`~~ | ~~`a7680ac`~~ |
+| Test                                                                  | Issue                                                                           | Resolution                                                 | Commit        |
+| --------------------------------------------------------------------- | ------------------------------------------------------------------------------- | ---------------------------------------------------------- | ------------- |
+| ~~`TestConcurrentOperations`~~ done at `a7680ac`                      | ~~Race condition - `os.Chdir()` is process-wide, cannot be used in goroutines~~ | ~~Converted to sequential test with proper documentation~~ | ~~`a7680ac`~~ |
+| ~~`TestPerformanceCharacteristics/simple_project`~~ done at `a7680ac` | ~~Threshold too strict (100ms) for CI/CD variability~~                          | ~~Increased to 500ms/1s/3s thresholds~~                    | ~~`a7680ac`~~ |
+| ~~`TestValidateOutputFormatting`~~ done at `a7680ac`                  | ~~Missing `cmd/` directory in test setup~~                                      | ~~Added proper project structure with `cmd/main.go`~~      | ~~`a7680ac`~~ |
+| ~~`TestRunValidate`~~ done at `a7680ac`                               | ~~Same as above + called `os.Exit()` in test~~                                  | ~~Refactored `performValidation()` from `runValidate()`~~  | ~~`a7680ac`~~ |
 
 ### Previous Session Fixes (Already Merged)
 
-| Fix                          | Description                                                |
-| ---------------------------- | ---------------------------------------------------------- |
-| ~~GoReleaser Template Escaping~~ done at `23889fb`, ` 29277e6`, ` e9217bd` | ~~Fixed `{{.Tag}}`, `{{.Version}}`, etc. to output literally~~ |
-| ~~Docker Registry Method Calls~~ done at `23889fb`, ` 29277e6`, ` e9217bd` | ~~Fixed `DockerRegistry.Value()` calls~~ |
-| ~~Code Formatting~~ done at `23889fb`, ` 29277e6`, ` e9217bd` | ~~Whitespace and formatting cleanup~~ |
+| Fix                                                                      | Description                                                    |
+| ------------------------------------------------------------------------ | -------------------------------------------------------------- |
+| ~~GoReleaser Template Escaping~~ done at `23889fb`, `29277e6`, `e9217bd` | ~~Fixed `{{.Tag}}`, `{{.Version}}`, etc. to output literally~~ |
+| ~~Docker Registry Method Calls~~ done at `23889fb`, `29277e6`, `e9217bd` | ~~Fixed `DockerRegistry.Value()` calls~~                       |
+| ~~Code Formatting~~ done at `23889fb`, `29277e6`, `e9217bd`              | ~~Whitespace and formatting cleanup~~                          |
 
 ### Current Test Status
 
@@ -73,35 +73,35 @@ ok  	github.com/LarsArtmann/GoReleaser-Wizard/internal/validation	0.431s
 
 ### High Priority Architectural Issues
 
-| Issue                       | Description                                      | Impact                          |
-| --------------------------- | ------------------------------------------------ | ------------------------------- |
-| ~~`os.Chdir()` Usage~~ done — resolved in later test rewrites; WorkingDir deliberately never added | ~~15+ locations use process-wide directory changes~~ | ~~Prevents true concurrency~~ |
-| ~~Working Directory Injection~~ done — resolved in later test rewrites; WorkingDir deliberately never added | ~~No `WorkingDir` field in config~~ | ~~Forces reliance on global state~~ |
-| ~~Dependency Injection~~ done — acceptable global for validate path | ~~Global variables (e.g., `fileSystemRepo`)~~ | ~~Testing difficulty~~ |
+| Issue                                                                                                       | Description                                          | Impact                              |
+| ----------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- | ----------------------------------- |
+| ~~`os.Chdir()` Usage~~ done — resolved in later test rewrites; WorkingDir deliberately never added          | ~~15+ locations use process-wide directory changes~~ | ~~Prevents true concurrency~~       |
+| ~~Working Directory Injection~~ done — resolved in later test rewrites; WorkingDir deliberately never added | ~~No `WorkingDir` field in config~~                  | ~~Forces reliance on global state~~ |
+| ~~Dependency Injection~~ done — acceptable global for validate path                                         | ~~Global variables (e.g., `fileSystemRepo`)~~        | ~~Testing difficulty~~              |
 
 ### Code Quality Issues
 
-| File                                            | Lines | Recommended Max | Action                   |
-| ----------------------------------------------- | ----- | --------------- | ------------------------ |
-| ~~`internal/types/validation.go`~~ **Superseded — point-in-time sizes; splitting tracked in TODO_LIST.md.** | ~~857~~ | ~~350~~ | ~~Split by validation type~~ |
-| ~~`cmd/goreleaser-wizard/jobs.go`~~ **Superseded — point-in-time sizes; splitting tracked in TODO_LIST.md.** | ~~838~~ | ~~350~~ | ~~Split by responsibility~~ |
-| ~~`internal/domain/validation.go`~~ **Superseded — point-in-time sizes; splitting tracked in TODO_LIST.md.** | ~~659~~ | ~~350~~ | ~~Split by domain concern~~ |
-| ~~`internal/validation/basic.go`~~ **Superseded — point-in-time sizes; splitting tracked in TODO_LIST.md.** | ~~626~~ | ~~350~~ | ~~Split by validation type~~ |
-| ~~`internal/validation/business_rules.go`~~ **Superseded — point-in-time sizes; splitting tracked in TODO_LIST.md.** | ~~626~~ | ~~350~~ | ~~Split by business domain~~ |
-| ~~`cmd/goreleaser-wizard/jobs/implementations.go`~~ **Superseded — point-in-time sizes; splitting tracked in TODO_LIST.md.** | ~~573~~ | ~~350~~ | ~~Split by job type~~ |
+| File                                                                                                                         | Lines   | Recommended Max | Action                       |
+| ---------------------------------------------------------------------------------------------------------------------------- | ------- | --------------- | ---------------------------- |
+| ~~`internal/types/validation.go`~~ **Superseded — point-in-time sizes; splitting tracked in TODO_LIST.md.**                  | ~~857~~ | ~~350~~         | ~~Split by validation type~~ |
+| ~~`cmd/goreleaser-wizard/jobs.go`~~ **Superseded — point-in-time sizes; splitting tracked in TODO_LIST.md.**                 | ~~838~~ | ~~350~~         | ~~Split by responsibility~~  |
+| ~~`internal/domain/validation.go`~~ **Superseded — point-in-time sizes; splitting tracked in TODO_LIST.md.**                 | ~~659~~ | ~~350~~         | ~~Split by domain concern~~  |
+| ~~`internal/validation/basic.go`~~ **Superseded — point-in-time sizes; splitting tracked in TODO_LIST.md.**                  | ~~626~~ | ~~350~~         | ~~Split by validation type~~ |
+| ~~`internal/validation/business_rules.go`~~ **Superseded — point-in-time sizes; splitting tracked in TODO_LIST.md.**         | ~~626~~ | ~~350~~         | ~~Split by business domain~~ |
+| ~~`cmd/goreleaser-wizard/jobs/implementations.go`~~ **Superseded — point-in-time sizes; splitting tracked in TODO_LIST.md.** | ~~573~~ | ~~350~~         | ~~Split by job type~~        |
 
 ### Missing Test Coverage
 
-| Package                            | Status        |
-| ---------------------------------- | ------------- |
-| ~~`cmd/goreleaser-wizard/generators`~~ done at `8edf0b1` | ~~No test files~~ |
-| ~~`cmd/goreleaser-wizard/jobs`~~ **NOT-DO — jobs/ package dissolved.** | ~~No test files~~ |
-| ~~`cmd/goreleaser-wizard/templates`~~ done at `8edf0b1`, ` 6f4f54d` | ~~No test files~~ |
-| ~~`cmd/goreleaser-wizard/types`~~ done at `8edf0b1`, ` 6f4f54d` | ~~No test files~~ |
-| ~~`internal/config`~~ **Superseded — TODO_LIST.md (M20).** | ~~No test files~~ |
+| Package                                                                 | Status            |
+| ----------------------------------------------------------------------- | ----------------- |
+| ~~`cmd/goreleaser-wizard/generators`~~ done at `8edf0b1`                | ~~No test files~~ |
+| ~~`cmd/goreleaser-wizard/jobs`~~ **NOT-DO — jobs/ package dissolved.**  | ~~No test files~~ |
+| ~~`cmd/goreleaser-wizard/templates`~~ done at `8edf0b1`, `6f4f54d`      | ~~No test files~~ |
+| ~~`cmd/goreleaser-wizard/types`~~ done at `8edf0b1`, `6f4f54d`          | ~~No test files~~ |
+| ~~`internal/config`~~ **Superseded — TODO_LIST.md (M20).**              | ~~No test files~~ |
 | ~~`internal/errors`~~ **NOT-DO — internal/errors dissolved (dde1081).** | ~~No test files~~ |
-| ~~`internal/git`~~ **Superseded — TODO_LIST.md (M19).** | ~~No test files~~ |
-| ~~`internal/utils`~~ **Superseded — TODO_LIST.md (M19).** | ~~No test files~~ |
+| ~~`internal/git`~~ **Superseded — TODO_LIST.md (M19).**                 | ~~No test files~~ |
+| ~~`internal/utils`~~ **Superseded — TODO_LIST.md (M19).**               | ~~No test files~~ |
 
 ---
 
@@ -124,34 +124,40 @@ The codebase is in good shape. No show-stoppers identified.
 ### Priority 1: Architectural (High Impact)
 
 ~~1. **Consolidate Templates to Single Source**~~ done at `9f4bd71`
-   - Create canonical template in `templates/embedded.go`
-   - Remove duplicates from `jobs.go`
-   - Update all generators to use single source
+
+- Create canonical template in `templates/embedded.go`
+- Remove duplicates from `jobs.go`
+- Update all generators to use single source
 
 ~~2. **Inject Working Directory**~~ **Won't implement — WorkingDir never needed (TypeSpec model).**
-   - Add `WorkingDir string` to `SafeProjectConfig`
-   - Replace `os.Chdir()` with `filepath.Join(workingDir, ...)`
-   - Enables true concurrent testing
+
+- Add `WorkingDir string` to `SafeProjectConfig`
+- Replace `os.Chdir()` with `filepath.Join(workingDir, ...)`
+- Enables true concurrent testing
 
 ~~3. **Dependency Injection**~~ **Won't implement — samber/do never adopted; interface-based DI.**
-   - Replace global `fileSystemRepo` with injected dependency
-   - Use `samber/do/v2` as specified in AGENTS.md
+
+- Replace global `fileSystemRepo` with injected dependency
+- Use `samber/do/v2` as specified in AGENTS.md
 
 ### Priority 2: Code Quality (Medium Impact)
 
 ~~4. **Split Large Files**~~ **Superseded — TODO_LIST.md (split-oversized-files).**
-   - Follow 350-line guideline from AGENTS.md
-   - Split by responsibility, not by type
+
+- Follow 350-line guideline from AGENTS.md
+- Split by responsibility, not by type
 
 ~~5. **Standardize Error Handling**~~ done — domain errors standard
-   - Audit all error returns
-   - Ensure domain errors everywhere (no `fmt.Errorf`)
+
+- Audit all error returns
+- Ensure domain errors everywhere (no `fmt.Errorf`)
 
 ### Priority 3: Testing (Medium Impact)
 
 ~~6. **Add Missing Test Coverage**~~ **Superseded — TODO_LIST.md (M19-M21).**
-   - Priority: `generators`, `jobs`, `git` packages
-   - Target: 80% coverage minimum
+
+- Priority: `generators`, `jobs`, `git` packages
+- Target: 80% coverage minimum
 
 ---
 
@@ -159,48 +165,48 @@ The codebase is in good shape. No show-stoppers identified.
 
 ### Immediate (This Week)
 
-| # | Task                                              | Impact | Effort | Priority Score |
-| - | ------------------------------------------------- | ------ | ------ | -------------- |
-| ~~1~~ done at `9f4bd71` | ~~Consolidate GoReleaser templates to single source~~ | ~~High~~ | ~~Medium~~ | ~~95~~ |
-| ~~2~~ **Won't implement — WorkingDir never needed.** | ~~Add `WorkingDir` to `SafeProjectConfig`~~ | ~~High~~ | ~~Medium~~ | ~~90~~ |
-| ~~3~~ **Superseded — BuildFlow since reworked.** | ~~Fix pre-commit hook timeout (README age check)~~ | ~~Low~~ | ~~Low~~ | ~~85~~ |
-| ~~4~~ done at `8edf0b1` | ~~Add tests for `generators` package~~ | ~~Medium~~ | ~~Medium~~ | ~~80~~ |
-| ~~5~~ **Superseded — TODO_LIST.md (split-oversized-files).** | ~~Split `jobs.go` (838 lines) into focused files~~ | ~~Medium~~ | ~~Medium~~ | ~~75~~ |
+| #                                                            | Task                                                  | Impact     | Effort     | Priority Score |
+| ------------------------------------------------------------ | ----------------------------------------------------- | ---------- | ---------- | -------------- |
+| ~~1~~ done at `9f4bd71`                                      | ~~Consolidate GoReleaser templates to single source~~ | ~~High~~   | ~~Medium~~ | ~~95~~         |
+| ~~2~~ **Won't implement — WorkingDir never needed.**         | ~~Add `WorkingDir` to `SafeProjectConfig`~~           | ~~High~~   | ~~Medium~~ | ~~90~~         |
+| ~~3~~ **Superseded — BuildFlow since reworked.**             | ~~Fix pre-commit hook timeout (README age check)~~    | ~~Low~~    | ~~Low~~    | ~~85~~         |
+| ~~4~~ done at `8edf0b1`                                      | ~~Add tests for `generators` package~~                | ~~Medium~~ | ~~Medium~~ | ~~80~~         |
+| ~~5~~ **Superseded — TODO_LIST.md (split-oversized-files).** | ~~Split `jobs.go` (838 lines) into focused files~~    | ~~Medium~~ | ~~Medium~~ | ~~75~~         |
 
 ### Short Term (Next 2 Weeks)
 
-| #  | Task                                                  | Impact | Effort | Priority Score |
-| -- | ----------------------------------------------------- | ------ | ------ | -------------- |
-| ~~6~~ done — resolved in test rewrites | ~~Replace `os.Chdir()` with working directory parameter~~ | ~~High~~ | ~~High~~ | ~~70~~ |
-| ~~7~~ **Superseded — jobs/ package dissolved; TODO_LIST.md (M20).** | ~~Add tests for `jobs` package~~ | ~~Medium~~ | ~~Medium~~ | ~~68~~ |
-| ~~8~~ **Superseded — TODO_LIST.md (split-oversized-files).** | ~~Split `internal/types/validation.go` (857 lines)~~ | ~~Medium~~ | ~~Medium~~ | ~~65~~ |
-| ~~9~~ **Won't implement — samber/do never adopted.** | ~~Implement dependency injection with `samber/do/v2`~~ | ~~Medium~~ | ~~High~~ | ~~62~~ |
-| ~~10~~ **Superseded — TODO_LIST.md (M19).** | ~~Add tests for `git` package~~ | ~~Medium~~ | ~~Low~~ | ~~60~~ |
+| #                                                                   | Task                                                      | Impact     | Effort     | Priority Score |
+| ------------------------------------------------------------------- | --------------------------------------------------------- | ---------- | ---------- | -------------- |
+| ~~6~~ done — resolved in test rewrites                              | ~~Replace `os.Chdir()` with working directory parameter~~ | ~~High~~   | ~~High~~   | ~~70~~         |
+| ~~7~~ **Superseded — jobs/ package dissolved; TODO_LIST.md (M20).** | ~~Add tests for `jobs` package~~                          | ~~Medium~~ | ~~Medium~~ | ~~68~~         |
+| ~~8~~ **Superseded — TODO_LIST.md (split-oversized-files).**        | ~~Split `internal/types/validation.go` (857 lines)~~      | ~~Medium~~ | ~~Medium~~ | ~~65~~         |
+| ~~9~~ **Won't implement — samber/do never adopted.**                | ~~Implement dependency injection with `samber/do/v2`~~    | ~~Medium~~ | ~~High~~   | ~~62~~         |
+| ~~10~~ **Superseded — TODO_LIST.md (M19).**                         | ~~Add tests for `git` package~~                           | ~~Medium~~ | ~~Low~~    | ~~60~~         |
 
 ### Medium Term (Next Month)
 
-| #  | Task                                                      | Impact | Effort | Priority Score |
-| -- | --------------------------------------------------------- | ------ | ------ | -------------- |
-| ~~11~~ **Superseded — TODO_LIST.md (split-oversized-files).** | ~~Split `internal/domain/validation.go` (659 lines)~~ | ~~Medium~~ | ~~Medium~~ | ~~55~~ |
-| ~~12~~ **Superseded — TODO_LIST.md (split-oversized-files).** | ~~Split `internal/validation/basic.go` (626 lines)~~ | ~~Medium~~ | ~~Medium~~ | ~~52~~ |
-| ~~13~~ **Superseded — TODO_LIST.md (split-oversized-files).** | ~~Split `internal/validation/business_rules.go` (626 lines)~~ | ~~Medium~~ | ~~Medium~~ | ~~50~~ |
-| ~~14~~ **NOT-DO — internal/errors dissolved (dde1081).** | ~~Add tests for `internal/errors` package~~ | ~~Low~~ | ~~Low~~ | ~~48~~ |
-| ~~15~~ **Superseded — TODO_LIST.md (M19).** | ~~Add tests for `internal/utils` package~~ | ~~Low~~ | ~~Low~~ | ~~45~~ |
-| ~~16~~ done — domain errors standard | ~~Standardize error handling across codebase~~ | ~~Medium~~ | ~~Medium~~ | ~~42~~ |
-| ~~17~~ done at `8edf0b1` | ~~Add integration tests for full wizard flow~~ | ~~Medium~~ | ~~High~~ | ~~40~~ |
-| ~~18~~ **Won't implement — decisions live in AGENTS.md/docs instead.** | ~~Document architecture decisions (ADR)~~ | ~~Low~~ | ~~Medium~~ | ~~38~~ |
-| ~~19~~ done — performance_test.go | ~~Add benchmark tests for performance~~ | ~~Low~~ | ~~Medium~~ | ~~35~~ |
-| ~~20~~ **Won't implement — not pursued.** | ~~Implement result type pattern for error handling~~ | ~~Medium~~ | ~~High~~ | ~~32~~ |
+| #                                                                      | Task                                                          | Impact     | Effort     | Priority Score |
+| ---------------------------------------------------------------------- | ------------------------------------------------------------- | ---------- | ---------- | -------------- |
+| ~~11~~ **Superseded — TODO_LIST.md (split-oversized-files).**          | ~~Split `internal/domain/validation.go` (659 lines)~~         | ~~Medium~~ | ~~Medium~~ | ~~55~~         |
+| ~~12~~ **Superseded — TODO_LIST.md (split-oversized-files).**          | ~~Split `internal/validation/basic.go` (626 lines)~~          | ~~Medium~~ | ~~Medium~~ | ~~52~~         |
+| ~~13~~ **Superseded — TODO_LIST.md (split-oversized-files).**          | ~~Split `internal/validation/business_rules.go` (626 lines)~~ | ~~Medium~~ | ~~Medium~~ | ~~50~~         |
+| ~~14~~ **NOT-DO — internal/errors dissolved (dde1081).**               | ~~Add tests for `internal/errors` package~~                   | ~~Low~~    | ~~Low~~    | ~~48~~         |
+| ~~15~~ **Superseded — TODO_LIST.md (M19).**                            | ~~Add tests for `internal/utils` package~~                    | ~~Low~~    | ~~Low~~    | ~~45~~         |
+| ~~16~~ done — domain errors standard                                   | ~~Standardize error handling across codebase~~                | ~~Medium~~ | ~~Medium~~ | ~~42~~         |
+| ~~17~~ done at `8edf0b1`                                               | ~~Add integration tests for full wizard flow~~                | ~~Medium~~ | ~~High~~   | ~~40~~         |
+| ~~18~~ **Won't implement — decisions live in AGENTS.md/docs instead.** | ~~Document architecture decisions (ADR)~~                     | ~~Low~~    | ~~Medium~~ | ~~38~~         |
+| ~~19~~ done — performance_test.go                                      | ~~Add benchmark tests for performance~~                       | ~~Low~~    | ~~Medium~~ | ~~35~~         |
+| ~~20~~ **Won't implement — not pursued.**                              | ~~Implement result type pattern for error handling~~          | ~~Medium~~ | ~~High~~   | ~~32~~         |
 
 ### Long Term (Future)
 
-| #  | Task                                          | Impact | Effort    | Priority Score |
-| -- | --------------------------------------------- | ------ | --------- | -------------- |
-| ~~21~~ **Won't implement — not pursued.** | ~~Consider `samber/lo` for functional utilities~~ | ~~Low~~ | ~~Low~~ | ~~28~~ |
-| ~~22~~ **Won't implement — not pursued.** | ~~Evaluate `go.uber.org/zap` for logging~~ | ~~Low~~ | ~~Medium~~ | ~~25~~ |
-| ~~23~~ **Won't implement — not pursued.** | ~~Add OpenAPI documentation~~ | ~~Low~~ | ~~Medium~~ | ~~22~~ |
-| ~~24~~ **Superseded — ROADMAP.md.** | ~~Create plugin architecture~~ | ~~Low~~ | ~~High~~ | ~~20~~ |
-| ~~25~~ **Won't implement — rejected: non-goal.** | ~~Add web UI for configuration~~ | ~~Low~~ | ~~Very High~~ | ~~15~~ |
+| #                                                | Task                                              | Impact  | Effort        | Priority Score |
+| ------------------------------------------------ | ------------------------------------------------- | ------- | ------------- | -------------- |
+| ~~21~~ **Won't implement — not pursued.**        | ~~Consider `samber/lo` for functional utilities~~ | ~~Low~~ | ~~Low~~       | ~~28~~         |
+| ~~22~~ **Won't implement — not pursued.**        | ~~Evaluate `go.uber.org/zap` for logging~~        | ~~Low~~ | ~~Medium~~    | ~~25~~         |
+| ~~23~~ **Won't implement — not pursued.**        | ~~Add OpenAPI documentation~~                     | ~~Low~~ | ~~Medium~~    | ~~22~~         |
+| ~~24~~ **Superseded — ROADMAP.md.**              | ~~Create plugin architecture~~                    | ~~Low~~ | ~~High~~      | ~~20~~         |
+| ~~25~~ **Won't implement — rejected: non-goal.** | ~~Add web UI for configuration~~                  | ~~Low~~ | ~~Very High~~ | ~~15~~         |
 
 ---
 
@@ -236,15 +242,15 @@ The codebase is in good shape. No show-stoppers identified.
 
 ## Codebase Statistics
 
-| Metric                    | Value   |
-| ------------------------- | ------- |
-| ~~Total Go Files~~ done — point-in-time metrics | ~~79~~ |
-| ~~Test Files~~ done — point-in-time metrics | ~~12~~ |
-| ~~Total Lines of Go Code~~ done — point-in-time metrics | ~~~19,924~~ |
-| ~~Packages with Tests~~ done — point-in-time metrics | ~~4~~ |
-| ~~Packages without Tests~~ done — point-in-time metrics | ~~8~~ |
-| ~~Files Over 350 Lines~~ done — point-in-time metrics | ~~21~~ |
-| ~~Test Coverage (estimated)~~ done — point-in-time metrics | ~~~60%~~ |
+| Metric                                                     | Value       |
+| ---------------------------------------------------------- | ----------- |
+| ~~Total Go Files~~ done — point-in-time metrics            | ~~79~~      |
+| ~~Test Files~~ done — point-in-time metrics                | ~~12~~      |
+| ~~Total Lines of Go Code~~ done — point-in-time metrics    | ~~~19,924~~ |
+| ~~Packages with Tests~~ done — point-in-time metrics       | ~~4~~       |
+| ~~Packages without Tests~~ done — point-in-time metrics    | ~~8~~       |
+| ~~Files Over 350 Lines~~ done — point-in-time metrics      | ~~21~~      |
+| ~~Test Coverage (estimated)~~ done — point-in-time metrics | ~~~60%~~    |
 
 ## Recent Commits
 
@@ -263,15 +269,15 @@ c2be290 docs: mark TUI interface as FULLY_FUNCTIONAL and fix test expectations
 
 ## Dependencies (Key)
 
-| Package                             | Version | Purpose                        |
-| ----------------------------------- | ------- | ------------------------------ |
-| ~~`github.com/spf13/cobra`~~ done — koanf/cobra still current | ~~v1.10.2~~ | ~~CLI framework~~ |
-| ~~`github.com/knadh/koanf/v2`~~ done — koanf/cobra still current | ~~v2.2.1~~ | ~~Configuration (replaced viper)~~ |
-| ~~`github.com/charmbracelet/huh`~~ **Superseded — charm stack since migrated to charm.land v2 (c99a279, 52a5a96).** | ~~v1.0.0~~ | ~~Interactive forms~~ |
-| ~~`github.com/charmbracelet/lipgloss`~~ **Superseded — charm stack since migrated to charm.land v2 (c99a279, 52a5a96).** | ~~v1.1.0~~ | ~~Terminal styling~~ |
-| ~~`github.com/charmbracelet/log`~~ **Superseded — charm stack since migrated to charm.land v2 (c99a279, 52a5a96).** | ~~v1.0.0~~ | ~~Logging~~ |
-| ~~`github.com/stretchr/testify`~~ done — still current | ~~v1.11.1~~ | ~~Testing assertions~~ |
-| ~~`github.com/go-faster/yaml`~~ done — still current | ~~v0.4.6~~ | ~~YAML parsing~~ |
+| Package                                                                                                                  | Version     | Purpose                            |
+| ------------------------------------------------------------------------------------------------------------------------ | ----------- | ---------------------------------- |
+| ~~`github.com/spf13/cobra`~~ done — koanf/cobra still current                                                            | ~~v1.10.2~~ | ~~CLI framework~~                  |
+| ~~`github.com/knadh/koanf/v2`~~ done — koanf/cobra still current                                                         | ~~v2.2.1~~  | ~~Configuration (replaced viper)~~ |
+| ~~`github.com/charmbracelet/huh`~~ **Superseded — charm stack since migrated to charm.land v2 (c99a279, 52a5a96).**      | ~~v1.0.0~~  | ~~Interactive forms~~              |
+| ~~`github.com/charmbracelet/lipgloss`~~ **Superseded — charm stack since migrated to charm.land v2 (c99a279, 52a5a96).** | ~~v1.1.0~~  | ~~Terminal styling~~               |
+| ~~`github.com/charmbracelet/log`~~ **Superseded — charm stack since migrated to charm.land v2 (c99a279, 52a5a96).**      | ~~v1.0.0~~  | ~~Logging~~                        |
+| ~~`github.com/stretchr/testify`~~ done — still current                                                                   | ~~v1.11.1~~ | ~~Testing assertions~~             |
+| ~~`github.com/go-faster/yaml`~~ done — still current                                                                     | ~~v0.4.6~~  | ~~YAML parsing~~                   |
 
 ---
 

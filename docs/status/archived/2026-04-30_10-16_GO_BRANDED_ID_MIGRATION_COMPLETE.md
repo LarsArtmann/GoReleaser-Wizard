@@ -17,28 +17,28 @@ Successfully migrated the `id/` package from `github.com/larsartmann/go-composab
 
 ### a) FULLY DONE ✅
 
-| Task                         | Status | Notes                                               |
-| ---------------------------- | ------ | --------------------------------------------------- |
-| ~~Import path update~~ done at `cc8a753` | ~~✅~~ | ~~Changed to `github.com/larsartmann/go-branded-id`~~ |
-| ~~Comment/documentation update~~ done at `cc8a753` | ~~✅~~ | ~~Updated doc comment in ids.go~~ |
-| ~~go.mod dependency swap~~ done at `cc8a753` | ~~✅~~ | ~~Replaced old dep with new~~ |
-| ~~Replace directive~~ done at `cc8a753` | ~~✅~~ | ~~Points to local `/home/lars/projects/go-branded-id`~~ |
-| ~~go mod tidy~~ done at `cc8a753` | ~~✅~~ | ~~Successfully tidied~~ |
-| ~~Build verification~~ done at `cc8a753` | ~~✅~~ | ~~`go build ./...` passes~~ |
-| ~~Domain tests~~ done at `cc8a753` | ~~✅~~ | ~~`internal/domain` tests pass~~ |
+| Task                                               | Status | Notes                                                   |
+| -------------------------------------------------- | ------ | ------------------------------------------------------- |
+| ~~Import path update~~ done at `cc8a753`           | ~~✅~~ | ~~Changed to `github.com/larsartmann/go-branded-id`~~   |
+| ~~Comment/documentation update~~ done at `cc8a753` | ~~✅~~ | ~~Updated doc comment in ids.go~~                       |
+| ~~go.mod dependency swap~~ done at `cc8a753`       | ~~✅~~ | ~~Replaced old dep with new~~                           |
+| ~~Replace directive~~ done at `cc8a753`            | ~~✅~~ | ~~Points to local `/home/lars/projects/go-branded-id`~~ |
+| ~~go mod tidy~~ done at `cc8a753`                  | ~~✅~~ | ~~Successfully tidied~~                                 |
+| ~~Build verification~~ done at `cc8a753`           | ~~✅~~ | ~~`go build ./...` passes~~                             |
+| ~~Domain tests~~ done at `cc8a753`                 | ~~✅~~ | ~~`internal/domain` tests pass~~                        |
 
 ### b) PARTIALLY DONE 🔄
 
-| Task                       | Status | Notes                                  |
-| -------------------------- | ------ | -------------------------------------- |
+| Task                                                                                                 | Status | Notes                                      |
+| ---------------------------------------------------------------------------------------------------- | ------ | ------------------------------------------ |
 | ~~Pre-existing test failures~~ **Superseded — suite green since 2026-08 (8edf0b1 skip-if-missing).** | ~~🔄~~ | ~~3 test failures unrelated to migration~~ |
 
 ### c) NOT STARTED ⬜
 
-| Task           | Status | Notes                              |
-| -------------- | ------ | ---------------------------------- |
-| ~~Push to remote~~ done — pushed long since; justfile replaced by flake.nix (a6719bc) | ~~⬜~~ | ~~User instructed not to push~~ |
-| ~~Final CI run~~ done — pushed long since; justfile replaced by flake.nix (a6719bc) | ~~⬜~~ | ~~Would need `just ci` before commit~~ |
+| Task                                                                                  | Status | Notes                                  |
+| ------------------------------------------------------------------------------------- | ------ | -------------------------------------- |
+| ~~Push to remote~~ done — pushed long since; justfile replaced by flake.nix (a6719bc) | ~~⬜~~ | ~~User instructed not to push~~        |
+| ~~Final CI run~~ done — pushed long since; justfile replaced by flake.nix (a6719bc)   | ~~⬜~~ | ~~Would need `just ci` before commit~~ |
 
 ### d) TOTALLY FUCKED UP ❌
 
@@ -81,21 +81,21 @@ Successfully migrated the `id/` package from `github.com/larsartmann/go-composab
 
 ## Verification Results
 
-| Check          | Result  | Command                         |
-| -------------- | ------- | ------------------------------- |
-| ~~Build~~ done — still passing 2026-11-07 | ~~✅ PASS~~ | ~~`GOWORK=off go build ./...`~~ |
-| ~~Module Tidy~~ done — still passing 2026-11-07 | ~~✅ PASS~~ | ~~`go mod tidy`~~ |
-| ~~Domain Tests~~ done — still passing 2026-11-07 | ~~✅ PASS~~ | ~~`go test ./internal/domain/...`~~ |
-| ~~Domain Package~~ done — still passing 2026-11-07 | ~~✅ PASS~~ | ~~Tests completed in 0.002s~~ |
+| Check                                              | Result      | Command                             |
+| -------------------------------------------------- | ----------- | ----------------------------------- |
+| ~~Build~~ done — still passing 2026-11-07          | ~~✅ PASS~~ | ~~`GOWORK=off go build ./...`~~     |
+| ~~Module Tidy~~ done — still passing 2026-11-07    | ~~✅ PASS~~ | ~~`go mod tidy`~~                   |
+| ~~Domain Tests~~ done — still passing 2026-11-07   | ~~✅ PASS~~ | ~~`go test ./internal/domain/...`~~ |
+| ~~Domain Package~~ done — still passing 2026-11-07 | ~~✅ PASS~~ | ~~Tests completed in 0.002s~~       |
 
 ---
 
 ## Pre-Existing Test Failures (Unrelated to Migration)
 
-| Test                       | File                 | Issue                            |
-| -------------------------- | -------------------- | -------------------------------- |
-| ~~`TestCheckFileExists`~~ **Superseded — resolved; suite green (8edf0b1).** | ~~validate_test.go:257~~ | ~~File existence check logic issue~~ |
-| ~~`TestValidateDependencies`~~ **Superseded — resolved; suite green (8edf0b1).** | ~~validate_test.go:459~~ | ~~goreleaser binary not found~~ |
+| Test                                                                             | File                     | Issue                                |
+| -------------------------------------------------------------------------------- | ------------------------ | ------------------------------------ |
+| ~~`TestCheckFileExists`~~ **Superseded — resolved; suite green (8edf0b1).**      | ~~validate_test.go:257~~ | ~~File existence check logic issue~~ |
+| ~~`TestValidateDependencies`~~ **Superseded — resolved; suite green (8edf0b1).** | ~~validate_test.go:459~~ | ~~goreleaser binary not found~~      |
 
 **Impact:** These failures existed before migration. Not caused by dependency change.
 
@@ -164,11 +164,11 @@ Successfully migrated the `id/` package from `github.com/larsartmann/go-composab
 
 ## Files Changed Summary
 
-| File                   | Lines Added | Lines Removed | Net Change |
-| ---------------------- | ----------- | ------------- | ---------- |
-| ~~go.mod~~ done — recorded | ~~+2~~ | ~~-2~~ | ~~0~~ |
-| ~~internal/domain/ids.go~~ done — recorded | ~~+2~~ | ~~-2~~ | ~~0~~ |
-| ~~**TOTAL**~~ done — computed total | ~~**4**~~ | ~~**4**~~ | ~~**0**~~ |
+| File                                       | Lines Added | Lines Removed | Net Change |
+| ------------------------------------------ | ----------- | ------------- | ---------- |
+| ~~go.mod~~ done — recorded                 | ~~+2~~      | ~~-2~~        | ~~0~~      |
+| ~~internal/domain/ids.go~~ done — recorded | ~~+2~~      | ~~-2~~        | ~~0~~      |
+| ~~**TOTAL**~~ done — computed total        | ~~**4**~~   | ~~**4**~~     | ~~**0**~~  |
 
 ---
 

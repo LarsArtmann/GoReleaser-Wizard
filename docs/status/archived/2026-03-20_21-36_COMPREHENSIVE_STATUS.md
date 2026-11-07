@@ -8,13 +8,13 @@
 
 ## Executive Summary
 
-| Aspect               | Status                     | Confidence |
-| -------------------- | -------------------------- | ---------- |
-| ~~**Build**~~ done — verified 2026-11-07 | ~~✅ SUCCESS~~ | ~~100%~~ |
-| ~~**Tests**~~ **Superseded — superseded same evening (b767071, a7680ac); disk-era noise.** | ~~❌ FAILING (~85%+ failing)~~ | ~~High~~ |
-| ~~**Production Ready**~~ **Superseded — superseded same evening (b767071, a7680ac); disk-era noise.** | ~~❌ NO~~ | ~~Critical~~ |
-| ~~**Code Quality**~~ **Superseded — superseded same evening (b767071, a7680ac); disk-era noise.** | ~~⚠️ WARNINGS~~ | ~~Medium~~ |
-| ~~**Disk Space**~~ **Superseded — superseded same evening (b767071, a7680ac); disk-era noise.** | ~~⚠️ CRITICAL~~ | ~~High~~ |
+| Aspect                                                                                                | Status                         | Confidence   |
+| ----------------------------------------------------------------------------------------------------- | ------------------------------ | ------------ |
+| ~~**Build**~~ done — verified 2026-11-07                                                              | ~~✅ SUCCESS~~                 | ~~100%~~     |
+| ~~**Tests**~~ **Superseded — superseded same evening (b767071, a7680ac); disk-era noise.**            | ~~❌ FAILING (~85%+ failing)~~ | ~~High~~     |
+| ~~**Production Ready**~~ **Superseded — superseded same evening (b767071, a7680ac); disk-era noise.** | ~~❌ NO~~                      | ~~Critical~~ |
+| ~~**Code Quality**~~ **Superseded — superseded same evening (b767071, a7680ac); disk-era noise.**     | ~~⚠️ WARNINGS~~                 | ~~Medium~~   |
+| ~~**Disk Space**~~ **Superseded — superseded same evening (b767071, a7680ac); disk-era noise.**       | ~~⚠️ CRITICAL~~                 | ~~High~~     |
 
 ---
 
@@ -73,15 +73,15 @@
 
 **Location**: `internal/validation/basic.go`
 
-| Function                     | Status     | Issue                                              |
-| ---------------------------- | ---------- | -------------------------------------------------- |
-| ~~`ValidateProjectName`~~ done — still passing 2026-11-07 | ~~✅ PASSING~~ | ~~-~~ |
-| ~~`ValidateBinaryName`~~ done — still passing 2026-11-07 | ~~✅ PASSING~~ | ~~-~~ |
-| ~~`ValidateMainPath`~~ done — still passing 2026-11-07 | ~~✅ PASSING~~ | ~~-~~ |
-| ~~`ValidateProjectDescription`~~ done — still passing 2026-11-07 | ~~✅ PASSING~~ | ~~-~~ |
-| ~~`ValidateBuildTags`~~ done — still passing 2026-11-07 | ~~✅ PASSING~~ | ~~-~~ |
-| ~~`ValidateDockerRegistry`~~ done at `b767071` | ~~❌ FAILING~~ | ~~Empty string returns nil, test expects error~~ |
-| ~~`SanitizeInput`~~ done at `b767071` | ~~❌ FAILING~~ | ~~Tab/newline handling differs from test expectation~~ |
+| Function                                                         | Status         | Issue                                                  |
+| ---------------------------------------------------------------- | -------------- | ------------------------------------------------------ |
+| ~~`ValidateProjectName`~~ done — still passing 2026-11-07        | ~~✅ PASSING~~ | ~~-~~                                                  |
+| ~~`ValidateBinaryName`~~ done — still passing 2026-11-07         | ~~✅ PASSING~~ | ~~-~~                                                  |
+| ~~`ValidateMainPath`~~ done — still passing 2026-11-07           | ~~✅ PASSING~~ | ~~-~~                                                  |
+| ~~`ValidateProjectDescription`~~ done — still passing 2026-11-07 | ~~✅ PASSING~~ | ~~-~~                                                  |
+| ~~`ValidateBuildTags`~~ done — still passing 2026-11-07          | ~~✅ PASSING~~ | ~~-~~                                                  |
+| ~~`ValidateDockerRegistry`~~ done at `b767071`                   | ~~❌ FAILING~~ | ~~Empty string returns nil, test expects error~~       |
+| ~~`SanitizeInput`~~ done at `b767071`                            | ~~❌ FAILING~~ | ~~Tab/newline handling differs from test expectation~~ |
 
 **Root Cause**:
 
@@ -215,9 +215,9 @@ FAIL: TestConfigurationValidation/missing_binary_name
 ### Code Quality
 
 ~~1. **Reduce cyclomatic complexity** - `ValidateDockerImageName` (12, max 10), `EscapeDockerLabel` (18, max 10)~~ done — validators refactored since
-~~2. **Extract magic numbers** to named constants~~ done at `6e91b43`, ` a698119`
-~~3. **Add package comments** to validation packages~~ done at `9703270`, ` a7680ac`
-~~4. **Fix paralleltest warnings** - add `t.Parallel()` to all test functions~~ done at `9703270`, ` a7680ac`
+~~2. **Extract magic numbers** to named constants~~ done at `6e91b43`, `a698119`
+~~3. **Add package comments** to validation packages~~ done at `9703270`, `a7680ac`
+~~4. **Fix paralleltest warnings** - add `t.Parallel()` to all test functions~~ done at `9703270`, `a7680ac`
 ~~5. **Remove unused functions** - `contains` in build_tag.go~~ done — removed during later refactors
 
 ### Architecture
@@ -273,7 +273,7 @@ FAIL: TestConfigurationValidation/missing_binary_name
 
 ### Priority 4: Code Quality
 
-~~16. **Extract magic numbers** to constants~~ done at `6e91b43`, ` a698119`
+~~16. **Extract magic numbers** to constants~~ done at `6e91b43`, `a698119`
 ~~17. **Reduce cyclomatic complexity** in validators~~ done — refactored since; suite rewritten (a7680ac)
 ~~18. **Add t.Parallel()** to all test functions~~ done — refactored since; suite rewritten (a7680ac)
 ~~19. **Remove unused functions** (contains, etc.)~~ done — refactored since; suite rewritten (a7680ac)
@@ -378,15 +378,15 @@ FAIL    github.com/LarsArtmann/GoReleaser-Wizard/internal/validation
 
 ## Metrics
 
-| Metric                | Value               |
-| --------------------- | ------------------- |
-| ~~Total Go Files~~ done — point-in-time metrics | ~~~70~~ |
-| ~~Test Coverage~~ done — point-in-time metrics | ~~~80% (when passing)~~ |
-| ~~Linter Warnings~~ done — point-in-time metrics | ~~193+~~ |
-| ~~Linter Errors~~ done — point-in-time metrics | ~~1 (disk space)~~ |
-| ~~Cyclomatic Complexity~~ done — point-in-time metrics | ~~2 functions > 10~~ |
-| ~~Magic Numbers~~ done — point-in-time metrics | ~~8 instances~~ |
-| ~~Unused Code~~ done — point-in-time metrics | ~~1 function~~ |
+| Metric                                                 | Value                   |
+| ------------------------------------------------------ | ----------------------- |
+| ~~Total Go Files~~ done — point-in-time metrics        | ~~~70~~                 |
+| ~~Test Coverage~~ done — point-in-time metrics         | ~~~80% (when passing)~~ |
+| ~~Linter Warnings~~ done — point-in-time metrics       | ~~193+~~                |
+| ~~Linter Errors~~ done — point-in-time metrics         | ~~1 (disk space)~~      |
+| ~~Cyclomatic Complexity~~ done — point-in-time metrics | ~~2 functions > 10~~    |
+| ~~Magic Numbers~~ done — point-in-time metrics         | ~~8 instances~~         |
+| ~~Unused Code~~ done — point-in-time metrics           | ~~1 function~~          |
 
 ---
 
@@ -404,8 +404,8 @@ FAIL    github.com/LarsArtmann/GoReleaser-Wizard/internal/validation
 ~~1. ⏸️ **WAIT FOR USER INSTRUCTIONS**~~ done — superseded by same-evening commits
 ~~2. Clarify project type detection behavior~~ done — superseded by same-evening commits
 ~~3. Commit current changes with detailed messages~~ done — superseded by same-evening commits
-~~4. Fix remaining validation tests~~ done at `b767071`, ` 9f4bd71`
-~~5. Wire generators to workflow~~ done at `b767071`, ` 9f4bd71`
+~~4. Fix remaining validation tests~~ done at `b767071`, `9f4bd71`
+~~5. Wire generators to workflow~~ done at `b767071`, `9f4bd71`
 
 ---
 

@@ -136,8 +136,9 @@ Successfully migrated from `gopkg.in/yaml.v3` to `github.com/go-faster/yaml` and
   - **Pre-commit Hooks** (Unknown)
   - May fail due to build errors
   - **File Size Analysis**:
-    | File                                                   | Lines | Category                 |
-    | ------------------------------------------------------ | ----- | ------------------------ |
+    | File | Lines | Category |
+    | ---- | ----- | -------- |
+
 | ~~`internal/types/validation.go`~~ **Superseded — point-in-time audit; splitting superseded — TODO_LIST.md (split-oversized-files).** | ~~857~~ | ~~Validation Types~~ |
 | ~~`cmd/goreleaser-wizard/jobs.go`~~ **Superseded — point-in-time audit; splitting superseded — TODO_LIST.md (split-oversized-files).** | ~~833~~ | ~~Job Orchestration~~ |
 | ~~`internal/domain/validation.go`~~ **Superseded — point-in-time audit; splitting superseded — TODO_LIST.md (split-oversized-files).** | ~~659~~ | ~~Domain Validation~~ |
@@ -179,21 +180,21 @@ Successfully migrated from `gopkg.in/yaml.v3` to `github.com/go-faster/yaml` and
 | ~~`cmd/goreleaser-wizard/validate_workflow.go`~~ **Superseded — point-in-time audit; splitting superseded — TODO_LIST.md (split-oversized-files).** | ~~52~~ | ~~Validation Workflow~~ |
 | ~~`cmd/goreleaser-wizard/generators/homebrew_formula.go`~~ **Superseded — point-in-time audit; splitting superseded — TODO_LIST.md (split-oversized-files).** | ~~47~~ | ~~Homebrew Formula~~ |
 
-  ## Priority Recommendations (Next Steps)
+## Priority Recommendations (Next Steps)
 
-  | Priority | Task | Status | Effort | Impact |
-  | -------- | ----------------------------------------------------------------- | ------- | --------- | --------------------------------- | --------------------- |
-| ~~**1**~~ done at `50c0feb`, ` a7680ac` | ~~Fix koanf env provider API~~ | ~~BLOCKED~~ | ~~15 min~~ | ~~HIGH - Blocks all builds/tests~~ |
-| ~~**2**~~ done at `50c0feb`, ` a7680ac` | ~~Verify build succeeds~~ | ~~PENDING~~ | ~~5 min~~ | ~~HIGH - Confirms migration success~~ |
-| ~~**3**~~ done at `50c0feb`, ` a7680ac` | ~~Run test suite~~ | ~~PENDING~~ | ~~10 min~~ | ~~HIGH - Ensures no regressions~~ |
+| Priority | Task | Status | Effort | Impact |
+| -------- | ----------------------------------------------------------------- | ------- | --------- | --------------------------------- | --------------------- |
+| ~~**1**~~ done at `50c0feb`, `a7680ac` | ~~Fix koanf env provider API~~ | ~~BLOCKED~~ | ~~15 min~~ | ~~HIGH - Blocks all builds/tests~~ |
+| ~~**2**~~ done at `50c0feb`, `a7680ac` | ~~Verify build succeeds~~ | ~~PENDING~~ | ~~5 min~~ | ~~HIGH - Confirms migration success~~ |
+| ~~**3**~~ done at `50c0feb`, `a7680ac` | ~~Run test suite~~ | ~~PENDING~~ | ~~10 min~~ | ~~HIGH - Ensures no regressions~~ |
 | ~~**4**~~ **Superseded — TODO_LIST.md (split-oversized-files).** | ~~Split `internal/types/validation.go` (857 lines)~~ | ~~PENDING~~ | ~~2 hours~~ | ~~HIGH - Largest violation~~ |
 | ~~**5**~~ **Superseded — TODO_LIST.md (split-oversized-files).** | ~~Split `cmd/goreleaser-wizard/jobs.go` (833 lines)~~ | ~~PENDING~~ | ~~2 hours~~ | ~~HIGH - Complex orchestration~~ |
 | ~~**6**~~ **Superseded — TODO_LIST.md (split-oversized-files).** | ~~Split `internal/domain/validation.go` (659 lines)~~ | ~~PENDING~~ | ~~1.5 hours~~ | ~~HIGH - Core domain logic~~ |
 | ~~**7**~~ **Superseded — TODO_LIST.md (split-oversized-files).** | ~~Split `internal/validation/business_rules.go` (626 lines)~~ | ~~PENDING~~ | ~~1.5 hours~~ | ~~MEDIUM - Business validation~~ |
 | ~~**8**~~ **Superseded — TODO_LIST.md (split-oversized-files).** | ~~Split `internal/validation/basic.go` (617 lines)~~ | ~~PENDING~~ | ~~1.5 hours~~ | ~~MEDIUM - Basic validation~~ |
 | ~~**9**~~ **Won't implement — cobra kept; fang never adopted.** | ~~Evaluate Cobra → fang migration~~ | ~~PENDING~~ | ~~2 hours~~ | ~~MEDIUM - Modern CLI framework~~ |
-| ~~**10**~~ done at `50c0feb`, ` ed01089` | ~~Update AGENTS.md viper examples~~ | ~~PENDING~~ | ~~30 min~~ | ~~LOW - Documentation consistency~~ |
-| ~~**11**~~ done at `50c0feb`, ` ed01089` | ~~Update README.md dependencies~~ | ~~PENDING~~ | ~~15 min~~ | ~~LOW - User-facing docs~~ |
+| ~~**10**~~ done at `50c0feb`, `ed01089` | ~~Update AGENTS.md viper examples~~ | ~~PENDING~~ | ~~30 min~~ | ~~LOW - Documentation consistency~~ |
+| ~~**11**~~ done at `50c0feb`, `ed01089` | ~~Update README.md dependencies~~ | ~~PENDING~~ | ~~15 min~~ | ~~LOW - User-facing docs~~ |
 | ~~**12**~~ **Superseded — TODO_LIST.md (M20).** | ~~Add integration tests for config manager~~ | ~~PENDING~~ | ~~1 hour~~ | ~~MEDIUM - Test coverage~~ |
 | ~~**13**~~ done at `a5e790d` | ~~Consolidate duplicate validation logic~~ | ~~PENDING~~ | ~~3 hours~~ | ~~MEDIUM - Code quality~~ |
 | ~~**14**~~ done at `7e85f9e` | ~~Remove unused code in interactive.go~~ | ~~PENDING~~ | ~~30 min~~ | ~~LOW - Code cleanup~~ |
@@ -209,108 +210,110 @@ Successfully migrated from `gopkg.in/yaml.v3` to `github.com/go-faster/yaml` and
 | ~~**24**~~ **Superseded — TODO_LIST.md (split-oversized-files).** | ~~Split `cmd/goreleaser-wizard/jobs/factory.go` (408 lines)~~ | ~~PENDING~~ | ~~1 hour~~ | ~~MEDIUM~~ | ~~Factory pattern~~ |
 | ~~**25**~~ **NOT-DO — superseded by completed migration.** | ~~Create migration checklist document~~ | ~~PENDING~~ | ~~30 min~~ | ~~LOW~~ | ~~Process tracking~~ |
 
-  ## Metrics Summary
+## Metrics Summary
 
-  | Metric                    | Value    | Target  | Status         |
-  | ------------------------- | -------- | ------- | -------------- |
-| ~~Banned libraries replaced~~ **Superseded — superseded same day (build/test green); disk environment-era.** | ~~2/3~~ | ~~3~~ | ~~67% Complete~~ |
-| ~~Files under 350 lines~~ **Superseded — superseded same day (build/test green); disk environment-era.** | ~~~200/222~~ | ~~222~~ | ~~~90% Compliant~~ |
-| ~~Files over 350 lines~~ **Superseded — superseded same day (build/test green); disk environment-era.** | ~~22~~ | ~~0~~ | ~~NEEDS WORK~~ |
-| ~~Build status~~ **Superseded — superseded same day (build/test green); disk environment-era.** | ~~FAILING~~ | ~~PASSING~~ | ~~BLOCKED~~ |
-| ~~Test status~~ **Superseded — superseded same day (build/test green); disk environment-era.** | ~~FAILING~~ | ~~PASSING~~ | ~~BLOCKED~~ |
-| ~~Disk usage~~ **Superseded — superseded same day (build/test green); disk environment-era.** | ~~91%~~ | ~~<85%~~ | ~~CRITICAL~~ |
+| Metric                                                                                                       | Value        | Target      | Status             |
+| ------------------------------------------------------------------------------------------------------------ | ------------ | ----------- | ------------------ |
+| ~~Banned libraries replaced~~ **Superseded — superseded same day (build/test green); disk environment-era.** | ~~2/3~~      | ~~3~~       | ~~67% Complete~~   |
+| ~~Files under 350 lines~~ **Superseded — superseded same day (build/test green); disk environment-era.**     | ~~~200/222~~ | ~~222~~     | ~~~90% Compliant~~ |
+| ~~Files over 350 lines~~ **Superseded — superseded same day (build/test green); disk environment-era.**      | ~~22~~       | ~~0~~       | ~~NEEDS WORK~~     |
+| ~~Build status~~ **Superseded — superseded same day (build/test green); disk environment-era.**              | ~~FAILING~~  | ~~PASSING~~ | ~~BLOCKED~~        |
+| ~~Test status~~ **Superseded — superseded same day (build/test green); disk environment-era.**               | ~~FAILING~~  | ~~PASSING~~ | ~~BLOCKED~~        |
+| ~~Disk usage~~ **Superseded — superseded same day (build/test green); disk environment-era.**                | ~~91%~~      | ~~<85%~~    | ~~CRITICAL~~       |
 
-  ## Open Questions
-~~  1. Should we use koanf v1 or v2 env provider? (v1 uses callback, v2 uses Config struct)~~ done at `50c0feb (env provider v2 in go.mod)`
-~~  2. What is the priority order for file splitting? (By size, by complexity, by domain importance?)~~ **Superseded — TODO_LIST.md (split-oversized-files).**
-~~  3. Should we address architecture violations before or after file splitting?~~ done — architecture green in gates
-~~  4. Is the local `go-composable-business-types` dependency intentional or a mistake?~~ done at `fb51e45`
-~~  5. Should we add integration tests before or after fixing the current blocker?~~ done at `8edf0b1`
+## Open Questions
 
-~~  6. What is the minimum Go version we should support? (Currently requires 1.26.1)~~ done — go.mod on 1.27 (2026-11-07)
-~~  7. Should we create a separate migration branch or continue on master?~~ done — master
-~~  8. How should we handle the 22 oversized files? (All at once, incrementally, or by priority?)~~ **Superseded — TODO_LIST.md (split-oversized-files).**
-~~  9. Should we document the splitting strategy before starting?~~ **NOT-DO — moot: migration completed.**
-~~  10. What is the rollback plan if file splitting breaks functionality?~~ **NOT-DO — moot: migration completed.**
+~~ 1. Should we use koanf v1 or v2 env provider? (v1 uses callback, v2 uses Config struct)~~ done at `50c0feb (env provider v2 in go.mod)`
+~~ 2. What is the priority order for file splitting? (By size, by complexity, by domain importance?)~~ **Superseded — TODO_LIST.md (split-oversized-files).**
+~~ 3. Should we address architecture violations before or after file splitting?~~ done — architecture green in gates
+~~ 4. Is the local `go-composable-business-types` dependency intentional or a mistake?~~ done at `fb51e45`
+~~ 5. Should we add integration tests before or after fixing the current blocker?~~ done at `8edf0b1`
 
-  ## Top #1 Question (Cannot Answer Myself)
+~~ 6. What is the minimum Go version we should support? (Currently requires 1.26.1)~~ done — go.mod on 1.27 (2026-11-07)
+~~ 7. Should we create a separate migration branch or continue on master?~~ done — master
+~~ 8. How should we handle the 22 oversized files? (All at once, incrementally, or by priority?)~~ **Superseded — TODO_LIST.md (split-oversized-files).**
+~~ 9. Should we document the splitting strategy before starting?~~ **NOT-DO — moot: migration completed.**
+~~ 10. What is the rollback plan if file splitting breaks functionality?~~ **NOT-DO — moot: migration completed.**
 
-  **Should we use koanf v1 env provider (with callback API) or upgrade to koanf v2 env provider (with Config struct)?**
-  - v1 API: `env.Provider(prefix, delimiter, callback)`
-  - v2 API: `env.Provider(&env.Config{Prefix: "...", TransformFunc: ...})`
-  - Current go.mod has v1 (`github.com/knadh/koanf/providers/env v1.1.0`)
-  - Current config.go imports v1 path (`github.com/knadh/koanf/providers/env`)
-  - But the callback signature is v1 style, while the implementation attempted v2 style
-  - **Decision needed**: Use v1 API correctly OR upgrade to v2 providers
+## Top #1 Question (Cannot Answer Myself)
 
-  ## Detailed File Changes
+**Should we use koanf v1 env provider (with callback API) or upgrade to koanf v2 env provider (with Config struct)?**
 
-  ### internal/config/config.go (180 lines - NEW)
+- v1 API: `env.Provider(prefix, delimiter, callback)`
+- v2 API: `env.Provider(&env.Config{Prefix: "...", TransformFunc: ...})`
+- Current go.mod has v1 (`github.com/knadh/koanf/providers/env v1.1.0`)
+- Current config.go imports v1 path (`github.com/knadh/koanf/providers/env`)
+- But the callback signature is v1 style, while the implementation attempted v2 style
+- **Decision needed**: Use v1 API correctly OR upgrade to v2 providers
 
-  ````go
-  // Package config provides configuration management using koanf.
-          package config
+## Detailed File Changes
 
-          import (
-              "fmt"
-              "os"
-              "path/filepath"
-              "strings"
-              "sync"
+### internal/config/config.go (180 lines - NEW)
 
-              "github.com/knadh/koanf/parsers/yaml"
-              "github.com/knadh/koanf/providers/confmap"
-              "github.com/knadh/koanf/providers/env"  // v1 import
-              "github.com/knadh/koanf/providers/file"
-              "github.com/knadh/koanf/providers/posflag"
-              "github.com/knadh/koanf/v2"
-              "github.com/spf13/pflag"
-          )
+````go
+// Package config provides configuration management using koanf.
+        package config
 
-          // Config holds application configuration.
-          type Config struct {
-              Debug   bool `koanf:"debug"`
-              NoColor bool `koanf:"no-color"`
-          }
+        import (
+            "fmt"
+            "os"
+            "path/filepath"
+            "strings"
+            "sync"
 
-          // Manager manages configuration loading and access.
-          type Manager struct {
-              k     *koanf.Koanf
-              mu    sync.RWMutex
-              cfg   Config
-              flags *pflag.FlagSet
-          }
+            "github.com/knadh/koanf/parsers/yaml"
+            "github.com/knadh/koanf/providers/confmap"
+            "github.com/knadh/koanf/providers/env"  // v1 import
+            "github.com/knadh/koanf/providers/file"
+            "github.com/knadh/koanf/providers/posflag"
+            "github.com/knadh/koanf/v2"
+            "github.com/spf13/pflag"
+        )
 
-          // NewManager, Load, RegisterFlags, loadFile, Get, IsDebug,
-          // NoColors, Set, Reset, GetRaw, GetManager, SetGlobalManager
-          // ... (full implementation)
-          ```
+        // Config holds application configuration.
+        type Config struct {
+            Debug   bool `koanf:"debug"`
+            NoColor bool `koanf:"no-color"`
+        }
 
-  ### cmd/goreleaser-wizard/main.go (Changes)
-  ```diff
-          - import "github.com/spf13/viper"
-          + import "github.com/LarsArtmann/GoReleaser-Wizard/internal/config"
+        // Manager manages configuration loading and access.
+        type Manager struct {
+            k     *koanf.Koanf
+            mu    sync.RWMutex
+            cfg   Config
+            flags *pflag.FlagSet
+        }
 
-          - viper.GetBool("debug")
-          + config.GetManager().IsDebug()
+        // NewManager, Load, RegisterFlags, loadFile, Get, IsDebug,
+        // NoColors, Set, Reset, GetRaw, GetManager, SetGlobalManager
+        // ... (full implementation)
+        ```
 
-          - viper.BindPFlag(...)
-          + config.GetManager().RegisterFlags(rootCmd.PersistentFlags())
+### cmd/goreleaser-wizard/main.go (Changes)
+```diff
+        - import "github.com/spf13/viper"
+        + import "github.com/LarsArtmann/GoReleaser-Wizard/internal/config"
 
-          - func initConfig() {
-          -     viper.SetConfigFile(cfgFile)
-          -     viper.AddConfigPath(home)
-          -     viper.SetConfigName(".goreleaser-wizard")
-          -     viper.SetConfigType("yaml")
-          -     viper.SetEnvPrefix("GORELEASER_WIZARD")
-          -     viper.AutomaticEnv()
-          -     viper.ReadInConfig()
-          +     config.GetManager().Load(cfgFile)
-          +     // Simplified error handling
-          }
-  ````
+        - viper.GetBool("debug")
+        + config.GetManager().IsDebug()
 
-  ### Test File Changes
+        - viper.BindPFlag(...)
+        + config.GetManager().RegisterFlags(rootCmd.PersistentFlags())
+
+        - func initConfig() {
+        -     viper.SetConfigFile(cfgFile)
+        -     viper.AddConfigPath(home)
+        -     viper.SetConfigName(".goreleaser-wizard")
+        -     viper.SetConfigType("yaml")
+        -     viper.SetEnvPrefix("GORELEASER_WIZARD")
+        -     viper.AutomaticEnv()
+        -     viper.ReadInConfig()
+        +     config.GetManager().Load(cfgFile)
+        +     // Simplified error handling
+        }
+````
+
+### Test File Changes
 
             ```diff
             // init_test.go
@@ -329,24 +332,25 @@ Successfully migrated from `gopkg.in/yaml.v3` to `github.com/go-faster/yaml` and
             + config.GetManager().Set("debug", false)
             ```
 
-  ## Commit Plan
+## Commit Plan
 
-~~      1. **Fix env provider API** (Priority 1)~~ done at `50c0feb`, ` a7680ac`
-         - Update internal/config/config.go to use correct v1 API
-         - Run `go build ./...` to verify
-~~         2. **Verify and commit** (Priority 2)~~ done at `50c0feb`, ` a7680ac`
-         - Run `go test ./...` to ensure tests pass
-         - Commit with message: "refactor(config): fix koanf env provider API"
-~~         3. **Split oversized files** (Priority 3)~~ **Superseded — TODO_LIST.md (split-oversized-files).**
-         - Start with largest file: internal/types/validation.go (857 lines)
-         - Create splitting plan document
-         - Execute splits incrementally
-         - Run tests after each split
-~~         4. **Update documentation** (Priority 4)~~ done at `50c0feb`
-         - Remove viper references from AGENTS.md
-         - Update README.md dependencies section
-         - Add migration notes to changelog
-~~      5. **Final verification** (Priority 5)~~ done — gates green (2026-11-07)
-         - Run full CI pipeline locally
-         - Verify all changes work correctly
-         - Create PR or merge to master
+~~ 1. **Fix env provider API** (Priority 1)~~ done at `50c0feb`, `a7680ac`
+
+- Update internal/config/config.go to use correct v1 API
+- Run `go build ./...` to verify
+  ~~ 2. **Verify and commit** (Priority 2)~~ done at `50c0feb`, `a7680ac`
+- Run `go test ./...` to ensure tests pass
+- Commit with message: "refactor(config): fix koanf env provider API"
+  ~~ 3. **Split oversized files** (Priority 3)~~ **Superseded — TODO_LIST.md (split-oversized-files).**
+- Start with largest file: internal/types/validation.go (857 lines)
+- Create splitting plan document
+- Execute splits incrementally
+- Run tests after each split
+  ~~ 4. **Update documentation** (Priority 4)~~ done at `50c0feb`
+- Remove viper references from AGENTS.md
+- Update README.md dependencies section
+- Add migration notes to changelog
+  ~~ 5. **Final verification** (Priority 5)~~ done — gates green (2026-11-07)
+- Run full CI pipeline locally
+- Verify all changes work correctly
+- Create PR or merge to master

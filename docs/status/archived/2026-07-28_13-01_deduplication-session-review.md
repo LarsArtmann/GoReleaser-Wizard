@@ -20,48 +20,48 @@ clones are structural Cobra boilerplate with unique values — accepted and docu
 
 ## A) FULLY DONE
 
-| # | Item                                                    | Verification                      |
-| - | ------------------------------------------------------- | --------------------------------- |
-| ~~1~~ done at `22d656f` | ~~`art-dupl -t 3` report run and analyzed~~ | ~~HTML + text output reviewed~~ |
-| ~~2~~ done at `22d656f` | ~~Root cause identified (11× error-discarding flag reads)~~ | ~~grep confirmed all sites~~ |
-| ~~3~~ done at `22d656f` | ~~`flags.go` created with `getBoolFlag` / `getStringFlag`~~ | ~~Compiles, 11 call sites updated~~ |
-| ~~4~~ done at `22d656f` | ~~`generate.go` — 6 flag reads replaced~~ | ~~`go test` passes~~ |
-| ~~5~~ done at `22d656f` | ~~`validate.go` — 3 flag reads replaced~~ | ~~`go test` passes~~ |
-| ~~6~~ done at `22d656f` | ~~`init.go` — 2 flag reads replaced~~ | ~~`go test` passes~~ |
-| ~~7~~ done at `22d656f` | ~~Remaining clones evaluated and accepted~~ | ~~`dedup-acceptance.md` written~~ |
-| ~~8~~ done at `22d656f` | ~~Full test suite passes~~ | ~~`go test ./...` — all packages OK~~ |
-| ~~9~~ done at `22d656f` | ~~Changes auto-committed by git daemon~~ | ~~`22d656f` on `master`~~ |
+| #                       | Item                                                        | Verification                          |
+| ----------------------- | ----------------------------------------------------------- | ------------------------------------- |
+| ~~1~~ done at `22d656f` | ~~`art-dupl -t 3` report run and analyzed~~                 | ~~HTML + text output reviewed~~       |
+| ~~2~~ done at `22d656f` | ~~Root cause identified (11× error-discarding flag reads)~~ | ~~grep confirmed all sites~~          |
+| ~~3~~ done at `22d656f` | ~~`flags.go` created with `getBoolFlag` / `getStringFlag`~~ | ~~Compiles, 11 call sites updated~~   |
+| ~~4~~ done at `22d656f` | ~~`generate.go` — 6 flag reads replaced~~                   | ~~`go test` passes~~                  |
+| ~~5~~ done at `22d656f` | ~~`validate.go` — 3 flag reads replaced~~                   | ~~`go test` passes~~                  |
+| ~~6~~ done at `22d656f` | ~~`init.go` — 2 flag reads replaced~~                       | ~~`go test` passes~~                  |
+| ~~7~~ done at `22d656f` | ~~Remaining clones evaluated and accepted~~                 | ~~`dedup-acceptance.md` written~~     |
+| ~~8~~ done at `22d656f` | ~~Full test suite passes~~                                  | ~~`go test ./...` — all packages OK~~ |
+| ~~9~~ done at `22d656f` | ~~Changes auto-committed by git daemon~~                    | ~~`22d656f` on `master`~~             |
 
 ---
 
 ## B) PARTIALLY DONE
 
-| # | Item                    | What's done                       | What's missing                                                                          |
-| - | ----------------------- | --------------------------------- | --------------------------------------------------------------------------------------- |
-| ~~1~~ done at `9703270` | ~~Duplication elimination~~ | ~~All harmful duplication extracted~~ | ~~Did not run art-dupl a 3rd time post-acceptance to confirm report is stable~~ |
-| ~~2~~ done at `9703270` | ~~Test verification~~ | ~~`go test ./...` passes~~ | ~~Did NOT run `golangci-lint` or `go-arch-lint` — both are project-standard quality gates~~ |
+| #                       | Item                        | What's done                           | What's missing                                                                              |
+| ----------------------- | --------------------------- | ------------------------------------- | ------------------------------------------------------------------------------------------- |
+| ~~1~~ done at `9703270` | ~~Duplication elimination~~ | ~~All harmful duplication extracted~~ | ~~Did not run art-dupl a 3rd time post-acceptance to confirm report is stable~~             |
+| ~~2~~ done at `9703270` | ~~Test verification~~       | ~~`go test ./...` passes~~            | ~~Did NOT run `golangci-lint` or `go-arch-lint` — both are project-standard quality gates~~ |
 
 ---
 
 ## C) NOT STARTED
 
-| # | Item                                                     | Why it matters                                                                                                                                                                    |
-| - | -------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| ~~1~~ **Superseded — documented 2026-08; obsolete on Go 1.27 (2026-10-28).** | ~~**Document `GOEXPERIMENT=jsonv2` requirement**~~ | ~~Build FAILS without it. `internal/domain/config_core.go` imports `encoding/json/v2`. Not in AGENTS.md, not in flake.nix. Every fresh session will hit this wall.~~ |
-| ~~2~~ done at `fa648db`, ` 3cb91da` | ~~**Remove 3 stale `.orig` files**~~ | ~~`main.go.orig`, `validate_main.go.orig`, `internal/domain/errors.go.orig` — commit `fa648db` claimed to remove these but they're still here.~~ |
-| ~~3~~ done at `3cb91da` | ~~**Fix unused `createTempFile` in `validate_test.go:59`**~~ | ~~gopls flagged it as unused during this session. Ignored.~~ |
-| ~~4~~ **Superseded — TODO_LIST.md (M26).** | ~~**Fix `init.go` header inconsistency**~~ | ~~`generate.go` and `validate.go` use `printCommandHeader()`; `init.go` does `fmt.Println(titleStyle.Render(...)); fmt.Println()` inline — same logic, not using the shared helper.~~ |
-| ~~5~~ **Superseded — /mnt/buildcache diagnosis; AGENTS.md gotcha 12.** | ~~**Investigate Go cache corruption**~~ | ~~`rm -rf ~/.cache/go-build` failed with "directory not empty" on multiple subdirs. Worked around with `GOCACHE=/tmp/...` but root cause unknown.~~ |
+| #                                                                            | Item                                                         | Why it matters                                                                                                                                                                        |
+| ---------------------------------------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ~~1~~ **Superseded — documented 2026-08; obsolete on Go 1.27 (2026-10-28).** | ~~**Document `GOEXPERIMENT=jsonv2` requirement**~~           | ~~Build FAILS without it. `internal/domain/config_core.go` imports `encoding/json/v2`. Not in AGENTS.md, not in flake.nix. Every fresh session will hit this wall.~~                  |
+| ~~2~~ done at `fa648db`, `3cb91da`                                           | ~~**Remove 3 stale `.orig` files**~~                         | ~~`main.go.orig`, `validate_main.go.orig`, `internal/domain/errors.go.orig` — commit `fa648db` claimed to remove these but they're still here.~~                                      |
+| ~~3~~ done at `3cb91da`                                                      | ~~**Fix unused `createTempFile` in `validate_test.go:59`**~~ | ~~gopls flagged it as unused during this session. Ignored.~~                                                                                                                          |
+| ~~4~~ **Superseded — TODO_LIST.md (M26).**                                   | ~~**Fix `init.go` header inconsistency**~~                   | ~~`generate.go` and `validate.go` use `printCommandHeader()`; `init.go` does `fmt.Println(titleStyle.Render(...)); fmt.Println()` inline — same logic, not using the shared helper.~~ |
+| ~~5~~ **Superseded — /mnt/buildcache diagnosis; AGENTS.md gotcha 12.**       | ~~**Investigate Go cache corruption**~~                      | ~~`rm -rf ~/.cache/go-build` failed with "directory not empty" on multiple subdirs. Worked around with `GOCACHE=/tmp/...` but root cause unknown.~~                                   |
 
 ---
 
 ## D) TOTALLY FUCKED UP
 
-| # | What                                                                   | Impact                                                                                                                                                                                                  | Severity |
-| - | ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| ~~1~~ done — honesty log; all resolved by later sessions | ~~**Skipped project-standard linting**~~ | ~~Project has golangci-lint + go-arch-lint as quality gates. I ran neither. Only `go test`. This violates the project's own AGENTS.md testing mandate.~~ | ~~HIGH~~ |
-| ~~2~~ done — honesty log; all resolved by later sessions | ~~**Saw `.orig` files and walked past them**~~ | ~~Ran `ls` early in the session, saw `main.go.orig` and `validate_main.go.orig`. A previous commit explicitly tried to remove these. I did nothing.~~ | ~~MEDIUM~~ |
-| ~~3~~ done — honesty log; all resolved by later sessions | ~~**Discovered a critical build-breaking gotcha and didn't document it**~~ | ~~The `GOEXPERIMENT=jsonv2` requirement is a trap for every future session. I spent 4 tool calls working around it, then dropped it. The AGENTS.md "Important Gotchas" section is begging for this entry.~~ | ~~HIGH~~ |
+| #                                                        | What                                                                       | Impact                                                                                                                                                                                                      | Severity   |
+| -------------------------------------------------------- | -------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- |
+| ~~1~~ done — honesty log; all resolved by later sessions | ~~**Skipped project-standard linting**~~                                   | ~~Project has golangci-lint + go-arch-lint as quality gates. I ran neither. Only `go test`. This violates the project's own AGENTS.md testing mandate.~~                                                    | ~~HIGH~~   |
+| ~~2~~ done — honesty log; all resolved by later sessions | ~~**Saw `.orig` files and walked past them**~~                             | ~~Ran `ls` early in the session, saw `main.go.orig` and `validate_main.go.orig`. A previous commit explicitly tried to remove these. I did nothing.~~                                                       | ~~MEDIUM~~ |
+| ~~3~~ done — honesty log; all resolved by later sessions | ~~**Discovered a critical build-breaking gotcha and didn't document it**~~ | ~~The `GOEXPERIMENT=jsonv2` requirement is a trap for every future session. I spent 4 tool calls working around it, then dropped it. The AGENTS.md "Important Gotchas" section is begging for this entry.~~ | ~~HIGH~~   |
 
 ---
 
@@ -70,29 +70,29 @@ clones are structural Cobra boilerplate with unique values — accepted and docu
 ### Process Improvements
 
 ~~1. **Always run the project's full quality gate, not just `go test`.** This project has~~ done — gates green in later sessions
-   golangci-lint and go-arch-lint. The AGENTS.md says "minimum 80% coverage enforced by
-   `just coverage`" and lists architecture enforcement as a first-class concern. Skipping
-   these is not acceptable.
+golangci-lint and go-arch-lint. The AGENTS.md says "minimum 80% coverage enforced by
+`just coverage`" and lists architecture enforcement as a first-class concern. Skipping
+these is not acceptable.
 
 ~~2. **Fix issues on sight.** The AGENTS.md philosophy says "fix immediately when detected."~~ done at `3cb91da`
-   I detected `.orig` files, an unused function, and a build-breaking missing flag — and
-   fixed none of them.
+I detected `.orig` files, an unused function, and a build-breaking missing flag — and
+fixed none of them.
 
 ~~3. **Document gotchas at discovery time.** The `GOEXPERIMENT=jsonv2` requirement was~~ **Superseded — documented 2026-08; gotcha 11 records jsonv2 obsolete on Go 1.27.**
-   discovered through a painful 4-call debugging sequence. The AGENTS.md memory protocol
-   says update immediately. I didn't.
+discovered through a painful 4-call debugging sequence. The AGENTS.md memory protocol
+says update immediately. I didn't.
 
 ### Code Improvements
 
 ~~4. **`init.go` should use `printCommandHeader()`** for consistency with the other two~~ **Superseded — TODO_LIST.md (M26).**
-   command files. It's a one-line fix that eliminates an inconsistency.
+command files. It's a one-line fix that eliminates an inconsistency.
 
 ~~5. **The `flags.go` helpers discard errors silently.** This is intentional (flags are~~ **Superseded — TODO_LIST.md (M17).**
-   registered at init time, so errors are programming bugs), but a linter may flag the
-   `_` assignment. Consider documenting why or using a `//nolint` directive if needed.
+registered at init time, so errors are programming bugs), but a linter may flag the
+`_` assignment. Consider documenting why or using a `//nolint` directive if needed.
 
 ~~6. **`dedup-acceptance.md` is at repo root.** Consider moving to `docs/` to keep the root~~ **Won't implement — kept at repo root deliberately.**
-   clean, or folding the rationale into a code comment near the accepted pattern.
+clean, or folding the rationale into a code comment near the accepted pattern.
 
 ---
 
@@ -168,15 +168,15 @@ clones are structural Cobra boilerplate with unique values — accepted and docu
 ## G) Questions I Cannot Answer Myself
 
 ~~1. **Is `encoding/json/v2` intentional?** `internal/domain/config_core.go` imports it, and the~~ done — intentional; default on Go 1.27 (AGENTS.md gotcha 11)
-   build requires `GOEXPERIMENT=jsonv2`. This could be a deliberate choice to preview Go's
-   upcoming JSON v2, or it could be an accidental import that should be `encoding/json`.
-   I can't tell which without your intent — and it determines whether I should document the
-   workaround or fix the import.
+build requires `GOEXPERIMENT=jsonv2`. This could be a deliberate choice to preview Go's
+upcoming JSON v2, or it could be an accidental import that should be `encoding/json`.
+I can't tell which without your intent — and it determines whether I should document the
+workaround or fix the import.
 
 ~~2. **Should `dedup-acceptance.md` live at repo root or in `docs/`?** The skill says to create~~ **Won't implement — kept at repo root.**
-   it, but doesn't specify location. Repo root keeps it visible; `docs/` keeps the root clean.
-   I need your preference for the project convention.
+it, but doesn't specify location. Repo root keeps it visible; `docs/` keeps the root clean.
+I need your preference for the project convention.
 
 ~~3. **The `.orig` files — were these intentionally re-added after commit `fa648db` removed~~ **Superseded — moot: removed for good in 3cb91da.**
-   them, or is this a regression?** I don't want to delete files that might be in-progress
-   work, even though they look like stale backups.
+them, or is this a regression?** I don't want to delete files that might be in-progress
+work, even though they look like stale backups.

@@ -177,12 +177,10 @@ func TestForgejoWorkflowsPassActionLint(t *testing.T) {
 	AssertFileExists(t, ciPath, "forgejo provider must generate the CI workflow")
 	AssertFileExists(t, releasePath, "forgejo provider must generate the release workflow")
 
-	actionlintConfigPath := filepath.Join(tmpDir, "actionlint.yaml")
-
-	actionlintConfig := "self-hosted-runner:\n  labels:\n    - native\n"
-	if err := os.WriteFile(actionlintConfigPath, []byte(actionlintConfig), 0o644); err != nil {
-		t.Fatal(err)
-	}
+	// The generated actionlint config declares the self-hosted runner label,
+	// so the workflows lint out of the box (no hand-written config needed).
+	actionlintConfigPath := filepath.Join(tmpDir, forgejoActionlintConfigPath)
+	AssertFileExists(t, actionlintConfigPath, "forgejo provider must generate the actionlint config")
 
 	for _, path := range []string{ciPath, releasePath} {
 		cmd := exec.Command(actionlintPath, "-config-file", actionlintConfigPath, path)

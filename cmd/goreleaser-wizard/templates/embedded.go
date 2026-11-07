@@ -256,6 +256,15 @@ jobs:
           forgejo-release-shadow
 `
 
+// ForgejoActionlintTemplate is the actionlint config shipped next to the
+// generated Forgejo workflows: it declares the self-hosted runner label so
+// `actionlint` accepts runs-on: <label> out of the box, no hand-written
+// config needed (retires the process-substitution workaround).
+const ForgejoActionlintTemplate = `self-hosted-runner:
+  labels:
+    - [[.RunnerLabel]]
+`
+
 // DockerfileTemplate renders a Dockerfile for use with dockers_v2.
 // GoReleaser copies the prebuilt binaries of each target platform into the
 // build context under $TARGETPLATFORM, so the Dockerfile must COPY them

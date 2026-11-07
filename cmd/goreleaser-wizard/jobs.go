@@ -540,7 +540,7 @@ func generationTargets(config *domain.SafeProjectConfig, includeActions bool) []
 	}
 
 	if includeActions && config.ShouldGenerateForgejoWorkflows() {
-		targets = append(targets, forgejoCIWorkflowPath, forgejoReleaseWorkflowPath)
+		targets = append(targets, forgejoCIWorkflowPath, forgejoReleaseWorkflowPath, forgejoActionlintConfigPath)
 	}
 
 	if config.DockerSupport.IsEnabled() {

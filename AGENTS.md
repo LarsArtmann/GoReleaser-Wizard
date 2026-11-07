@@ -82,8 +82,7 @@ The E2E test `TestGeneratedConfigPassesGoReleaserCheck` automates this; skips gr
 - Pins live in `types/template_data.go`: BuildFlow flake rev + nixpkgs goreleaser v2.17.1 — bump deliberately, never float
 - Goldens: `forgejo-workflows.yml`, `goreleaser-forgejo.yaml`, `goreleaser-dual.yaml` (dual = both workflow sets, goreleaser still targets Forgejo)
 
-**17. actionlint + self-hosted runner labels** — generated workflows use `runs-on: native`; actionlint rejects it without a config:
-`actionlint -config-file <(printf 'self-hosted-runner:\n  labels:\n    - native\n') ...` (the E2E test does exactly this)
+**17. actionlint + self-hosted runner labels** — generated workflows use `runs-on: native`; the wizard now also generates `.forgejo/actionlint.yaml` declaring the label (2026-11-07, `ForgejoActionlintTemplate`), so `actionlint -config-file .forgejo/actionlint.yaml ...` works out of the box (the E2E test uses exactly that; the old `<(...)` process-substitution hack is retired)
 
 **18. CLI defaults are applied twice (quirk, not a bug to chase)** — `runGenerate` applies `ApplyDefaults()` after flag overrides; `ConfigGenerationJob` re-applies harmlessly. The docker dependency check still consults pre-override DockerSupport on the CLI path — pass a `docker` shim on hosts without docker when smoke-testing.
 

@@ -1,13 +1,16 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"flag"
 	"os"
 	"path/filepath"
 	"testing"
+	"text/template"
 
 	"github.com/LarsArtmann/GoReleaser-Wizard/cmd/goreleaser-wizard/generators"
+	"github.com/LarsArtmann/GoReleaser-Wizard/cmd/goreleaser-wizard/templates"
 	"github.com/LarsArtmann/GoReleaser-Wizard/cmd/goreleaser-wizard/types"
 	"github.com/LarsArtmann/GoReleaser-Wizard/internal/domain"
 )
@@ -183,6 +186,29 @@ func TestGoldenForgejoWorkflows(t *testing.T) {
 	}
 
 	assertGolden(t, "forgejo-workflows.yml", output)
+}
+
+// TestGoldenForgejoActionlint pins the generated actionlint config: the
+// self-hosted runner label must be declared exactly once, from the same
+// typed constant the workflows use.
+func TestGoldenForgejoActionlint(t *testing.T) {
+	config := goldenConfig(t, domain.DockerSupportNone, domain.SigningLevelNone, domain.ProjectTypeCLI)
+	config.CIProvider = domain.CIProviderForgejo
+
+	data := types.NewForgejoWorkflowsTemplateData(config)
+
+	tmpl, err := template.New("actionlint").Delims("[[", "]]").Parse(templates.ForgejoActionlintTemplate)
+	if err != nil {
+		t.Fatalf("template parse failed: %v", err)
+	}
+
+	var output bytes.Buffer
+
+	if err := tmpl.Execute(&output, data); err != nil {
+		t.Fatalf("template execute failed: %v", err)
+	}
+
+	assertGolden(t, "forgejo-actionlint.yaml", output.String())
 }
 
 // TestGoldenGoReleaserForgejo pins the forgejo-provider GoReleaser config:

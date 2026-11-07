@@ -40,7 +40,8 @@ func TestForgejoPinsAreExactValues(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.got != tt.want {
-				t.Errorf("pin %s = %q, want %q (bumps are deliberate: update this test, the templates, and the goldens together)", tt.name, tt.got, tt.want)
+				t.Errorf("pin %s = %q, want %q (bumps are deliberate; update test, templates, goldens)",
+					tt.name, tt.got, tt.want)
 			}
 		})
 	}
@@ -78,12 +79,18 @@ func TestForgejoPinsAreWellFormed(t *testing.T) {
 
 			ref := strings.TrimPrefix(tt.pin, tt.wantScheme)
 			rev := ref[strings.LastIndex(ref, "/")+1:]
+
 			if attr := strings.Index(rev, "#"); attr != -1 {
 				rev = rev[:attr]
 			}
 
 			if len(rev) != tt.revLength {
-				t.Errorf("pin revision %q is %d chars, want full %d-char git revision (never a branch or short hash)", rev, len(rev), tt.revLength)
+				t.Errorf(
+					"pin revision %q is %d chars, want full %d-char git revision (never a branch or short hash)",
+					rev,
+					len(rev),
+					tt.revLength,
+				)
 			}
 		})
 	}

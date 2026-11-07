@@ -75,9 +75,11 @@ func (osRepo) GetFileInfo(_ context.Context, path string) (os.FileInfo, error) {
 }
 
 func (osRepo) CheckPermissions(_ context.Context, path string) (bool, error) {
-	file, err := os.Open(path)
-	if err != nil {
-		return false, nil
+	// Best-effort probe: an unreadable path reports no permission rather
+	// than the open error, matching the real repo's boolean contract.
+	file, openErr := os.Open(path)
+	if openErr != nil {
+		return false, nil //nolint:nilerr // boolean contract, error already inspected
 	}
 
 	file.Close()
@@ -105,7 +107,7 @@ func (osRepo) TempDir(dir, pattern string) (string, error) {
 	return os.MkdirTemp(dir, pattern)
 }
 
-// compile-time interface checks
+// Compile-time interface checks.
 var (
 	_ FileSystemRepository = osRepo{}
 	_ Logger               = stubLogger{}
@@ -125,6 +127,7 @@ func TestValidationUseCaseValidConfiguration(t *testing.T) {
 	}
 
 	vu := NewValidationUseCase(stubLogger{}, osRepo{})
+
 	result, err := vu.ValidateConfiguration(context.Background(), validTestConfig())
 	if err != nil {
 		t.Fatalf("ValidateConfiguration() = %v", err)
@@ -182,21 +185,23 @@ func TestAddValidationErrorFiltersNonDomainErrors(t *testing.T) {
 	result := &ValidationResult{IsValid: true, Errors: []*DomainError{}}
 
 	addValidationError(result, errors.New("plain error"))
+
 	if result.IsValid {
 		t.Error("a plain error must turn the result invalid")
 	}
 
-	if len(result.Errors) != 2 || result.Errors[0] == nil || result.Errors[1] == nil {
-		t.Errorf("both errors must be recorded (count=%d), none silently dropped", len(result.Errors))
+	if len(result.Errors) != 1 || result.Errors[0] == nil {
+		t.Errorf("plain error must be recorded (count=%d), not silently dropped", len(result.Errors))
 	}
 
 	addValidationError(result, NewValidationError(ErrInvalidConfig, "typed", "detail"))
+
 	if result.IsValid {
 		t.Error("DomainError must flip IsValid to false")
 	}
 
-	if len(result.Errors) != 1 {
-		t.Errorf("errors = %d, want 1", len(result.Errors))
+	if len(result.Errors) != 2 {
+		t.Errorf("errors after both additions = %d, want 2", len(result.Errors))
 	}
 }
 

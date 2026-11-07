@@ -63,11 +63,13 @@ func (m *Manager) Load(cfgFile string) error {
 
 	// 2. Load config file if specified or found
 	if cfgFile != "" {
-		return m.loadFile(cfgFile)
+		if err := m.loadFile(cfgFile); err != nil {
+			return err
+		}
+	} else {
+		// Try to find config in home directory
+		m.tryLoadHomeConfig()
 	}
-
-	// Try to find config in home directory
-	m.tryLoadHomeConfig()
 
 	// 3. Load environment variables (higher priority)
 	err = m.k.Load(env.Provider(".", env.Opt{
@@ -169,7 +171,11 @@ func (m *Manager) Set(key string, value any) error {
 		return fmt.Errorf("failed to load configuration value (key=%q): %w", key, err)
 	}
 
-	return fmt.Errorf("failed to unmarshal configuration: %w", m.k.Unmarshal("", &m.cfg))
+	if err := m.k.Unmarshal("", &m.cfg); err != nil {
+		return fmt.Errorf("failed to unmarshal configuration: %w", err)
+	}
+
+	return nil
 }
 
 // Reset clears all configuration (mainly for tests).

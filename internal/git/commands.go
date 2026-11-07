@@ -204,7 +204,10 @@ type RepositoryInfo struct {
 }
 
 // ParseGitHubURL parses a GitHub URL and extracts owner and repo.
-// Supports formats: git@github.com:owner/repo.git or https://github.com/owner/repo.git
+// Supports formats: git@github.com:owner/repo.git, https://github.com/owner/repo.git,
+// and ssh://git@github.com:port/owner/repo.git (custom-port hosts must not
+// leak the port into the owner). Anything unparseable falls back to the
+// documented "owner"/"repo" placeholders.
 func ParseGitHubURL(url string) (owner, repo string) {
 	if strings.Contains(url, "github.com") {
 		parts := strings.Split(url, "github.com")
@@ -213,14 +216,36 @@ func ParseGitHubURL(url string) (owner, repo string) {
 			repoPath = strings.TrimPrefix(repoPath, "/")
 			repoPath = strings.TrimSuffix(repoPath, ".git")
 
+			// ssh://git@github.com:22/owner/repo leaves "22/owner/repo"
+			// after the colon/slash trims; drop the port segment so it is
+			// never mistaken for the owner.
+			if slash := strings.Index(repoPath, "/"); slash != -1 && isAllDigits(repoPath[:slash]) {
+				repoPath = repoPath[slash+1:]
+			}
+
 			pathParts := strings.Split(repoPath, "/")
-			if len(pathParts) > 1 {
+			if len(pathParts) > 1 && pathParts[0] != "" && pathParts[1] != "" {
 				return pathParts[0], pathParts[1]
 			}
 		}
 	}
 
 	return "owner", "repo"
+}
+
+// isAllDigits reports whether s consists solely of ASCII digits (non-empty).
+func isAllDigits(s string) bool {
+	if s == "" {
+		return false
+	}
+
+	for _, r := range s {
+		if r < '0' || r > '9' {
+			return false
+		}
+	}
+
+	return true
 }
 
 // GetVersionInfo gets version information from git.

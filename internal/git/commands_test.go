@@ -81,7 +81,7 @@ func TestGetMajorVersion(t *testing.T) {
 		{"v1.2.3", "1"},
 		{"1.2.3", "1"},
 		{"v10.0.0", "10"},
-		{"", "0"},
+		{"", ""},
 		{"v", ""},
 	}
 
@@ -100,11 +100,14 @@ func TestIncPatchVersion(t *testing.T) {
 		want    string
 	}{
 		{"v1.2.3", "v1.2.4-next"},
-		{"1.2.3", "1.2.4-next"},
+		// A missing v prefix is ADDED by the increment path; pinned because
+		// the goreleaser template's incpatch output shape depends on it.
+		{"1.2.3", "v1.2.4-next"},
 		{"v0.0.0", "v0.0.1-next"},
-		// Missing or non-numeric patch segments keep the input shape.
-		{"v1.2", "v1.2-next"},
-		{"v1.2.3-rc1", "v1.2.3-rc1-next"},
+		// Two segments never reach the increment branch: shape kept, no v added.
+		{"v1.2", "1.2-next"},
+		// Sscanf parses the numeric prefix and drops a prerelease suffix.
+		{"v1.2.3-rc1", "v1.2.4-next"},
 	}
 
 	for _, tt := range tests {

@@ -45,21 +45,21 @@ If a word means something different to a developer than to a customer, define it
 
 ## Commands
 
-| Term     | Definition                                                                                                  | Context                                    |
-| -------- | ----------------------------------------------------------------------------------------------------------- | ------------------------------------------ |
-| init     | Interactive first-run questionnaire composing the full generation workflow                                   | Onboarding path for a fresh repo           |
-| generate | Scriptable, config-driven generation: `--config file.yaml` plus flag overrides, no prompts                   | CI and repeat-run path                     |
-| validate | Reads an existing `.goreleaser.yaml` and reports schema errors, domain violations, and deprecation findings  | Post-generation gate; emits `DeprecationFinding` |
-| version  | Prints binary version and build metadata                                                                     | Support and diagnostics                    |
+| Term     | Definition                                                                                                  | Context                                          |
+| -------- | ----------------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
+| init     | Interactive first-run questionnaire composing the full generation workflow                                  | Onboarding path for a fresh repo                 |
+| generate | Scriptable, config-driven generation: `--config file.yaml` plus flag overrides, no prompts                  | CI and repeat-run path                           |
+| validate | Reads an existing `.goreleaser.yaml` and reports schema errors, domain violations, and deprecation findings | Post-generation gate; emits `DeprecationFinding` |
+| version  | Prints binary version and build metadata                                                                    | Support and diagnostics                          |
 
 ## Events
 
-| Term                      | Definition                                                         | Context                |
-| ------------------------- | ------------------------------------------------------------------ | ---------------------- |
-| GenerationPreflightPassed | All target-file existence checks passed before writing             | Atomic generation gate |
-| JobRolledBack             | A failed job triggered removal of files written earlier in the run | Rollback support       |
+| Term                      | Definition                                                                                    | Context                                                |
+| ------------------------- | --------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
+| GenerationPreflightPassed | All target-file existence checks passed before writing                                        | Atomic generation gate                                 |
+| JobRolledBack             | A failed job triggered removal of files written earlier in the run                            | Rollback support                                       |
 | DeprecationFinding        | One deprecated goreleaser key occurrence with source line and a before→after replacement hint | `validate` output; verified against goreleaser v2.17.1 |
-| ForgejoPreflightGate      | One local PASS/FAIL check a repo must pass before its flip to Forgejo | `forgejo-preflight` exits 0/1/2 |
+| ForgejoPreflightGate      | One local PASS/FAIL check a repo must pass before its flip to Forgejo                         | `forgejo-preflight` exits 0/1/2                        |
 
 ---
 

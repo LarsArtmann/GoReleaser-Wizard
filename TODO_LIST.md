@@ -7,6 +7,7 @@
 ## Status legend
 
 <!-- check-rows:ledger -->
+
 | Status           | Meaning                                                 |
 | ---------------- | ------------------------------------------------------- |
 | 🔴 `TODO`        | Not started. Needs doing.                               |
@@ -16,12 +17,14 @@
 ## High Impact
 
 <!-- check-rows:ledger -->
-| Task                                                                                                                                 | Status    | Impact | Effort | Evidence                                                                                                                                                                                     |
-| ------------------------------------------------------------------------------------------------------------------------------------ | --------- | ------ | ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+
+| Task | Status | Impact | Effort | Evidence |
+| ---- | ------ | ------ | ------ | -------- |
 
 ## Medium Impact
 
 <!-- check-rows:ledger -->
+
 | Task                                                                                                                                                                                                              | Status    | Impact  | Effort | Evidence                                                                                                                      |
 | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- | ------- | ------ | ----------------------------------------------------------------------------------------------------------------------------- |
 | M19-M21 coverage lifts: `internal/git`, `internal/config`, `internal/utils`, `generators`, `templates`, `types` (0-5% → solid)                                                                                    | 🔴 `TODO` | Med     | 6h     | `go test -cover ./...`; goldens cover `generators` partially (plan M19/M20, 2026-08-17 01-15 c)                               |
@@ -34,6 +37,7 @@
 ## Blocked (external decision or owner action needed)
 
 <!-- check-rows:ledger -->
+
 | Task                                                                                                                                       | Status       | Blocker                                                                                                               |
 | ------------------------------------------------------------------------------------------------------------------------------------------ | ------------ | --------------------------------------------------------------------------------------------------------------------- |
 | M18: personal defaults — `--forgejo-owner`/`--runner` flags, tap repo pattern, commit author, homebrew casks wiring                        | 🔵 `BLOCKED` | Needs Lars's answers: tap pattern, author email, runner default (2026-08-17 00-04 §e)                                 |
@@ -46,9 +50,10 @@
 ## Sweep debts (2026-11-07 docs-health audit follow-ups)
 
 <!-- check-rows:ledger -->
-| Task                                                                                                                                                                                                                                                    | Status    | Impact  | Effort | Evidence                                                                         |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- | ------- | ------ | -------------------------------------------------------------------------------- |
-| 2025 pre-canon corpus sweep: annotate (pre-canon files get routing banners, not fake verdicts) + archive the 29 unarchived 2025 status reports so docs-gates cadence/routing go green (`docs-gates run .` is wired advisory in `scripts/docs-gates.sh`) | 🔴 `TODO` | Med     | 3h     | `docs-gates run .` 5-gate FAIL matrix 2026-11-07; oldest report 508d             |
+
+| Task                                                                                                                                                                                                                                                    | Status    | Impact | Effort | Evidence                                                             |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- | ------ | ------ | -------------------------------------------------------------------- |
+| 2025 pre-canon corpus sweep: annotate (pre-canon files get routing banners, not fake verdicts) + archive the 29 unarchived 2025 status reports so docs-gates cadence/routing go green (`docs-gates run .` is wired advisory in `scripts/docs-gates.sh`) | 🔴 `TODO` | Med    | 3h     | `docs-gates run .` 5-gate FAIL matrix 2026-11-07; oldest report 508d |
 
 ---
 

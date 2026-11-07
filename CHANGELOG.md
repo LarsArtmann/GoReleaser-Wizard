@@ -5,6 +5,32 @@ Format loosely follows [Keep a Changelog](https://keepachangelog.com); each entr
 
 ## [Unreleased]
 
+### Hardening wave (2026-11-07)
+
+Wave-6 of `docs/planning/2026-11-07_08-51_SUPERB-wave6-hardening-and-proof-plan.md`: 24 of 27 tasks executed; full status in `docs/status/2026-11-07_18-36_wave6-execution-24of27-tasks-status.md`.
+
+**Fixed** (real bugs found by the hardening passes):
+
+- Explicit `--config` files had no effect: loading early-returned before env vars, flags, and unmarshal were applied, and `GORELEASER_WIZARD_*` env vars mapped to dead keys because the prefix was never stripped (`260054f`)
+- `ssh://git@github.com:22/owner/repo` parsed the port "22" as the repo owner; numeric remote-URL segments are now dropped (`bf2d3a1`)
+- Five domain validators returned typed-nil `*DomainError`, making nil a non-nil error interface and silently invalidating valid configs; they return plain `error` now (`d38540d`)
+- `extractBinaryFromPath` returned "main" instead of the binary directory name for `src/<bin>/main.go` layouts (`9c3fe88`)
+
+**Added**:
+
+- `validate` detects deprecated GoReleaser v2.17 keys (`dockers`, `docker_manifests`, `brews`, `archives.format_overrides.format`) with line numbers and before→after migration hints, empirically verified against goreleaser 2.17.1 (`b198b32`)
+- Forgejo generations write `.forgejo/actionlint.yaml` (self-hosted `native` label) next to the workflows; the E2E gate actionlints the GENERATED config (`7bbf43c`)
+- Provider-aware success tips: `--ci-provider forgejo/dual` points users at `.forgejo/workflows`, not `.github/workflows` (`66f1997`)
+- Standing CI: golden-churn guard (`-update-golden` must leave `testdata/` clean), 5-provider generate matrix, flake go-pin ≥ go.mod guard, docs job running `cmd/docs-check` (`61d7efa`, `b160050`)
+- `cmd/forgejo-preflight` (local flip-readiness gates) + `forgejo-flip-batch@.service` (one-sudo-per-wave privileged batch flipper) (`ae56dd7`)
+- `scripts/docs-gates.sh`: dprint → docs-gates battery (advisory) → docs-check composition (`0308d5b`)
+- Coverage lifts: domain 15.5%→48.7%, config 84.1%, git 0%→45.5%, validation registry extraction; parse-proof tests for all 7 embedded templates (`d38540d`, `260054f`, `bf2d3a1`, `4a153ab`, `b87636e`, `506129e`)
+
+**Docs**:
+
+- Root-sprawl disposition proposal: decision-ready inventory of the 19 root markdown files and 7 `github_issues/` drafts with archive/delete/harvest plan; execution owner-gated (`0f2b48f`)
+- TODO_LIST synced with the wave-6 completions (17 completed rows removed); nix-flake-check-in-CI and `.docs-gates.json` seeding documented as deliberate non-goals in `ci.yml` and the wave-6 status report (`b706d1a`, `b198b32` era)
+
 ### Docs (2026-11-07)
 
 - docs-health AUDIT: created `TODO_LIST.md` + `ROADMAP.md`, refreshed `FEATURES.md`/`README.md`/`AGENTS.md` to the post-Forgejo/Go-1.27 reality, annotated and archived the 2026-01…08 status corpus to `docs/status/archived/` (`2fcc8a2`, sweep commit)

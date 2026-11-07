@@ -49,6 +49,10 @@ func validateGoReleaserConfig(results *ValidationResults) error {
 		return nil
 	}
 
+	// Detect deprecated keys with migration hints (works without the
+	// goreleaser binary, unlike the check below).
+	validateDeprecations(results, configPath)
+
 	// Check if goreleaser is available
 	if _, err := exec.LookPath("goreleaser"); err == nil {
 		results.GoReleaserFound = true

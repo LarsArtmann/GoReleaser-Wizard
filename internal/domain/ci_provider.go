@@ -55,6 +55,12 @@ func (p CIProvider) GeneratesForgejoWorkflows() bool {
 	return p == CIProviderForgejo || p == CIProviderDual
 }
 
+// GeneratesAnyWorkflows reports whether the provider generates any CI
+// workflow files at all.
+func (p CIProvider) GeneratesAnyWorkflows() bool {
+	return p.GeneratesGitHubWorkflows() || p.GeneratesForgejoWorkflows()
+}
+
 // isGitHubLike treats the unset provider as GitHub for backward compatibility.
 func (p CIProvider) isGitHubLike() bool {
 	return p == CIProviderGitHub || p == CIProviderDual || p == ""

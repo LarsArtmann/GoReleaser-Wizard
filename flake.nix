@@ -114,6 +114,18 @@
               ];
 
               GOFLAGS = "-mod=mod";
+
+              # Gotcha 12: /mnt/buildcache may be a dead mount, which makes
+              # every Go command fail with "failed to initialize build cache".
+              # When the mount is unavailable, fall back to /tmp caches.
+              shellHook = ''
+                if ! timeout 2 test -w /mnt/buildcache/ 2>/dev/null; then
+                  export GOCACHE="''${GOCACHE:-/tmp/gw-cache}"
+                  export GOMODCACHE="''${GOMODCACHE:-/tmp/gw-modcache}"
+                  export GOLANGCI_LINT_CACHE="''${GOLANGCI_LINT_CACHE:-/tmp/gw-lint-cache}"
+                  echo "gw devshell: /mnt/buildcache unavailable; using /tmp caches" >&2
+                fi
+              '';
             };
 
             ci = pkgs.mkShellNoCC {

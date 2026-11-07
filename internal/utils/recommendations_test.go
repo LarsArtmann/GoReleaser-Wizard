@@ -2,6 +2,7 @@ package utils
 
 import (
 	"os"
+	"path/filepath"
 	"runtime"
 	"testing"
 
@@ -87,4 +88,123 @@ func TestGetEnvironment(t *testing.T) {
 
 	os.Unsetenv("NODE_ENV")
 	assert.Equal(t, "development", GetEnvironment())
+}
+
+func TestHasFile(t *testing.T) {
+	dir := t.TempDir()
+	t.Chdir(dir)
+
+	tests := []struct {
+		name  string
+		setup func()
+		file  string
+		want  bool
+	}{
+		{
+			name: "root_hit",
+			setup: func() {
+				os.WriteFile("go.mod", []byte("module t\n"), 0o644)
+			},
+			file: "go.mod",
+			want: true,
+		},
+		{
+			name:  "miss",
+			setup: func() {},
+			file:  "does-not-exist.txt",
+			want:  false,
+		},
+		{
+			name: "subdir_hit",
+			setup: func() {
+				os.MkdirAll("cmd", 0o755)
+				os.WriteFile("cmd/main.go", []byte("package main\n"), 0o644)
+			},
+			file: "main.go",
+			want: true,
+		},
+		{
+			name:  "dir_slash_form_hit",
+			setup: func() {},
+			file:  "api/",
+			want:  false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.setup()
+
+			if got := hasFile(tt.file); got != tt.want {
+				t.Errorf("hasFile(%q) = %v, want %v", tt.file, got, tt.want)
+			}
+		})
+	}
+}
+
+func TestGetRecommendedProjectType(t *testing.T) {
+	tests := []struct {
+		name  string
+		setup func(dir string)
+		want  domain.ProjectType
+	}{
+		{
+			name:  "no_go_mod_defaults_to_cli",
+			setup: func(dir string) {},
+			want:  domain.ProjectTypeCLI,
+		},
+		{
+			name: "go_mod_with_root_main_is_cli",
+			setup: func(dir string) {
+				os.WriteFile(filepath.Join(dir, "go.mod"), []byte("module t\n"), 0o644)
+				os.WriteFile(filepath.Join(dir, "main.go"), []byte("package main\n"), 0o644)
+			},
+			want: domain.ProjectTypeCLI,
+		},
+		{
+			name: "go_mod_with_cmd_main_is_cli",
+			setup: func(dir string) {
+				os.WriteFile(filepath.Join(dir, "go.mod"), []byte("module t\n"), 0o644)
+				os.MkdirAll(filepath.Join(dir, "cmd"), 0o755)
+				os.WriteFile(filepath.Join(dir, "cmd", "main.go"), []byte("package main\n"), 0o644)
+			},
+			want: domain.ProjectTypeCLI,
+		},
+		{
+			name: "go_mod_with_api_dir_is_webapi",
+			setup: func(dir string) {
+				os.WriteFile(filepath.Join(dir, "go.mod"), []byte("module t\n"), 0o644)
+				os.MkdirAll(filepath.Join(dir, "api"), 0o755)
+			},
+			want: domain.ProjectTypeWebAPI,
+		},
+		{
+			name: "go_mod_with_grpc_dir_is_grpc",
+			setup: func(dir string) {
+				os.WriteFile(filepath.Join(dir, "go.mod"), []byte("module t\n"), 0o644)
+				os.MkdirAll(filepath.Join(dir, "grpc"), 0o755)
+			},
+			want: domain.ProjectTypeGRPCService,
+		},
+		{
+			name: "go_mod_alone_is_library",
+			setup: func(dir string) {
+				os.WriteFile(filepath.Join(dir, "go.mod"), []byte("module t\n"), 0o644)
+			},
+			want: domain.ProjectTypeLibrary,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			dir := t.TempDir()
+			t.Chdir(dir)
+
+			tt.setup(dir)
+
+			if got := GetRecommendedProjectType(); got != tt.want {
+				t.Errorf("GetRecommendedProjectType() = %v, want %v", got, tt.want)
+			}
+		})
+	}
 }

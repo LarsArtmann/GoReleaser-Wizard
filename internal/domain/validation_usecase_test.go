@@ -182,8 +182,12 @@ func TestAddValidationErrorFiltersNonDomainErrors(t *testing.T) {
 	result := &ValidationResult{IsValid: true, Errors: []*DomainError{}}
 
 	addValidationError(result, errors.New("plain error"))
-	if !result.IsValid {
-		t.Error("plain errors must be ignored by addValidationError")
+	if result.IsValid {
+		t.Error("a plain error must turn the result invalid")
+	}
+
+	if len(result.Errors) != 2 || result.Errors[0] == nil || result.Errors[1] == nil {
+		t.Errorf("both errors must be recorded (count=%d), none silently dropped", len(result.Errors))
 	}
 
 	addValidationError(result, NewValidationError(ErrInvalidConfig, "typed", "detail"))

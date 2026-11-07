@@ -22,15 +22,28 @@ func NewValidationUseCase(logger Logger, repo FileSystemRepository) *ValidationU
 	}
 }
 
-// addValidationError adds an error to the result if err is not nil.
+// addValidationError adds an error to the result if err is not nil. Typed
+// DomainErrors are appended as-is; a plain error (a contract violation by the
+// validator) must not vanish silently, so it is wrapped as a generic internal
+// error before being recorded. Either way the result turns invalid.
 func addValidationError(result *ValidationResult, err error) {
-	if err != nil {
-		if domainErr, ok := errors.AsType[*DomainError](err); ok {
-			result.Errors = append(result.Errors, domainErr)
-		}
-
-		result.IsValid = false
+	if err == nil {
+		return
 	}
+
+	domainErr, ok := errors.AsType[*DomainError](err)
+	if !ok {
+		domainErr = NewSystemError(
+			ErrInvalidOperation,
+			"Non-domain error escaped a validator",
+			err.Error(),
+			err,
+		)
+	}
+
+	result.Errors = append(result.Errors, domainErr)
+
+	result.IsValid = false
 }
 
 // ValidateConfiguration performs comprehensive validation of project configuration.
@@ -72,7 +85,7 @@ func (vu *ValidationUseCase) ValidateConfiguration(
 // validateBasicFields validates basic required fields.
 func (vu *ValidationUseCase) validateBasicFields(
 	config *SafeProjectConfig,
-) *DomainError {
+) error {
 	// Project name validation
 	err := ValidateProjectName(config.ProjectName)
 	if err != nil {
@@ -121,7 +134,7 @@ func (vu *ValidationUseCase) validateBasicFields(
 // validateTypes validates enum types.
 func (vu *ValidationUseCase) validateTypes(
 	config *SafeProjectConfig,
-) *DomainError {
+) error {
 	// Project type validation
 	if !config.ProjectType.IsValid() {
 		return NewValidationError(
@@ -209,7 +222,7 @@ func (vu *ValidationUseCase) validateTypes(
 // validatePlatformArchCompatibility validates platform-architecture compatibility.
 func (vu *ValidationUseCase) validatePlatformArchCompatibility(
 	config *SafeProjectConfig,
-) *DomainError {
+) error {
 	err := ValidatePlatformArchCompatibility(config.Platforms, config.Architectures)
 	if err != nil {
 		return NewValidationError(
@@ -225,7 +238,7 @@ func (vu *ValidationUseCase) validatePlatformArchCompatibility(
 // validateBusinessRules validates domain business rules.
 func (vu *ValidationUseCase) validateBusinessRules(
 	config *SafeProjectConfig,
-) *DomainError {
+) error {
 	// Docker support rule
 	if config.GetDockerEnabled() && !config.ProjectType.DockerSupported() {
 		return NewConfigurationError(
@@ -271,7 +284,7 @@ func (vu *ValidationUseCase) validateBusinessRules(
 // validateSecurity performs security-focused validation.
 func (vu *ValidationUseCase) validateSecurity(
 	config *SafeProjectConfig,
-) *DomainError {
+) error {
 	// Check for potential path traversal in main path
 	if containsPathTraversal(config.MainPath) {
 		return NewBusinessRuleError(

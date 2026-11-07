@@ -170,6 +170,11 @@ func ValidateMainPath(path string) error {
 		return errors.New("path contains dangerous characters")
 	}
 
+	// Check for URL scheme injection (javascript:, data:, vbscript:)
+	if containsURLInjection(cleanPath) {
+		return errors.New("URL scheme injection not allowed")
+	}
+
 	// Validate path doesn't point to system directories
 	parts := strings.SplitSeq(cleanPath, string(filepath.Separator))
 	for part := range parts {

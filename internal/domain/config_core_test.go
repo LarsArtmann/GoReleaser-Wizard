@@ -170,7 +170,10 @@ func TestSafeProjectConfigCloneDeepIndependence(t *testing.T) {
 	}
 
 	if original.Platforms[0] != PlatformLinux {
-		t.Errorf("mutating clone slice changed original Platforms[0] to %q (shared backing array)", original.Platforms[0])
+		t.Errorf(
+			"mutating clone slice changed original Platforms[0] to %q (shared backing array)",
+			original.Platforms[0],
+		)
 	}
 }
 

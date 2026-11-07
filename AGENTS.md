@@ -94,5 +94,8 @@ The E2E test `TestGeneratedConfigPassesGoReleaserCheck` automates this; skips gr
 - A `go = pkgs.go_1_27;` attr INSIDE the buildGoModule set is silently swallowed by mkDerivation (callPackage-level arg); working form: `pkgs.buildGoModule.override { go = pkgs.go_1_27; } { ... }`
 - Current nixpkgs buildGoModule defaults `doCheck = true` on the package: plain `nix build .#goreleaser-wizard` RUNS tests and fails in the sandbox (`git` not on PATH). Flake sets `doCheck = false` on the package; tests live in `checks.test` with `git`/`goreleaser`/`actionlint` as `nativeCheckInputs` (E2E proof runs fully there instead of skipping)
 - Symptom when these drift: `nix flake check` fails on `packages...` (not `checks.test`) with `git init failed: exec: "git": executable file not found in $PATH`
+- Companion: the nix build source EXCLUDES flake.nix itself — tests reading `../../flake.nix` fail sandboxed `checks.test` with `no such file or directory`; guard with `errors.Is(err, fs.ErrNotExist)` → `t.Skip` (pattern: `flake_guard_test.go`)
+
+**21. Root-anchor binary patterns in .gitignore** — the bare `goreleaser-wizard` entry (added for a stray build binary) also matched `cmd/goreleaser-wizard/`, making `git add` refuse tracked files under the source dir; binary ignores must be `/name` at root. Also a daemon trap: it auto-stages files mid-flight, so a single-file commit may carry co-staged neighbors — read `git show --stat` before assuming.
 
 > This file was auto-trimmed. Full history in git.

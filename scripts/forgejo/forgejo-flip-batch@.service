@@ -1,0 +1,35 @@
+# forgejo-flip-batch@.service — flip a whole migration wave with ONE sudo
+#
+# Skeleton (2026-11-07): the real units (forgejo-flip@, forgejo-flip-check@,
+# forgejo-branch-protect) live in the SystemNix flake; this batch wrapper is
+# the in-repo skeleton for the wave flips (M12/T22). Deploy by copying into
+# /etc/systemd/system/ on the Forgejo host, then:
+#
+#   sudo systemctl daemon-reload
+#   sudo systemctl start forgejo-flip-batch@wave1.service
+#   journalctl -u forgejo-flip-batch@wave1 --no-pager -f
+#
+# The template instance name selects the wave file:
+#   /etc/forgejo-migration/wave1.repos  (one repo name per line, # comments ok)
+#
+# One sudo per wave instead of one per repo: the unit flips repos SEQUENTIALLY
+# (each flip is a full import + verify; parallel flips would contend on the
+# Forgejo API and make failure triage ambiguous). Stop-on-first-failure: a red
+# repo halts the wave so the blast radius stays one repo.
+
+[Unit]
+Description=Forgejo migration wave flip (%i)
+After=network-online.target forgejo.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+# The wave file lives under /etc; flips need root for docker + forgejo CLI.
+Environment=WAVE_FILE=/etc/forgejo-migration/%i.repos
+ExecStartPre=/usr/bin/test -r /etc/forgejo-migration/%i.repos
+ExecStart=/usr/local/sbin/forgejo-flip-batch %i
+# Give a whole wave time: each repo flip is import + verify + mirror attach.
+TimeoutStartSec=8h
+
+[Install]
+WantedBy=multi-user.target

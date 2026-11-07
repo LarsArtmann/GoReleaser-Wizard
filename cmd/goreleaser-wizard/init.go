@@ -72,6 +72,11 @@ func runInitWizard(cmd *cobra.Command, _ []string) {
 	fmt.Println("Next steps:")
 	fmt.Println("  • Review the generated .goreleaser.yaml")
 	fmt.Println("  • Run 'goreleaser-wizard validate' to check the configuration")
+
+	for _, tip := range providerWorkflowTips(config.CIProvider, false) {
+		fmt.Println(tip)
+	}
+
 	fmt.Println("  • Commit the configuration to your repository")
 }
 

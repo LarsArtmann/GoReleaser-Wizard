@@ -16,21 +16,19 @@ func providerWorkflowTips(provider domain.CIProvider, configOnly bool) []string 
 		return nil
 	}
 
-	switch provider {
-	case domain.CIProviderForgejo:
-		return []string{
-			"  • Commit .forgejo/workflows/ci.yml and .forgejo/workflows/release.yml to enable Forgejo Actions CI/CD",
-		}
-	case domain.CIProviderDual:
+	switch {
+	case provider.GeneratesForgejoWorkflows() && provider.GeneratesGitHubWorkflows():
 		return []string{
 			"  • Commit .github/workflows/release.yml and .forgejo/workflows/ (ci.yml, release.yml) to enable both CI systems",
 		}
-	case domain.CIProviderGitHub:
+	case provider.GeneratesForgejoWorkflows():
+		return []string{
+			"  • Commit .forgejo/workflows/ci.yml and .forgejo/workflows/release.yml to enable Forgejo Actions CI/CD",
+		}
+	case provider.GeneratesGitHubWorkflows():
 		return []string{
 			"  • Commit .github/workflows/release.yml to enable CI/CD",
 		}
-	case domain.CIProviderNone:
-		return nil
 	default:
 		return nil
 	}

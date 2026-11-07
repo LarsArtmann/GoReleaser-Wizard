@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 
 	"charm.land/log/v2"
@@ -69,26 +68,7 @@ func runGenerate(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	fmt.Println()
-
-	if configOnly {
-		fmt.Println(successStyle.Render("📄 GoReleaser configuration generated successfully!"))
-	} else {
-		fmt.Println(
-			successStyle.Render("🎉 GoReleaser configuration and workflow generated successfully!"),
-		)
-	}
-
-	fmt.Println()
-	fmt.Println("Next steps:")
-	fmt.Println("  • Review generated files")
-	fmt.Println("  • Run 'goreleaser-wizard validate' to check configuration")
-
-	if !configOnly {
-		fmt.Println("  • Commit .github/workflows/release.yml to enable CI/CD")
-	}
-
-	fmt.Println("  • Test configuration with 'goreleaser check'")
+	printGenerateSuccess(projectConfig.CIProvider, configOnly)
 }
 
 func init() {

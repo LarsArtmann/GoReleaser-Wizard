@@ -9,6 +9,8 @@ import (
 // truth is syntactically valid with its documented delimiters. Unwired
 // templates rot silently without this: the homebrew template has no
 // generator yet, and a syntax break would only surface when someone wires it.
+// The GitHub Actions and Forgejo templates use [[ ]] delimiters so
+// ${{ secrets.* }} expression literals need no escaping (gotcha 3).
 func TestAllEmbeddedTemplatesParse(t *testing.T) {
 	tests := []struct {
 		name     string
@@ -17,7 +19,7 @@ func TestAllEmbeddedTemplatesParse(t *testing.T) {
 		right    string
 	}{
 		{name: "goreleaser", template: GoReleaserTemplate, left: "{{", right: "}}"},
-		{name: "github_actions", template: GitHubActionsTemplate, left: "{{", right: "}}"},
+		{name: "github_actions", template: GitHubActionsTemplate, left: "[[", right: "]]"},
 		{name: "forgejo_ci", template: ForgejoCITemplate, left: "[[", right: "]]"},
 		{name: "forgejo_release", template: ForgejoReleaseTemplate, left: "[[", right: "]]"},
 		{name: "forgejo_actionlint", template: ForgejoActionlintTemplate, left: "[[", right: "]]"},

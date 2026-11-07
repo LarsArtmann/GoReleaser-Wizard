@@ -216,3 +216,6 @@ result-*
 .direnv/
 # <<< buildflow-managed (.gitignore) <<<
 *.orig
+
+# local build artifacts
+goreleaser-wizard

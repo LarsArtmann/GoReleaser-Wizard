@@ -3,7 +3,7 @@
 **Project**: GoReleaser-Wizard — interactive GoReleaser configuration wizard
 **Repository**: https://github.com/LarsArtmann/GoReleaser-Wizard
 
-Only non-obvious, session-critical context lives here. Full history in git; details in README.md / FEATURES.md / TODO_LIST.md / ROADMAP.md / CHANGELOG.md / docs/.
+Only non-obvious, session-critical context lives here. Full history in git; details in README.md / FEATURES.md / TODO_LIST.md / ROADMAP.md / CHANGELOG.md / docs/. Historical status reports live in `docs/status/archived/` (closed — do not mine them for backlog; `TODO_LIST.md` owns open work; docs-health annotated+archived the 2026-01…08 corpus on 2026-11-07).
 
 ## Overview
 

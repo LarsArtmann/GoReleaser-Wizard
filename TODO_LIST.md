@@ -37,6 +37,7 @@
 | Split oversized files (>600 lines): `internal/types/validation.go` (898), `internal/validation/basic.go` (767), `cmd/goreleaser-wizard/jobs.go` (685), `internal/validation/business_rules.go` (650) | 🔴 `TODO` | Med | 4h | `wc -l` 2026-11-07; open since the 2026-03-25 report, revisit scope before starting      |
 | M12: wave-1 preflight generator for the 7 Phase-F repos + preflight checklists (starred/pending-verdict gates) | 🔴 `TODO` | Med | 2h | builds on the M3 `forgejo-post-flip-verify` harness, fixture-green but never run live (2026-11-04 f.17/f.42) |
 | Fix `git log` failures on stoptube/papdashboard/autocart/buildflow (safe.directory/worktree) — unblocks wave-3 preflights | 🔴 `TODO` | Med | 30min | (repo: machine/fleet) 2026-11-04 f.18                                                    |
+| Consolidate root-level doc sprawl: 17 root `.md` files (2025-era: `BDD_TESTS_REVIEW.md`, `COMPREHENSIVE_REFACTORING_TODO.md`, `EXECUTION_PLAN.md`, …) → archive to `docs/` or delete; root keeps only living docs | 🔴 `TODO` | Low-Med | 1h | `ls *.md` (2026-06-30 report §06 item 6; root keeps README/FEATURES/TODO_LIST/ROADMAP/CHANGELOG/AGENTS/SECURITY/CONTRIBUTING) |
 
 ## Blocked (external decision or owner action needed)
 

@@ -38,6 +38,7 @@ Raw ideas:
 - GitLab CI and Bitbucket Pipelines workflow families (the domain already has the git-provider enums)
 - Gitea self-hosted flavor distinct from Forgejo (shared `gitea_urls`, different Actions assumptions)
 - Release-shadow as a generated optional workflow (today it is a SystemNix fleet script)
+- packslip integration in generated release workflows (external review 2026-10-17; product-direction call — does the wizard grow this at all?)
 
 ### 4. Extensibility
 

@@ -104,6 +104,53 @@ func TestGeneratedConfigPassesGoReleaserCheck(t *testing.T) {
 	}
 }
 
+// TestDualProviderGeneratedConfigPassesGoReleaserCheck extends the North Star
+// proof to --ci-provider dual: both workflow sets generate and the Forgejo-
+// targeted goreleaser config (gitea_urls release block) must still pass
+// `goreleaser check` with zero deprecations and a clean environment.
+func TestDualProviderGeneratedConfigPassesGoReleaserCheck(t *testing.T) {
+	goreleaserPath, err := exec.LookPath("goreleaser")
+	if err != nil {
+		t.Skip("goreleaser binary not found in PATH; skipping E2E proof")
+	}
+
+	tmpDir := setupTempGoModule(t)
+
+	// The Forgejo-targeted release block makes goreleaser check resolve the
+	// origin remote (real Forgejo repos always have one); a non-resolvable
+	// URL is enough, check never contacts the host.
+	if out, err := exec.Command("git", "-C", tmpDir, "remote", "add", "origin",
+		"https://forgejo.example.com/owner/demo.git").CombinedOutput(); err != nil {
+		t.Fatalf("git remote add failed: %v: %s", err, out)
+	}
+
+	config := baseTestProjectConfig()
+	config.ProjectName = "e2e-app"
+	config.BinaryName = "e2e-app"
+	config.MainPath = "./cmd/demo"
+	config.CIProvider = domain.CIProviderDual
+
+	generateIntoModule(t, tmpDir, &config)
+
+	AssertFileExists(t, ".goreleaser.yaml", "dual provider must generate .goreleaser.yaml")
+	AssertFileExists(t, releaseWorkflowTargetPath, "dual provider must generate the GitHub release workflow")
+	AssertFileExists(t, forgejoCIWorkflowPath, "dual provider must generate the Forgejo CI workflow")
+	AssertFileExists(t, forgejoReleaseWorkflowPath, "dual provider must generate the Forgejo release workflow")
+
+	cmd := exec.Command(goreleaserPath, "check")
+	cmd.Dir = tmpDir
+	cmd.Env = []string{"HOME=" + tmpDir, "PATH=" + os.Getenv("PATH")}
+
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		t.Fatalf("goreleaser check failed for dual-provider config (exit %v):\n%s", err, output)
+	}
+
+	if strings.Contains(strings.ToUpper(string(output)), "DEPRECATED") {
+		t.Errorf("goreleaser check reported deprecations for dual-provider config:\n%s", output)
+	}
+}
+
 // TestForgejoWorkflowsPassActionLint generates Forgejo workflows for a
 // forgejo-provider project and requires actionlint to accept them. The
 // self-hosted runner label must be declared in an actionlint config, as on

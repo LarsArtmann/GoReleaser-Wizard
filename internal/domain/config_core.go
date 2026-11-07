@@ -92,18 +92,33 @@ func (spc *SafeProjectConfig) Validate() error {
 
 // validateBasicFields validates the scalar config fields.
 func (spc *SafeProjectConfig) validateBasicFields() error {
-	for _, err := range []error{
-		ValidateProjectName(spc.ProjectName),
-		ValidateBinaryName(spc.BinaryName),
-		ValidateMainPath(spc.MainPath),
-	} {
-		if err != nil {
-			return err
+	basicChecks := []struct {
+		field string
+		err   error
+	}{
+		{"project_name", ValidateProjectName(spc.ProjectName)},
+		{"binary_name", ValidateBinaryName(spc.BinaryName)},
+		{"main_path", ValidateMainPath(spc.MainPath)},
+	}
+
+	for _, check := range basicChecks {
+		if check.err != nil {
+			return NewValidationError(
+				ErrInvalidField,
+				check.err.Error(),
+				check.err.Error(),
+			).WithField(check.field)
 		}
 	}
 
 	if spc.ProjectDescription != "" {
-		return ValidateProjectDescription(spc.ProjectDescription)
+		if err := ValidateProjectDescription(spc.ProjectDescription); err != nil {
+			return NewValidationError(
+				ErrInvalidProjectDescription,
+				err.Error(),
+				spc.ProjectDescription,
+			).WithField("project_description")
+		}
 	}
 
 	return nil

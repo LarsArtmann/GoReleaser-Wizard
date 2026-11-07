@@ -1,398 +1,218 @@
 # GoReleaser-Wizard Features
 
-> **Last Updated:** 2025-12-16\
+> **Last Updated:** 2026-11-07 (docs-health audit; feature claims verified against code this sweep)\
 > **Version:** Current Development State
 
 ## 🎯 Executive Summary
 
-GoReleaser-Wizard is an ambitious CLI tool designed to simplify GoReleaser configuration and setup. It aims to provide an interactive wizard experience with smart defaults, automated configuration generation, and comprehensive validation capabilities.
+GoReleaser-Wizard is a CLI tool that generates production-ready GoReleaser v2.17 configurations plus release CI workflows (GitHub Actions, Forgejo, or both) for Go projects. Its correctness is machine-proven: an E2E test requires `goreleaser check` to exit 0 with zero deprecations on generated output, and golden files lock every generated artifact variant.
 
-**Current State:** The project has a solid architectural foundation with extensive domain modeling, but many features remain partially implemented or in planning stages.
+**Current State:** Core generation paths are fully functional and continuously verified. Package-manager publishing (Homebrew casks) and config-side signing are partial; Pro integration and config migration are planned.
 
 ---
 
 ## 🚀 Core Features
 
-### 1. Interactive Configuration Wizard
+### 1. Interactive Configuration Wizard (TUI)
 
 **State:** FULLY_FUNCTIONAL
 
-- **Description:** Interactive CLI wizard that guides users through GoReleaser setup
-- **Implementation:** Complete interactive prompting system with rich feedback
+- **Description:** Rich terminal wizard (`huh/v2`, Charm theme) that guides users through GoReleaser setup
+- **Implementation:** `cmd/goreleaser-wizard/tui_wizard.go`
 - **Features:**
   - Project information confirmation and modification ✅
   - Interactive platform and architecture selection ✅
-  - CGO configuration prompting ✅
-  - Docker support level selection ✅
-  - Git provider selection ✅
-  - Advanced options (code signing, SBOM, etc.) ✅
+  - CGO, Docker support level, and git provider configuration ✅
+  - Advanced options (LDFlags, signing, SBOM, GitHub Actions) ✅
   - Final configuration review and confirmation ✅
-  - Rich styling and user-friendly prompts ✅
-- **Status:** Complete interactive wizard implemented
+  - Non-TTY detection with a helpful headless hint ✅
 
 ### 2. Project Auto-Detection
 
 **State:** FULLY_FUNCTIONAL
 
 - **Description:** Automatically detects project structure and settings
-- **Implementation:** Scans for go.mod, main.go location, and project type
 - **Features:**
-  - Detects module name from go.mod
-  - Identifies main.go location (root, cmd/, etc.)
-  - Determines project type (CLI, Library, etc.)
-- **Status:** Working correctly
+  - Module name from go.mod ✅
+  - Main package location (root, `cmd/`) ✅
+  - Project type inference ✅
+  - Owner/repo from git remote (flag-overridable) ✅
 
 ### 3. GoReleaser Configuration Generation
 
 **State:** FULLY_FUNCTIONAL
 
-- **Description:** Generates .goreleaser.yaml configuration files
-- **Implementation:** Complete template-based generation system
+- **Description:** Generates a modern `.goreleaser.yaml` (v2.17)
 - **Features:**
-  - Multi-platform build configuration
-  - Archive generation settings
-  - Checksum generation
-  - Changelog configuration
-  - Release settings
-- **Status:** Fully operational
+  - Multi-platform builds with typed template data ✅
+  - `dockers_v2` images + OCI annotations when Docker is enabled ✅
+  - Checksums, GitHub-native changelog, snapshot config ✅
+  - Literal owner/repo (checks clean locally, no env vars) ✅
+  - Passes `goreleaser check` with zero deprecations (E2E-proven) ✅
 
-### 4. GitHub Actions Workflow Generation
+### 4. CI Workflow Generation (GitHub / Forgejo / Dual)
 
 **State:** FULLY_FUNCTIONAL
 
-- **Description:** Generates GitHub Actions workflows for automated releases
-- **Implementation:** Template-based generation with custom delimiters
+- **Description:** `--ci-provider {github,forgejo,dual,none}` selects the generated workflow set and release targets
 - **Features:**
-  - Automated release triggers
-  - Multi-platform build support
-  - Docker registry integration
-  - Code signing setup (Cosign)
-  - GoReleaser integration
-- **Status:** Fully operational
+  - GitHub Actions release workflow (`ubuntu-latest`, buildx, conditional docker-login/cosign) ✅
+  - Forgejo workflows (`.forgejo/workflows/ci.yml` + `release.yml`) with pinned BuildFlow flake rev and goreleaser v2.17.1 ✅
+  - Forgejo releases: `gitea_urls` + git changelog; `GITHUB_TOKEN` is the Forgejo API token inside Forgejo Actions ✅
+  - `dual`: both workflow sets; goreleaser still targets Forgejo ✅
+  - Unset provider behaves byte-identically to legacy github output ✅
+
+### 5. Dockerfile Generation
+
+**State:** FULLY_FUNCTIONAL
+
+- **Description:** goreleaser-prebuilt Dockerfile for `dockers_v2`
+- **Features:**
+  - `FROM scratch` (or `alpine` with CGO), `ARG TARGETPLATFORM`, copies prebuilt binaries ✅
+  - Web API projects get `EXPOSE 8080` ✅
+  - Wired into both full-wizard and config-only paths ✅
+  - Rollback + `--force`/atomic preflight guards ✅
 
 ---
 
 ## 🔧 Configuration Features
 
-### 5. Multi-Platform Build Support
+### 6. Multi-Platform Build Support
 
 **State:** FULLY_FUNCTIONAL
 
-- **Description:** Configure builds for multiple platforms and architectures
-- **Implementation:** Comprehensive platform and architecture enums
-- **Supported Platforms:** Linux, macOS, Windows
-- **Supported Architectures:** amd64, arm64, etc.
-- **Status:** Working with template generation
+- **Platforms:** Linux, macOS, Windows, FreeBSD
+- **Architectures:** amd64, arm64 (windows+arm64 rejected by domain validation by design)
 
-### 6. Docker Integration
+### 7. Docker Integration
 
 **State:** FULLY_FUNCTIONAL
 
-- **Description:** Docker image building and publishing configuration
-- **Implementation:** `dockers_v2` multi-platform images with OCI annotations; prebuilt-pattern Dockerfile (`FROM scratch`/`alpine`, `ARG TARGETPLATFORM`, copies binaries GoReleaser built -- never rebuilds in-image), generated in both full-wizard and config-only workflows
+- **Implementation:** `dockers_v2` multi-platform images; prebuilt-pattern Dockerfile (never rebuilds in-image)
 - **Features:**
-  - Prebuilt-pattern Dockerfile generation ✅ (multi-stage rebuild would be wrong for dockers_v2)
-  - Build-only mode ✅
-  - Publish-only mode ✅
-  - Build and Publish mode ✅
-  - Multiple registry support (GitHub, Docker Hub, etc.) ✅
-  - Web API projects get `EXPOSE 8080` ✅
-- **Status:** Verified end-to-end: snapshot release builds and pushes amd64+arm64 images
+  - Build-only / publish-only / build-and-publish modes ✅
+  - ghcr.io, Docker Hub, GitLab Registry, Quay.io, custom registries ✅
+  - Verified end-to-end 2026-08-17: local snapshot release built and published amd64+arm64 images
 
-### 7. Code Signing Support
+### 8. Code Signing Support
 
 **State:** PARTIALLY_FUNCTIONAL
 
-- **Description:** Code signing configuration for releases
-- **Implementation:** Signing level enums and configuration options
-- **Features:**
-  - Cosign installer step in generated GitHub Actions workflow (conditional) ✅
-  - Multiple signing levels defined ✅
-- **Limitations:** Generated `.goreleaser.yaml` contains no `signs:` section yet
-- **Status:** CI-side signing ready; config-side signing not yet generated
+- Cosign installer step in generated workflows (conditional) ✅
+- Own-config cosign keyless signing with `--bundle` (CI-only, needs OIDC) ✅
+- **Limitation:** generated `.goreleaser.yaml` contains no `signs:` section yet (ROADMAP)
 
-### 8. Package Manager Integration
+### 9. Package Manager Integration
 
 **State:** PARTIALLY_FUNCTIONAL
 
-- **Description:** Generate configurations for package managers
-- **Implementation:** Typed Homebrew cask generator exists (`generators/homebrew.go`) but is not yet wired into any workflow; generated configs currently contain no tap-publishing section
-- **Features:**
-  - Project detection and defaults ✅
-- **Planned Features:**
-  - Wire `homebrew_casks` generation (blocked on personal tap defaults)
-  - Snap package support
-  - Scoop Windows packages
-  - AUR (Arch Linux) support
-- **Status:** Homebrew generator built but unwired; other package managers planned
+- Typed Homebrew cask generator exists (`cmd/goreleaser-wizard/generators/homebrew.go`) but is unwired, blocked on personal tap defaults
+- Own `.goreleaser.yaml` uses `homebrew_casks` (dogfood), quarantine hook + `Casks/` directory
+- **Planned:** Snap, Scoop, AUR, winget, chocolatey (see ROADMAP)
 
 ---
 
 ## 🛠️ Validation and Testing
 
-### 9. Configuration Validation
+### 10. Configuration Validation
 
 **State:** FULLY_FUNCTIONAL
 
-- **Description:** Validates GoReleaser and GitHub Actions configurations
-- **Implementation:** Comprehensive validation framework with detailed reporting
-- **Features:**
-  - File existence checks ✅
-  - YAML structure validation ✅
-  - GoReleaser integration (if installed) ✅
-  - Project structure validation ✅
-  - Dependency availability checking ✅
-  - Template validation for all generators ✅
-  - Detailed error reporting with suggestions ✅
-  - Configuration preview without file generation ✅
-- **Status:** Complete validation system implemented
+- File existence, YAML structure, GoReleaser integration (when installed), dependency availability ✅
+- Template validation for all generators; detailed error reporting with suggestions ✅
+- **Planned (M22):** deprecated-key detection with before→after migration hints (TODO_LIST)
 
-### 10. Project Structure Validation
+### 11. Project Structure Validation
 
 **State:** FULLY_FUNCTIONAL
 
-- **Description:** Validates that project structure matches configuration
-- **Implementation:** Checks for go.mod, main.go location, and directory structure
-- **Features:**
-  - Go module validation ✅
-  - Main directory detection ✅
-  - Alternative structure warnings ✅
-- **Status:** Working correctly
+- Go module validation, main directory detection, alternative-structure warnings ✅
+
+### 12. Automated Correctness Proof
+
+**State:** FULLY_FUNCTIONAL
+
+- E2E: generate into a temp module → `goreleaser check` exit 0, zero deprecations, no env vars (`cmd/goreleaser-wizard/e2e_test.go`; skips gracefully without the binary) ✅
+- Golden files for goreleaser configs (github + forgejo + dual variants), workflows, Dockerfiles (`cmd/goreleaser-wizard/golden_test.go`, `-update-golden`) ✅
+- CI: lint + race tests + fixture `goreleaser check` (`.github/workflows/ci.yml`) ✅
+- actionlint E2E with self-hosted-runner config for the `native` label ✅
 
 ---
 
 ## 🏗️ Architecture and Infrastructure
 
-### 11. Domain-Driven Architecture
+### 13. Domain-Driven Architecture
 
 **State:** FULLY_FUNCTIONAL
 
-- **Description:** Comprehensive domain model with strong typing
-- **Implementation:** Extensive domain layer with enums, validation, and interfaces
-- **Features:**
-  - Type-safe enums for all configuration options ✅
-  - Clean Architecture separation ✅
-  - Comprehensive error handling ✅
-  - Interface-based dependency injection ✅
-- **Status:** Excellent architectural foundation
+- Type-safe enums for every configuration axis; `SafeProjectConfig` with validation + defaults ✅
+- Clean Architecture separation enforced by go-arch-lint (deep AST scanning) ✅
+- Structured `DomainError` system (`internal/domain/errors.go`) ✅
 
-### 12. Template System
+### 14. Template System
 
 **State:** FULLY_FUNCTIONAL
 
-- **Description:** Template-based generation system with custom functions
-- **Implementation:** Go template system with custom delimiters and functions
-- **Features:**
-  - GoReleaser configuration template ✅
-  - GitHub Actions workflow template ✅
-  - Custom template functions ✅
-  - Git integration for dynamic values ✅
-- **Status:** Fully operational
+- Embedded templates in `cmd/goreleaser-wizard/templates/embedded.go` — single source of truth, rendered only by typed generators ✅
+- Forgejo templates use `[[ ]]` delimiters; GitHub templates escape `{{ }}` correctly ✅
+- Typed template data with owner/repo resolution (flag > git remote > placeholder warning) ✅
 
-### 13. Workflow Engine
+### 15. Workflow Engine
 
 **State:** FULLY_FUNCTIONAL
 
-- **Description:** Job-based workflow execution system
-- **Implementation:** Complete workflow framework with comprehensive job support
-- **Features:**
-  - Job queuing and execution ✅
-  - Rollback capabilities ✅
-  - Timeout handling ✅
-  - Multiple workflow types ✅
-  - Comprehensive job factory ✅
-  - Project validation jobs ✅
-  - Config generation jobs ✅
-  - Dockerfile generation jobs ✅
-  - Homebrew formula generation jobs ✅
-  - GitHub Actions workflow generation jobs ✅
-  - Dependency checking jobs ✅
-  - Preview generation jobs ✅
-  - Validation jobs ✅
-  - Job rollback support ✅
-- **Status:** Complete workflow engine with all required job types
+- Job interface (Execute + Rollback), JobManager (sequential + parallel), JobFactory ✅
+- All generation job types: project validation, config, workflows, Dockerfile, dependency check, preview ✅
+- Atomic generation: preflight checks all target files before anything is written ✅
 
 ---
 
-## 🚧 Planned Features (Not Implemented)
+## 🚧 Planned Features
 
-### 14. GoReleaser Pro Integration
-
-**State:** PLANNED
-
-- **Description:** Support for GoReleaser Pro features
-- **Implementation:** Configuration options defined but not implemented
-- **Features:**
-  - Custom publishers
-  - Advanced templating
-  - Nightly builds
-  - Docker manifests
-
-### 15. Interactive TUI Interface
-
-**State:** FULLY_FUNCTIONAL
-
-- **Description:** Rich terminal user interface using Charm's huh library
-- **Implementation:** `cmd/goreleaser-wizard/tui_wizard.go` (367 lines)
-- **Library:** `github.com/charmbracelet/huh` with `huh.ThemeCharm()` theme
-- **Features:**
-  - Terminal detection via `os.Stdout.Stat()` with helpful non-interactive error
-  - 7 form groups for comprehensive configuration
-  - Real-time validation using domain validators
-  - Multi-select for platforms and architectures
-  - Support for 8 project types (CLI, Web API, Library, gRPC, Microservice, Desktop, Daemon, Tool)
-  - CGO, Docker, and Git provider configuration
-  - Advanced options: LDFlags, signing, SBOM, Homebrew, Snap, GitHub Actions
-
-### 16. Configuration Migration System
+### 16. GoReleaser Pro Integration
 
 **State:** PLANNED
 
-- **Description:** Migrate configurations between versions
-- **Implementation:** Migration job types defined but not implemented
-- **Features:**
-  - Version compatibility checking
-  - Automated migration
-  - Backup and rollback
+- Custom publishers, advanced templating, nightly builds UI
 
-### 17. Advanced Customization
+### 17. Configuration Migration System
 
 **State:** PLANNED
 
-- **Description:** Advanced configuration options
-- **Features:**
-  - Custom build hooks
-  - Environment-specific configs
-  - Conditional builds
-  - Custom archive formats
+- Migrate existing `.goreleaser.yaml` to modern v2.17 (detect deprecated keys, propose diff, backup + rollback)
+
+### 18. Advanced Customization
+
+**State:** PLANNED
+
+- Custom build hooks (opt-in `go test`/`go generate` before-hooks — needs a TypeSpec change), environment-specific configs, custom archive formats
 
 ---
 
 ## 🐛 Known Issues and Limitations
 
-### Technical Debt
-
-- **Large Files:** Many files exceed 300 lines and need splitting
-- **TODO Overload:** Extensive TODOs indicate incomplete features
-- **Interface Segregation:** Some interfaces are too large
-- **Limited Testing:** Test coverage needs improvement
-
-### Missing Features
-
-- **Package Managers:** Homebrew cask generation built but not wired into workflows
-- **Config-side signing:** No `signs:` section in generated configs
-- **Rich Interactivity:** Limited user input and confirmation
-- **Documentation:** Generated configs lack inline documentation
-- **Preview Mode:** Limited preview capabilities
-
-### Integration Issues
-
-- **GoReleaser Dependency:** Validation requires external GoReleaser installation
-- **Git Integration:** Basic git info extraction, could be more robust
-- **Platform Detection:** Limited to common platform/architecture combinations
+- **Large files:** several core files exceed 600 lines (`internal/types/validation.go` 898, `internal/validation/basic.go` 767, `cmd/goreleaser-wizard/jobs.go` 685) — splitting tracked in TODO_LIST
+- **Package Managers:** Homebrew cask generation built but not wired into workflows (blocked on personal defaults)
+- **Config-side signing:** no `signs:` section in generated configs (CI-side only)
+- **Coverage:** domain layer ~10%, several packages at 0% — coverage lifts tracked in TODO_LIST (M19-M21)
+- **Test coverage of tests:** dual-provider `goreleaser check` E2E missing (only github+forgejo goldens are check-proven) — TODO_LIST M16b
+- **GoReleaser Dependency:** E2E check requires external GoReleaser installation (skips gracefully without it)
 
 ---
 
 ## 📊 Feature Status Summary
 
+Computed from the rows above on 2026-11-07.
+
 | Category       | Fully Functional | Partially Functional | Planned | Broken |
 | -------------- | ---------------- | -------------------- | ------- | ------ |
-| Core Features  | 4                | 0                    | 0       | 0      |
-| Configuration  | 2                | 1                    | 0       | 0      |
-| Validation     | 1                | 0                    | 0       | 0      |
-| Architecture   | 2                | 0                    | 0       | 0      |
-| Infrastructure | 2                | 0                    | 0       | 0      |
-| **TOTAL**      | **11**           | **1**                | **0**   | **0**  |
-
-**Overall Completion:** ~92% (11/12 major feature areas)
-
-## 🎉 Recent Improvements
-
-### ✅ Completed Features (This Session)
-
-1. **Enhanced Interactive Wizard** - Full prompting system with rich user experience
-2. **Docker Integration** - Complete Dockerfile generation with multi-stage builds
-3. **Homebrew Formula Generation** - Automated formula creation with smart defaults
-4. **Workflow Engine Enhancement** - Added all missing job types for complete generation
-5. **Template System Expansion** - Added Dockerfile and Homebrew templates
-6. **Validation System** - Comprehensive validation with detailed error reporting
-
-### 🚀 Key Enhancements
-
-- **Rich Interactive Prompts** - User-friendly configuration with detailed explanations
-- **Multi-stage Docker Support** - Production-ready container builds
-- **Package Manager Integration** - Homebrew formula generation with automatic naming
-- **Complete Job Framework** - All generation workflows fully implemented
-- **Template-based Architecture** - Extensible template system for new features
-
-### 📈 Progress Made
-
-- **Docker Integration:** PARTIALLY_FUNCTIONAL → FULLY_FUNCTIONAL
-- **Package Manager Integration:** PLANNED → PARTIALLY_FUNCTIONAL
-- **Interactive Wizard:** PARTIALLY_FUNCTIONAL → FULLY_FUNCTIONAL
-- **Configuration Validation:** PARTIALLY_FUNCTIONAL → FULLY_FUNCTIONAL
-- **Workflow Engine:** PARTIALLY_FUNCTIONAL → FULLY_FUNCTIONAL
-
-**Net Improvement:** +5 fully functional features, -5 partially functional features
+| Core Features  | 5                | 0                    | 0       | 0      |
+| Configuration  | 2                | 2                    | 0       | 0      |
+| Validation     | 3                | 0                    | 0       | 0      |
+| Architecture   | 3                | 0                    | 0       | 0      |
+| Planned        | 0                | 0                    | 3       | 0      |
+| **TOTAL**      | **13**           | **2**                | **3**   | **0**  |
 
 ---
 
-## 🎯 Recommended Priority
-
-### ✅ Completed (This Session)
-
-1. **✅ Docker Integration** - Implemented complete Dockerfile generation
-2. **✅ Validation Enhancement** - Expanded validation rules with detailed reporting
-3. **✅ Interactive Enhancement** - Added rich user prompts and confirmation system
-4. **✅ Package Manager Support** - Implemented Homebrew formula generation
-
-### 🎯 High Priority (Next Steps)
-
-1. **Code Refactoring** - Split large files (>300 lines) and address technical debt
-2. **Test Coverage** - Improve test coverage across all new modules
-3. **Additional Package Managers** - Implement Snap and Scoop support
-4. **GoReleaser Pro Integration** - Add Pro feature support
-
-### 📋 Medium Priority
-
-1. **Rich TUI** - Implement advanced terminal interface using Bubble Tea
-2. **Configuration Migration** - Add version upgrade and migration support
-3. **Advanced Customization** - Implement custom build hooks and templates
-4. **Performance Optimization** - Add benchmarking and optimization
-
-### 🔮 Low Priority
-
-1. **Plugin System** - Add extensible plugin architecture
-2. **Multi-project Support** - Support for monorepo configurations
-3. **Integration Testing** - Add comprehensive integration test suite
-4. **Documentation Site** - Generate comprehensive documentation
-
----
-
-## 🔮 Future Roadmap
-
-### Version 1.0 (MVP)
-
-- Complete all core features
-- Implement Dockerfile generation
-- Add basic package manager support
-- Improve validation and error handling
-- Stabilize APIs
-
-### Version 1.1
-
-- Rich TUI interface
-- Advanced validation rules
-- Configuration migration system
-- Extended platform support
-
-### Version 2.0
-
-- GoReleaser Pro integration
-- Advanced customization options
-- Plugin system
-- Multi-project support
-
----
-
-**Note:** This document reflects the current state of the codebase as of 2025-12-16. The project shows excellent architectural planning and has a solid foundation, but many features require implementation to reach its full potential.
+Open work lives in [TODO_LIST.md](TODO_LIST.md); long-term direction in [ROADMAP.md](ROADMAP.md); change history in [CHANGELOG.md](CHANGELOG.md).

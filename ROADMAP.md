@@ -1,8 +1,3 @@
-<!-- ROADMAP.md template, copy into the project root and fill in.
-     This is LONG-TERM DIRECTION and raw ideas.
-     No bounded tasks, no status indicators, no completed milestones.
-     See docs-health/SKILL.md. -->
-
 # Roadmap
 
 > Long-term direction and raw ideas. Items here are NOT actionable tasks.

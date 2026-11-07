@@ -3,10 +3,10 @@
 **Stop copy-pasting GoReleaser configs. Get a production-ready setup with one command.**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Go Version](https://img.shields.io/badge/go-1.26+-blue.svg)](https://golang.org)
+[![Go Version](https://img.shields.io/badge/go-1.27+-blue.svg)](https://golang.org)
 [![GoReleaser](https://img.shields.io/badge/powered%20by-GoReleaser-blue.svg)](https://goreleaser.com)
 
-An interactive CLI tool that generates production-ready GoReleaser configurations for Go projects. It auto-detects your project structure, guides you through options with a rich TUI, and outputs `.goreleaser.yaml`, a GitHub Actions release workflow, and a Dockerfile -- all verified against GoReleaser v2.17 with zero deprecations.
+An interactive CLI tool that generates production-ready GoReleaser configurations for Go projects. It auto-detects your project structure, guides you through options with a rich TUI, and outputs `.goreleaser.yaml`, release CI workflows (GitHub Actions, Forgejo, or both via `--ci-provider`), and a Dockerfile -- all verified against GoReleaser v2.17 with zero deprecations.
 
 ## Quick Start
 
@@ -99,6 +99,7 @@ goreleaser-wizard init
 | `--project-type` | auto-detected | Override project type                         |
 | `--github-owner` | git remote    | Override GitHub repository owner              |
 | `--github-repo`  | git remote    | Override GitHub repository name               |
+| `--ci-provider`  | `github`      | `github`, `forgejo`, `dual`, or `none` -- selects the generated workflow set and release targets |
 
 When stdout is not a terminal, `init` prints a helpful message with the non-interactive flag.
 
@@ -124,6 +125,16 @@ goreleaser-wizard generate \
 | `--project-type` | auto-detected | Override project type                                |
 | `--github-owner` | git remote    | Override GitHub repository owner                     |
 | `--github-repo`  | git remote    | Override GitHub repository name                      |
+| `--ci-provider`  | `github`      | `github`, `forgejo`, `dual`, or `none` -- selects the generated workflow set and release targets |
+
+Forgejo example:
+
+```bash
+goreleaser-wizard generate --ci-provider forgejo \
+  --project-name my-project --binary-name my-app --project-type cli
+```
+
+This emits `.forgejo/workflows/ci.yml` + `release.yml` and a `.goreleaser.yaml` with `gitea_urls` (releases target your Forgejo instance; inside Forgejo Actions `secrets.GITHUB_TOKEN` is the Forgejo API token). Workflow pins (BuildFlow flake rev, goreleaser v2.17.1) are deliberate -- see `cmd/goreleaser-wizard/types/template_data.go`.
 
 ### `validate` -- Check Configuration
 
@@ -154,9 +165,9 @@ goreleaser-wizard version
 
 Modern GoReleaser v2.17 configuration: multi-platform builds, archives with Windows zip overrides, checksums, GitHub-native changelog, literal owner/repo (checks clean locally without env vars), and `dockers_v2` multi-platform images with OCI annotations when Docker is enabled.
 
-### `.github/workflows/release.yml`
+### `.github/workflows/release.yml` and/or `.forgejo/workflows/`
 
-Tag-triggered release workflow on `ubuntu-latest`: checkout with full history, Go from `go.mod`, Docker buildx + registry login when Docker is enabled, cosign installer when signing is enabled, then `goreleaser release --clean`.
+Tag-triggered release workflow on `ubuntu-latest` (GitHub) or your Forgejo Actions runner (default label `native`): checkout with full history, Go from `go.mod`, Docker buildx + registry login when Docker is enabled, cosign installer when signing is enabled, then `goreleaser release --clean`. `--ci-provider` picks the family: `github` (default, byte-identical to legacy output), `forgejo` (`.forgejo/workflows/ci.yml` + `release.yml`, goreleaser targets Forgejo via `gitea_urls`), `dual` (both sets), `none` (no workflows).
 
 ### `Dockerfile`
 
@@ -203,13 +214,14 @@ Supported registries: GitHub Container Registry (ghcr.io), Docker Hub, GitLab Re
 
 ## Git Providers
 
-| Provider    | CI/CD Support       |
-| ----------- | ------------------- |
-| GitHub      | GitHub Actions      |
-| GitLab      | GitLab CI           |
-| Bitbucket   | Bitbucket Pipelines |
-| Gitea       | Manual              |
-| Self-hosted | Manual              |
+| Provider    | Generated CI/CD                                    |
+| ----------- | -------------------------------------------------- |
+| GitHub      | GitHub Actions release workflow                    |
+| Forgejo     | Forgejo Actions workflows (`--ci-provider forgejo`) |
+| Gitea       | Manual (config only)                               |
+| GitLab      | Config only (CI templates not generated)           |
+| Bitbucket   | Config only (CI templates not generated)           |
+| Self-hosted | Manual                                             |
 
 ## Architecture
 
@@ -235,9 +247,9 @@ Correctness is pinned by tests: an E2E test generates into a temp module and req
 
 ```bash
 nix develop                                   # dev shell
-GOEXPERIMENT=jsonv2 go build ./...           # jsonv2 is required
-GOEXPERIMENT=jsonv2 go test ./...            # includes E2E + golden tests
-GOEXPERIMENT=jsonv2 golangci-lint run ./...
+go build ./...                               # go.mod requires Go 1.27 (encoding/json/v2 is the default)
+go test ./...                                # includes E2E + golden tests
+golangci-lint run ./...
 go-arch-lint check
 nix flake check
 ```

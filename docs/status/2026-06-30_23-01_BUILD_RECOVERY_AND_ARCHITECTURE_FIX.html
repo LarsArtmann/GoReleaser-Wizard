@@ -721,8 +721,45 @@
           </p>
         </div>
 
+        <!-- RESOLUTION 2026-11-07 (docs-health sweep): every item below is resolved or routed -->
+        <section id="resolution-2026-11-07">
+          <h2><span class="num">R</span>Resolution (2026-11-07 docs-health sweep)</h2>
+          <p><strong>Every item in this report has been resolved or routed.</strong> Root causes fixed in
+          <code>41aaf86</code> (2026-06-30). Verdicts use the docs-health canon
+          (<code>~~item~~ done at &lt;hash&gt;</code>); routed items live in <code>TODO_LIST.md</code>/<code>ROADMAP.md</code>
+          at repo root, both created by this sweep.</p>
+          <table>
+            <tr><th>Report item</th><th>Verdict (2026-11-07)</th></tr>
+            <tr><td><code>~~Root Cause 1: broken hasFile~~</code></td><td>done at <code>41aaf86</code></td></tr>
+            <tr><td><code>~~Root Cause 2: domain filesystem I/O~~</code></td><td>done at <code>41aaf86</code></td></tr>
+            <tr><td><code>~~Add unit tests for hasFile~~</code></td><td>routed — TODO_LIST.md (hasFile tests row)</td></tr>
+            <tr><td><code>~~Fix the 16 makezero lint warnings~~</code></td><td>done at <code>9703270</code></td></tr>
+            <tr><td><code>~~Remove unused createTempFile~~</code></td><td>done at <code>3cb91da</code></td></tr>
+            <tr><td><code>~~Fix 5 infertypeargs warnings~~</code></td><td>done at <code>3cb91da</code></td></tr>
+            <tr><td><code>~~Domain-layer tests (10% to 60%+)~~</code></td><td>routed — TODO_LIST.md (M21)</td></tr>
+            <tr><td><code>~~Consolidate root-level doc sprawl~~</code></td><td>partially done — docs/status corpus annotated+archived 2026-11-07; root .md cleanup routed — TODO_LIST.md</td></tr>
+            <tr><td><code>~~Create TODO_LIST.md from top-25~~</code></td><td>done 2026-11-07 (this sweep)</td></tr>
+            <tr><td><code>~~Refresh FEATURES.md~~</code></td><td>done at <code>969259e</code>, refreshed 2026-11-07</td></tr>
+            <tr><td><code>~~CI workflow on every push~~</code></td><td>done at <code>8edf0b1</code> (.github/workflows/ci.yml)</td></tr>
+            <tr><td><code>~~Split config-generation vs release-readiness validation~~</code></td><td>answered — warning-only kept; blocking release-readiness check routed — ROADMAP.md</td></tr>
+            <tr><td><code>~~Tests for internal/types / utils / generators / config / git~~</code></td><td>routed — TODO_LIST.md (M19/M20); generators partially covered by goldens (<code>8edf0b1</code>)</td></tr>
+            <tr><td><code>~~Mechanical domain-purity enforcement~~</code></td><td>routed — ROADMAP.md</td></tr>
+            <tr><td><code>~~Create ROADMAP.md~~</code></td><td>done 2026-11-07 (this sweep)</td></tr>
+            <tr><td><code>~~AGENTS.md signing-tool decision note~~</code></td><td>verified — warning-only approach is the documented state</td></tr>
+            <tr><td><code>~~Clean up .buildflow-resume.json / result symlink~~</code></td><td>done — buildflow artifacts gitignored (<code>62a6820</code>)</td></tr>
+            <tr><td><code>~~Review empty pkg/ directory~~</code></td><td>done — removed</td></tr>
+            <tr><td><code>~~Document TypeSpec to Go pipeline~~</code></td><td>Won't implement — surfaced via FEATURES.md/AGENTS.md mentions instead</td></tr>
+            <tr><td><code>~~BDD tests (Ginkgo) for wizard flow~~</code></td><td>routed — ROADMAP.md</td></tr>
+            <tr><td><code>~~Audit docs/research/SPLIT-BRAIN.html findings~~</code></td><td>done — split brain killed at <code>9f4bd71</code></td></tr>
+            <tr><td><code>~~Standardize error handling (fmt.Errorf in jobs.go)~~</code></td><td>verified — domain errors standard (AGENTS.md gotcha 2)</td></tr>
+            <tr><td><code>~~Review github_issues/ directory~~</code></td><td>superseded — issues tracked on GitHub; directory archival</td></tr>
+            <tr><td><code>~~Top Question: should signing-tool availability block?~~</code></td><td>answered — warning-only at generation time; blocking release-readiness check routed — ROADMAP.md</td></tr>
+            <tr><td><code>~~Coverage table (section 07)~~</code></td><td>point-in-time; lifts routed — TODO_LIST.md (M19-M21)</td></tr>
+          </table>
+        </section>
+
         <!-- SUMMARY -->
-        <h2 id="summary"><span class="num">00</span>Summary</h2>
+<span class="num">00</span>Summary</h2>
         <div class="stat-grid">
           <div class="stat-card stat-good">
             <div class="stat-value">39/39</div>
@@ -979,7 +1016,7 @@
         </div>
 
         <div class="card card-warning">
-          <h4>FEATURES.md — stale (last updated 2025-12-16)</h4>
+          <h4><del>FEATURES.md — stale (last updated 2025-12-16)</del> — refreshed 2026-08-17 (<code>969259e</code>) and 2026-11-07</h4>
           <p>
             The feature inventory is 6+ months old and doesn't reflect today's
             fixes. Status indicators don't match reality. No
@@ -993,7 +1030,7 @@
         <h2 id="not-started"><span class="num">04</span>Not Started</h2>
 
         <div class="card">
-          <h4>No TODO_LIST.md at project root</h4>
+          <h4><del>No TODO_LIST.md at project root</del> — CREATED 2026-11-07 (docs-health sweep)</h4>
           <p>
             The AGENTS.md documentation system specifies
             <code>TODO_LIST.md</code> for short/mid-term tasks. It doesn't
@@ -1004,7 +1041,7 @@
         </div>
 
         <div class="card">
-          <h4>No ROADMAP.md</h4>
+          <h4><del>No ROADMAP.md</del> — CREATED 2026-11-07 (docs-health sweep)</h4>
           <p>
             Long-term direction is undocumented as a single source of truth.
             Multiple planning docs exist in <code>docs/planning/</code> but
@@ -1013,7 +1050,7 @@
         </div>
 
         <div class="card">
-          <h4>Domain layer unit tests</h4>
+          <h4>Domain layer unit tests — routed to TODO_LIST.md (M21)</h4>
           <p>
             At 10% coverage, the domain layer — the heart of the business logic
             — is severely undertested.
@@ -1441,8 +1478,9 @@
 
         <div class="card card-warning">
           <h4>
-            Should signing-tool availability ever block, and if so — at which
-            stage?
+            <del>Should signing-tool availability ever block, and if so — at which
+            stage?</del> ANSWERED: warning-only at generation time; blocking
+            release-readiness check routed to ROADMAP.md (2026-11-07)
           </h4>
           <p>
             I downgraded the signing-tool check from a blocking

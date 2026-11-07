@@ -14,6 +14,8 @@
     "vendor/**",
     ".git/**",
     "node_modules/**",
-    "**/CHANGELOG.md"
+    "**/CHANGELOG.md",
+    "**/testdata/**",
+    ".config/**"
   ]
 }

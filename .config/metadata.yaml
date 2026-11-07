@@ -1,28 +1,29 @@
-tags:
-  - tool
-  - cli
-  - goreleaser
-  - cobra
-  - viper
-  - clean-architecture
-  - ddd
-  - domain-driven-design
-  - charm
-  - charmbracelet
-  - tui
-  - lipgloss
-  - huh
-  - homebrew
-  - docker
-  - github-actions
-  - code-signing
-  - release-automation
-  - generator
-  - template
-  - validation
-  - workflow
-  - types
-  - typed-enums
-importance: 80
 created_at: 2026-02-15T14:10:57.097567Z
-updated_at: 2026-03-25T17:44:03.062515Z
+updated_at: 2026-11-07T05:45:11.99533044Z
+tags:
+    - tool
+    - cli
+    - goreleaser
+    - cobra
+    - viper
+    - clean-architecture
+    - ddd
+    - domain-driven-design
+    - charm
+    - charmbracelet
+    - tui
+    - lipgloss
+    - huh
+    - homebrew
+    - docker
+    - github-actions
+    - code-signing
+    - release-automation
+    - generator
+    - template
+    - validation
+    - workflow
+    - types
+    - typed-enums
+    - app
+importance: 80

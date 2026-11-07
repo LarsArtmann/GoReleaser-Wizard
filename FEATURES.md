@@ -92,7 +92,7 @@ GoReleaser-Wizard is a CLI tool that generates production-ready GoReleaser v2.17
 - **Features:**
   - Build-only / publish-only / build-and-publish modes ✅
   - ghcr.io, Docker Hub, GitLab Registry, Quay.io, custom registries ✅
-  - Verified end-to-end 2026-08-17: local snapshot release built and published amd64+arm64 images
+  - Verified end-to-end 2026-08-17: local snapshot release built and published amd64+arm64 images; 2026-11-07: own `.goreleaser.yaml` still passes `goreleaser check` (v2.17.1, zero deprecations)
 
 ### 8. Code Signing Support
 

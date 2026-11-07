@@ -123,6 +123,7 @@ func TestDetectDeprecatedKeyLinesPointAtSource(t *testing.T) {
 	}
 
 	sourceLines := map[string]int{}
+
 	for i, line := range strings.Split(deprecatedConfigFixture, "\n") {
 		trimmed := strings.TrimSpace(line)
 		for key := range lines {
@@ -178,14 +179,19 @@ func TestValidateDeprecationsPopulatesResults(t *testing.T) {
 		t.Fatal("deprecated fixture produced no warnings")
 	}
 
-	joinedWarnings := ""
+	var builder strings.Builder
+
 	for _, warning := range results.Warnings {
-		joinedWarnings += warning.Message + " " + warning.Suggestion
+		builder.WriteString(warning.Message)
+		builder.WriteString(" ")
+		builder.WriteString(warning.Suggestion)
 
 		if warning.Code != "DEPRECATED_KEY" {
 			t.Errorf("warning code = %q, want DEPRECATED_KEY", warning.Code)
 		}
 	}
+
+	joinedWarnings := builder.String()
 
 	for _, want := range []string{
 		`"dockers"`,

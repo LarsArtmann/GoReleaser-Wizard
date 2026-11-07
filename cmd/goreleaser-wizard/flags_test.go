@@ -97,8 +97,8 @@ func TestDetectAlternativeStructureGlobErrorPropagates(t *testing.T) {
 		t.Errorf("error path returned values (%q, %q, %q), want empty", mainPath, binaryName, projectType)
 	}
 
-	var domainErr *domain.DomainError
-	if !errors.As(err, &domainErr) {
+	domainErr, ok := errors.AsType[*domain.DomainError](err)
+	if !ok {
 		t.Fatalf("error is %T, want *domain.DomainError", err)
 	}
 

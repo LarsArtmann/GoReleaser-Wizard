@@ -158,8 +158,7 @@ func mappingValue(mappingNode *yaml.Node, key string) *yaml.Node {
 func validateDeprecations(results *ValidationResults, path string) {
 	findings, err := detectDeprecatedKeysInFile(path)
 	if err != nil {
-		var domainErr *domain.DomainError
-		if errors.As(err, &domainErr) {
+		if domainErr, ok := errors.AsType[*domain.DomainError](err); ok {
 			results.Warnings = append(results.Warnings, domainErr)
 		}
 

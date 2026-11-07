@@ -153,6 +153,13 @@ goreleaser-wizard validate --project-only
 | `--fix`          | `false` | Attempt to fix common issues automatically |
 | `--project-only` | `false` | Validate project structure only            |
 
+`validate` also detects **deprecated GoReleaser keys** in your `.goreleaser.yaml`
+and prints the exact file:line with a before→after migration hint — without
+needing the `goreleaser` binary. Detected (verified against GoReleaser
+v2.17.1): `dockers` / `docker_manifests` (→ `dockers_v2`), `brews` (→
+`homebrew_casks`), and `archives.format_overrides.format` (→ `formats`).
+Migration details live in [`docs/goreleaser-guide.md`](docs/goreleaser-guide.md).
+
 ### `version` -- Version Info
 
 ```bash

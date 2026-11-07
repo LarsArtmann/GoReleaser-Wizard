@@ -1,15 +1,18 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"io"
 	"os"
 	"path/filepath"
 	"slices"
 	"strings"
+	"sync"
 	"testing"
 
 	"charm.land/log/v2"
+	"github.com/LarsArtmann/GoReleaser-Wizard/cmd/goreleaser-wizard/types"
 	"github.com/LarsArtmann/GoReleaser-Wizard/internal/domain"
 )
 
@@ -152,6 +155,87 @@ func TestGenerationPreflightJobExecute(t *testing.T) {
 			}
 		})
 	}
+}
+
+// TestGenerationPreflightJobWarnsOnPlaceholderTarget proves the preflight
+// prints remediation guidance when owner/repo resolution fell back to
+// placeholders: silent placeholder rendering is the M17b failure class.
+func TestGenerationPreflightJobWarnsOnPlaceholderTarget(t *testing.T) {
+	// Force the placeholder state deterministically: overriding the owner with
+	// the placeholder constant makes HasPlaceholderGitHubTarget() true without
+	// depending on the ambient git remote of the machine running the tests.
+	types.SetGitHubOwnerOverride(types.PlaceholderGitHubOwner)
+	t.Cleanup(func() { types.SetGitHubOwnerOverride("") })
+
+	t.Chdir(t.TempDir())
+
+	var logs lockedBuffer
+
+	logger := log.New(&logs)
+
+	job := NewGenerationPreflightJob(false, []string{".goreleaser.yaml"}, logger)
+	if err := job.Execute(context.Background()); err != nil {
+		t.Fatalf("Execute() = %v, want nil", err)
+	}
+
+	output := logs.String()
+	for _, want := range []string{
+		"GitHub owner/repo not detected",
+		types.PlaceholderGitHubOwner,
+		"--github-owner",
+	} {
+		if !strings.Contains(output, want) {
+			t.Errorf("warning output does not contain %q; got: %s", want, output)
+		}
+	}
+}
+
+// TestGenerationPreflightJobNoWarningWithRealTarget proves the placeholder
+// warning stays silent when a concrete owner override is set.
+func TestGenerationPreflightJobNoWarningWithRealTarget(t *testing.T) {
+	types.SetGitHubOwnerOverride("real-owner")
+	types.SetGitHubRepoOverride("real-repo")
+	t.Cleanup(func() {
+		types.SetGitHubOwnerOverride("")
+		types.SetGitHubRepoOverride("")
+	})
+
+	t.Chdir(t.TempDir())
+
+	var logs lockedBuffer
+
+	logger := log.New(&logs)
+
+	job := NewGenerationPreflightJob(false, []string{".goreleaser.yaml"}, logger)
+	if err := job.Execute(context.Background()); err != nil {
+		t.Fatalf("Execute() = %v, want nil", err)
+	}
+
+	if strings.Contains(logs.String(), "GitHub owner/repo not detected") {
+		t.Errorf("placeholder warning printed despite real owner/repo: %s", logs.String())
+	}
+}
+
+// lockedBuffer is a concurrency-safe writer for capturing charm log output;
+// the logger writes from the calling goroutine, but the buffer also serves
+// assertions after Execute returns.
+type lockedBuffer struct {
+	mu  sync.Mutex
+	buf bytes.Buffer
+}
+
+func (b *lockedBuffer) Write(p []byte) (int, error) {
+	b.mu.Lock()
+	defer b.mu.Unlock()
+
+	return b.buf.Write(p)
+}
+
+func (b *lockedBuffer) String() string {
+	b.mu.Lock()
+	defer b.mu.Unlock()
+
+	return b.buf.String()
 }
 
 func TestDockerfileGenerationJobExecute(t *testing.T) {

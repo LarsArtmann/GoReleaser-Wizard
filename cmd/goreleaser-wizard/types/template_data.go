@@ -308,8 +308,10 @@ type githubRemote struct {
 //nolint:gochecknoglobals // The origin remote cannot change during one run; cached after first lookup.
 var cachedGitHubRemote *githubRemote
 
-// parseGitHubRemote tries to get GitHub owner and repo from git remote.
-// The result is cached for the lifetime of the process.
+// parseGitHubRemote resolves the origin remote to owner and repo. The result
+// is cached for the lifetime of the process. Detection failure returns EMPTY
+// strings: placeholders are a rendering concern injected by the Get* readers,
+// never a parse result, so "undetected" cannot masquerade as real data.
 func parseGitHubRemote() (string, string) {
 	if cachedGitHubRemote != nil {
 		return cachedGitHubRemote.owner, cachedGitHubRemote.repo
@@ -329,7 +331,7 @@ func parseGitHubRemote() (string, string) {
 		}
 	}
 
-	return PlaceholderGitHubOwner, PlaceholderGitHubRepo
+	return "", ""
 }
 
 // HasPlaceholderGitHubTarget reports whether GitHub owner or repository
@@ -358,24 +360,34 @@ func SetGitHubRepoOverride(repo string) {
 	githubRepoOverride = repo
 }
 
-// GetGitHubOwner tries to get GitHub owner from git remote.
+// GetGitHubOwner tries to get GitHub owner from git remote. Undetected owners
+// render as the documented placeholder so HasPlaceholderGitHubTarget can flag
+// them (the generation preflight warns with remediation guidance).
 func GetGitHubOwner() string {
 	if githubOwnerOverride != "" {
 		return githubOwnerOverride
 	}
 
 	owner, _ := parseGitHubRemote()
+	if owner == "" {
+		return PlaceholderGitHubOwner
+	}
 
 	return owner
 }
 
-// GetGitHubRepo tries to get GitHub repo from git remote.
+// GetGitHubRepo tries to get GitHub repo from git remote. Undetected repos
+// render as the documented placeholder so HasPlaceholderGitHubTarget can flag
+// them (the generation preflight warns with remediation guidance).
 func GetGitHubRepo() string {
 	if githubRepoOverride != "" {
 		return githubRepoOverride
 	}
 
 	_, repo := parseGitHubRemote()
+	if repo == "" {
+		return PlaceholderGitHubRepo
+	}
 
 	return repo
 }

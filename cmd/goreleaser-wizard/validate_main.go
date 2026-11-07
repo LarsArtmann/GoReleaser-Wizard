@@ -163,7 +163,22 @@ func validateProjectStructure(results *ValidationResults) {
 		// Try common alternatives
 		alternatives := []string{"main", "src"}
 		for _, alt := range alternatives {
-			if exists, _ := fileSystemRepo.DirExists(context.Background(), alt); exists {
+			altExists, err := fileSystemRepo.DirExists(context.Background(), alt)
+			if err != nil {
+				// A failed stat is not "missing": report it and keep checking
+				// the remaining alternatives instead of silently skipping.
+				results.Warnings = append(results.Warnings,
+					NewSystemError(
+						"FILE_READ_FAILED",
+						"Failed to check alternative main directory",
+						"Cannot access "+alt,
+						err,
+					).WithContext(alt))
+
+				continue
+			}
+
+			if altExists {
 				results.Warnings = append(results.Warnings,
 					NewValidationError(
 						"INVALID_PROJECT_STRUCTURE",

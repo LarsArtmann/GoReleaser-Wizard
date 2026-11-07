@@ -50,6 +50,17 @@
 | M10: authenticated mirror sweep (`has_actions` on private mirrors)                        | 🔵 `BLOCKED` | Needs the Forgejo API token (2026-11-04 line 55)                                            |
 | Answer-gated: M17-fleet docker-missing CLI behavior (g3), branch-protection strictness (g1), `RELEASE_SHADOW_GITHUB_TOKEN` PAT policy (g2) | 🔵 `BLOCKED` | Questions for Lars in `docs/status/2026-10-28_02-35_forgejo-migration-full-status-a-g.md` lines 146-148 |
 
+## Sweep debts (2026-11-07 docs-health audit follow-ups)
+
+| Task                                                                                     | Status     | Impact | Effort | Evidence                                                                                     |
+| ---------------------------------------------------------------------------------------- | ---------- | ------ | ------ | ---------------------------------------------------------------------------------------------- |
+| Formatter re-gate of annotated corpus: dprint over archived + living docs, then `check-rows --strict` + `bare-rows` + `prose-items` (annotate→check→**format**→check canon was left unfinished) | 🔴 `TODO` | High | 30min | `docs/status/archived/` (18 files, 2fcc8a2); damage class known from skill canon |
+| Post-sweep proof: `nix flake check`, `go mod tidy` state, daemon end-state verify, pin sweep hash `2fcc8a2` into CHANGELOG | 🔴 `TODO` | Med | 30min | CHANGELOG.md Unreleased section lacks the sweep commit hash |
+| Standing docs CI: formatter check + markdown link check + FEATURES status-counts test wired into `.github/workflows/ci.yml` | 🔴 `TODO` | Med | 30min | `ci.yml` covers lint+test only; FEATURES table hand-maintained |
+| docs-gates adoption: run `docs-gates run .`, seed `.docs-gates.json`, wire `scripts/docs-gates.sh` | 🔴 `TODO` | Low-Med | 30min | battery not installed locally (skill §battery) |
+| Dated-claims re-verify: local snapshot `goreleaser check` on own config → re-date FEATURES Docker claim; scan living docs for other dated claims | 🔴 `TODO` | Low-Med | 45min | FEATURES.md "Verified end-to-end 2026-08-17" |
+| Root sprawl + `github_issues/` disposition proposal (inventory + classification; execution awaits owner call) | 🔴 `TODO` | Low | 30min | 17 root `.md` files + `github_issues/` (25 files) |
+
 ---
 
-<!-- Harvested 2026-11-07 via docs-health AUDIT: HARVEST from docs/status/2026-08-17_*, docs/status/2026-10-*, docs/status/2026-11-04, docs/planning/2026-08-16 (Wave 6), verified against code. Superseded/done items from the 2026-01..08 corpus were annotated in place and archived to docs/status/archived/. -->
+<!-- Harvested 2026-11-07 via docs-health AUDIT: HARVEST from docs/status/2026-08-17_*, docs/status/2026-10-*, docs/status/2026-11-04, docs/planning/2026-08-16 (Wave 6), verified against code. Superseded/done items from the 2026-01..08 corpus were annotated in place and archived to docs/status/archived/. Sweep debts added from docs/planning/2026-11-07_08-51_SUPERB-wave6-hardening-and-proof-plan.md. -->

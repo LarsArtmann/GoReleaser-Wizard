@@ -18,11 +18,11 @@ Successfully completed migration from `charmbracelet/log` v1 and `charmbracelet/
 
 | Component           | Status      | Details                             |
 | ------------------- | ----------- | ----------------------------------- |
-| Import path updates | ✅ Complete | All 9 files updated                 |
-| go.mod dependencies | ✅ Complete | v2.0.0 for log, v2.0.1 for lipgloss |
-| go.sum updates      | ✅ Complete | All checksums present               |
-| Build verification  | ✅ Complete | `go build ./...` passes             |
-| Test verification   | ✅ Complete | All tests pass                      |
+| ~~Import path updates~~ done at `c99a279` | ~~✅ Complete~~ | ~~All 9 files updated~~ |
+| ~~go.mod dependencies~~ done at `c99a279` | ~~✅ Complete~~ | ~~v2.0.0 for log, v2.0.1 for lipgloss~~ |
+| ~~go.sum updates~~ done at `c99a279` | ~~✅ Complete~~ | ~~All checksums present~~ |
+| ~~Build verification~~ done at `c99a279` | ~~✅ Complete~~ | ~~`go build ./...` passes~~ |
+| ~~Test verification~~ done at `c99a279` | ~~✅ Complete~~ | ~~All tests pass~~ |
 
 **Files Modified:**
 
@@ -41,50 +41,50 @@ Successfully completed migration from `charmbracelet/log` v1 and `charmbracelet/
 
 | Feature             | Status                                 |
 | ------------------- | -------------------------------------- |
-| Cobra CLI framework | ✅ Complete with 4 commands            |
-| Command: `init`     | ✅ Interactive wizard fully functional |
-| Command: `generate` | ✅ Non-interactive generation works    |
-| Command: `validate` | ✅ Configuration validation works      |
-| Command: `version`  | ✅ Version display working             |
-| Global flags        | ✅ `--config`, `--debug`               |
+| ~~Cobra CLI framework~~ done — verified 2026-11-07 | ~~✅ Complete with 4 commands~~ |
+| ~~Command: `init`~~ done — verified 2026-11-07 | ~~✅ Interactive wizard fully functional~~ |
+| ~~Command: `generate`~~ done — verified 2026-11-07 | ~~✅ Non-interactive generation works~~ |
+| ~~Command: `validate`~~ done — verified 2026-11-07 | ~~✅ Configuration validation works~~ |
+| ~~Command: `version`~~ done — verified 2026-11-07 | ~~✅ Version display working~~ |
+| ~~Global flags~~ done — verified 2026-11-07 | ~~✅ `--config`, `--debug`~~ |
 
 ### 3. TUI (Terminal User Interface)
 
 | Component               | Status                                              |
 | ----------------------- | --------------------------------------------------- |
-| Huh-based forms         | ✅ 5 form groups implemented                        |
-| Project info collection | ✅ Name, description, type                          |
-| Build configuration     | ✅ Binary name, main path, platforms, architectures |
-| Feature selection       | ✅ Docker, Homebrew, SBOM, signing                  |
-| Git provider selection  | ✅ GitHub, GitLab, Gitea, Codeberg                  |
-| Validation              | ✅ Real-time with error display                     |
+| ~~Huh-based forms~~ done — huh/v2 since 52a5a96 (2026-03-26) | ~~✅ 5 form groups implemented~~ |
+| ~~Project info collection~~ done — huh/v2 since 52a5a96 (2026-03-26) | ~~✅ Name, description, type~~ |
+| ~~Build configuration~~ done — huh/v2 since 52a5a96 (2026-03-26) | ~~✅ Binary name, main path, platforms, architectures~~ |
+| ~~Feature selection~~ done — huh/v2 since 52a5a96 (2026-03-26) | ~~✅ Docker, Homebrew, SBOM, signing~~ |
+| ~~Git provider selection~~ done — huh/v2 since 52a5a96 (2026-03-26) | ~~✅ GitHub, GitLab, Gitea, Codeberg~~ |
+| ~~Validation~~ done — huh/v2 since 52a5a96 (2026-03-26) | ~~✅ Real-time with error display~~ |
 
 ### 4. Template Generation System
 
 | Template                | Status                          |
 | ----------------------- | ------------------------------- |
-| GoReleaser config       | ✅ Complete with all sections   |
-| GitHub Actions workflow | ✅ Multi-trigger support        |
-| Dockerfile              | ✅ Multi-stage builds           |
-| Homebrew formula        | ✅ Tap and core formula support |
+| ~~GoReleaser config~~ **Superseded — dockers_v2 prebuilt pattern e85bb4f; single source 9f4bd71.** | ~~✅ Complete with all sections~~ |
+| ~~GitHub Actions workflow~~ **Superseded — dockers_v2 prebuilt pattern e85bb4f; single source 9f4bd71.** | ~~✅ Multi-trigger support~~ |
+| ~~Dockerfile~~ **Superseded — dockers_v2 prebuilt pattern e85bb4f; single source 9f4bd71.** | ~~✅ Multi-stage builds~~ |
+| ~~Homebrew formula~~ **Superseded — dockers_v2 prebuilt pattern e85bb4f; single source 9f4bd71.** | ~~✅ Tap and core formula support~~ |
 
 ### 5. Domain Layer Architecture
 
 | Component          | Status                                       |
 | ------------------ | -------------------------------------------- |
-| SafeProjectConfig  | ✅ Core configuration type                   |
-| Typed enumerations | ✅ ProjectType, Platform, Architecture, etc. |
-| Validation logic   | ✅ Field and business rule validation        |
-| Domain errors      | ✅ Structured error system                   |
+| ~~SafeProjectConfig~~ done — verified 2026-11-07 | ~~✅ Core configuration type~~ |
+| ~~Typed enumerations~~ done — verified 2026-11-07 | ~~✅ ProjectType, Platform, Architecture, etc.~~ |
+| ~~Validation logic~~ done — verified 2026-11-07 | ~~✅ Field and business rule validation~~ |
+| ~~Domain errors~~ done — verified 2026-11-07 | ~~✅ Structured error system~~ |
 
 ### 6. Workflow Engine
 
 | Component        | Status                             |
 | ---------------- | ---------------------------------- |
-| Job interface    | ✅ Execute + Rollback              |
-| JobManager       | ✅ Sequential + parallel execution |
-| JobFactory       | ✅ Job creation pattern            |
-| Rollback support | ✅ Automatic on failure            |
+| ~~Job interface~~ done — verified 2026-11-07 | ~~✅ Execute + Rollback~~ |
+| ~~JobManager~~ done — verified 2026-11-07 | ~~✅ Sequential + parallel execution~~ |
+| ~~JobFactory~~ done — verified 2026-11-07 | ~~✅ Job creation pattern~~ |
+| ~~Rollback support~~ done — verified 2026-11-07 | ~~✅ Automatic on failure~~ |
 
 ---
 
@@ -94,51 +94,51 @@ Successfully completed migration from `charmbracelet/log` v1 and `charmbracelet/
 
 | Package                 | Current | Target | Gap      |
 | ----------------------- | ------- | ------ | -------- |
-| `cmd/goreleaser-wizard` | 51.9%   | 80%    | -28.1%   |
-| `internal/domain`       | 0.7%    | 80%    | -79.3% ⚠️ |
-| `internal/types`        | 1.7%    | 80%    | -78.3% ⚠️ |
-| `internal/validation`   | 56.3%   | 80%    | -23.7%   |
+| ~~`cmd/goreleaser-wizard`~~ **Superseded — point-in-time; lifts tracked in TODO_LIST.md (M19-M21).** | ~~51.9%~~ | ~~80%~~ | ~~-28.1%~~ |
+| ~~`internal/domain`~~ **Superseded — point-in-time; lifts tracked in TODO_LIST.md (M19-M21).** | ~~0.7%~~ | ~~80%~~ | ~~-79.3% ⚠️~~ |
+| ~~`internal/types`~~ **Superseded — point-in-time; lifts tracked in TODO_LIST.md (M19-M21).** | ~~1.7%~~ | ~~80%~~ | ~~-78.3% ⚠️~~ |
+| ~~`internal/validation`~~ **Superseded — point-in-time; lifts tracked in TODO_LIST.md (M19-M21).** | ~~56.3%~~ | ~~80%~~ | ~~-23.7%~~ |
 
 **Untested Packages (0% coverage):**
 
-1. `cmd/goreleaser-wizard/generators` - 6 files, ~800 lines
-2. `cmd/goreleaser-wizard/jobs` - 5 files, ~600 lines
-3. `cmd/goreleaser-wizard/templates` - Embedded templates
-4. `cmd/goreleaser-wizard/types` - Template data structs
-5. `internal/config` - Koanf configuration
-6. `internal/errors` - Domain error types
-7. `internal/git` - Git command wrappers
-8. `internal/utils` - Utility functions
+~~1. `cmd/goreleaser-wizard/generators` - 6 files, ~800 lines~~ **Superseded — goldens cover generators/templates 8edf0b1; rest in TODO_LIST.md (M19-M21).**
+~~2. `cmd/goreleaser-wizard/jobs` - 5 files, ~600 lines~~ **Superseded — goldens cover generators/templates 8edf0b1; rest in TODO_LIST.md (M19-M21).**
+~~3. `cmd/goreleaser-wizard/templates` - Embedded templates~~ **Superseded — goldens cover generators/templates 8edf0b1; rest in TODO_LIST.md (M19-M21).**
+~~4. `cmd/goreleaser-wizard/types` - Template data structs~~ **Superseded — goldens cover generators/templates 8edf0b1; rest in TODO_LIST.md (M19-M21).**
+~~5. `internal/config` - Koanf configuration~~ **Superseded — goldens cover generators/templates 8edf0b1; rest in TODO_LIST.md (M19-M21).**
+~~6. `internal/errors` - Domain error types~~ **Superseded — goldens cover generators/templates 8edf0b1; rest in TODO_LIST.md (M19-M21).**
+~~7. `internal/git` - Git command wrappers~~ **Superseded — goldens cover generators/templates 8edf0b1; rest in TODO_LIST.md (M19-M21).**
+~~8. `internal/utils` - Utility functions~~ **Superseded — goldens cover generators/templates 8edf0b1; rest in TODO_LIST.md (M19-M21).**
 
 ### 2. File Size Management
 
 | File                                         | Lines | Limit | Status      |
 | -------------------------------------------- | ----- | ----- | ----------- |
-| `cmd/goreleaser-wizard/jobs.go`              | 848   | 300   | ⚠️ 283% over |
-| `internal/types/validation.go`               | 857   | 300   | ⚠️ 286% over |
-| `cmd/goreleaser-wizard/workflow.go`          | 467   | 300   | ⚠️ 56% over  |
-| `cmd/goreleaser-wizard/architecture_test.go` | 412   | 300   | ⚠️ 37% over  |
-| `internal/domain/enums.go`                   | 429   | 300   | ⚠️ 43% over  |
-| `internal/domain/validation.go`              | 434   | 300   | ⚠️ 45% over  |
-| `internal/domain/interfaces.go`              | 450   | 300   | ⚠️ 50% over  |
+| ~~`cmd/goreleaser-wizard/jobs.go`~~ **Superseded — superseded by 2026-08 modernization; sizes tracked in TODO_LIST.md.** | ~~848~~ | ~~300~~ | ~~⚠️ 283% over~~ |
+| ~~`internal/types/validation.go`~~ **Superseded — superseded by 2026-08 modernization; sizes tracked in TODO_LIST.md.** | ~~857~~ | ~~300~~ | ~~⚠️ 286% over~~ |
+| ~~`cmd/goreleaser-wizard/workflow.go`~~ **Superseded — superseded by 2026-08 modernization; sizes tracked in TODO_LIST.md.** | ~~467~~ | ~~300~~ | ~~⚠️ 56% over~~ |
+| ~~`cmd/goreleaser-wizard/architecture_test.go`~~ **Superseded — superseded by 2026-08 modernization; sizes tracked in TODO_LIST.md.** | ~~412~~ | ~~300~~ | ~~⚠️ 37% over~~ |
+| ~~`internal/domain/enums.go`~~ **Superseded — superseded by 2026-08 modernization; sizes tracked in TODO_LIST.md.** | ~~429~~ | ~~300~~ | ~~⚠️ 43% over~~ |
+| ~~`internal/domain/validation.go`~~ **Superseded — superseded by 2026-08 modernization; sizes tracked in TODO_LIST.md.** | ~~434~~ | ~~300~~ | ~~⚠️ 45% over~~ |
+| ~~`internal/domain/interfaces.go`~~ **Superseded — superseded by 2026-08 modernization; sizes tracked in TODO_LIST.md.** | ~~450~~ | ~~300~~ | ~~⚠️ 50% over~~ |
 
 ### 3. Architecture Enforcement
 
 | Component               | Status                    |
 | ----------------------- | ------------------------- |
-| go-arch-lint configured | ✅                        |
-| Deep scanning enabled   | ✅                        |
-| CI integration          | ⚠️ Works but slow          |
-| Pre-commit hooks        | ⚠️ 1+ minute timeout issue |
+| ~~go-arch-lint configured~~ done — verified 2026-11-07; BuildFlow pre-commit since reworked | ~~✅~~ |
+| ~~Deep scanning enabled~~ done — verified 2026-11-07; BuildFlow pre-commit since reworked | ~~✅~~ |
+| ~~CI integration~~ done — verified 2026-11-07; BuildFlow pre-commit since reworked | ~~⚠️ Works but slow~~ |
+| ~~Pre-commit hooks~~ done — verified 2026-11-07; BuildFlow pre-commit since reworked | ~~⚠️ 1+ minute timeout issue~~ |
 
 ### 4. Code Quality
 
 | Aspect              | Status                                 |
 | ------------------- | -------------------------------------- |
-| golangci-lint       | ✅ 100+ linters enabled                |
-| Error wrapping      | ⚠️ Partial - some `fmt.Errorf` remain   |
-| Context propagation | ⚠️ Partial - some functions missing ctx |
-| Type safety         | ⚠️ Some `map[string]any` remain         |
+| ~~golangci-lint~~ done — verified 2026-11-07 | ~~✅ 100+ linters enabled~~ |
+| ~~Error wrapping~~ done — verified 2026-11-07 | ~~⚠️ Partial - some `fmt.Errorf` remain~~ |
+| ~~Context propagation~~ done — verified 2026-11-07 | ~~⚠️ Partial - some functions missing ctx~~ |
+| ~~Type safety~~ done at `9f4bd71` | ~~⚠️ Some `map[string]any` remain~~ |
 
 ---
 
@@ -218,10 +218,10 @@ validation.go (434 lines) → Split into:
 
 **Action Plan:**
 
-1. Add unit tests for domain types (enums, config_core.go)
-2. Mock git commands for testing
-3. Add generator tests with golden files
-4. Integration tests for full workflow
+~~1. Add unit tests for domain types (enums, config_core.go)~~ **Superseded — TODO_LIST.md (M21/M19).**
+~~2. Mock git commands for testing~~ **Superseded — TODO_LIST.md (M21/M19).**
+~~3. Add generator tests with golden files~~ done at `8edf0b1`
+~~4. Integration tests for full workflow~~ done at `8edf0b1`
 
 ### 3. Type Safety Improvements
 
@@ -268,40 +268,40 @@ type GoReleaserTemplateData struct {
 
 ### P0 - BLOCKING/CRITICAL (Do First)
 
-1. **Split jobs.go** - 848 lines is unmaintainable (2-3 hrs)
-2. **Add domain layer tests** - 0.7% → 50% coverage (8-10 hrs)
-3. **Add generator tests** - Currently 0% coverage (4-6 hrs)
-4. **Fix pre-commit hook timeout** - Blocking commits (30 min)
+~~1. **Split jobs.go** - 848 lines is unmaintainable (2-3 hrs)~~ **Superseded — TODO_LIST.md (split-oversized-files).**
+~~2. **Add domain layer tests** - 0.7% → 50% coverage (8-10 hrs)~~ **Superseded — TODO_LIST.md (M21).**
+~~3. **Add generator tests** - Currently 0% coverage (4-6 hrs)~~ done at `8edf0b1`
+~~4. **Fix pre-commit hook timeout** - Blocking commits (30 min)~~ **Superseded — BuildFlow since reworked; no timeout reproduces.**
 
 ### P1 - HIGH PRIORITY (This Week)
 
-5. **Split validation.go** - 434 lines (2 hrs)
-6. **Split enums.go** - 429 lines by entity (3 hrs)
-7. **Split interfaces.go** - 450 lines by domain (3 hrs)
-8. **Replace map[string]any** with typed structs (4-6 hrs)
-9. **Add WorkingDir to SafeProjectConfig** (2 hrs)
-10. **Implement repository pattern** for file I/O (4 hrs)
+~~5. **Split validation.go** - 434 lines (2 hrs)~~ **Superseded — TODO_LIST.md (split-oversized-files).**
+~~6. **Split enums.go** - 429 lines by entity (3 hrs)~~ done at `a23475d`
+~~7. **Split interfaces.go** - 450 lines by domain (3 hrs)~~ **Superseded — TODO_LIST.md (split-oversized-files).**
+~~8. **Replace map[string]any** with typed structs (4-6 hrs)~~ done at `9f4bd71`
+~~9. **Add WorkingDir to SafeProjectConfig** (2 hrs)~~ **Won't implement — SafeProjectConfig is TypeSpec-generated; never needed.**
+~~10. **Implement repository pattern** for file I/O (4 hrs)~~ **Won't implement — interface-based DI chosen instead.**
 
 ### P2 - MEDIUM PRIORITY (This Sprint)
 
-11. **Add jobs package tests** - Currently 0% (3-4 hrs)
-12. **Add templates package tests** (2-3 hrs)
-13. **Add internal/git tests** with mocks (3 hrs)
-14. **Consolidate GoReleaser templates** to single source (2-3 hrs)
-15. **Add context to all async operations** (2-3 hrs)
-16. **Implement proper error types** in generators (3 hrs)
-17. **Add fuzz tests** for validation functions (2 hrs)
-18. **Create test fixtures/factories** for configs (2 hrs)
+~~11. **Add jobs package tests** - Currently 0% (3-4 hrs)~~ **Superseded — jobs/ package dissolved; coverage in TODO_LIST.md (M20).**
+~~12. **Add templates package tests** (2-3 hrs)~~ done — 8edf0b1 golden/template coverage
+~~13. **Add internal/git tests** with mocks (3 hrs)~~ **Superseded — TODO_LIST.md (M19).**
+~~14. **Consolidate GoReleaser templates** to single source (2-3 hrs)~~ done at `9f4bd71`
+~~15. **Add context to all async operations** (2-3 hrs)~~ done — verified 2026-11-07
+~~16. **Implement proper error types** in generators (3 hrs)~~ done — verified 2026-11-07
+~~17. **Add fuzz tests** for validation functions (2 hrs)~~ **Superseded — ROADMAP.md (property-based/fuzz).**
+~~18. **Create test fixtures/factories** for configs (2 hrs)~~ done — test_helpers.go
 
 ### P3 - NICE TO HAVE (Next Sprint)
 
-19. **Add performance benchmarks** for critical paths (2 hrs)
-20. **Implement DI container** for better testability (4-6 hrs)
-21. **Add configuration persistence** for wizard answers (3-4 hrs)
-22. **Create architecture diagrams** with `just graph` (1 hr)
-23. **Add chaos engineering tests** for resilience (4 hrs)
-24. **Improve documentation** with examples (3 hrs)
-25. **Add E2E tests** for full wizard flow (4-6 hrs)
+~~19. **Add performance benchmarks** for critical paths (2 hrs)~~ done — performance_test.go exists
+~~20. **Implement DI container** for better testability (4-6 hrs)~~ **Won't implement — samber/do never adopted; interface-based DI.**
+~~21. **Add configuration persistence** for wizard answers (3-4 hrs)~~ **Superseded — ROADMAP.md (config persistence).**
+~~22. **Create architecture diagrams** with `just graph` (1 hr)~~ **Won't implement — justfile removed a6719bc; flake.nix gates.**
+~~23. **Add chaos engineering tests** for resilience (4 hrs)~~ **Won't implement — rejected: non-goal (ROADMAP.md).**
+~~24. **Improve documentation** with examples (3 hrs)~~ done at `969259e`
+~~25. **Add E2E tests** for full wizard flow (4-6 hrs)~~ done at `8edf0b1`
 
 ---
 
@@ -327,10 +327,10 @@ huh v1.0.0 → github.com/charmbracelet/lipgloss v1.1.0 ⚠️
 
 **Questions:**
 
-1. Should we wait for `huh` to release a v2 that uses `charm.land/lipgloss/v2`?
-2. Is there a compatibility shim between v1 and v2 lipgloss types?
-3. Should we fork/contribute to `huh` to update its dependencies?
-4. Will having both versions cause runtime issues with color profiles or styles?
+~~1. Should we wait for `huh` to release a v2 that uses `charm.land/lipgloss/v2`?~~ done at `52a5a96`
+~~2. Is there a compatibility shim between v1 and v2 lipgloss types?~~ **NOT-DO — obsolete after huh v2 adoption.**
+~~3. Should we fork/contribute to `huh` to update its dependencies?~~ **NOT-DO — obsolete after huh v2 adoption.**
+~~4. Will having both versions cause runtime issues with color profiles or styles?~~ done — no runtime issues observed since
 
 **Impact Assessment:**
 
@@ -376,10 +376,10 @@ ok      github.com/LarsArtmann/GoReleaser-Wizard/internal/validation      (cache
 
 | Package                           | Old    | New      |
 | --------------------------------- | ------ | -------- |
-| charm.land/lipgloss/v2            | -      | v2.0.1   |
-| charm.land/log/v2                 | -      | v2.0.0   |
-| github.com/charmbracelet/lipgloss | v1.1.0 | indirect |
-| github.com/charmbracelet/log      | v1.0.0 | removed  |
+| ~~charm.land/lipgloss/v2~~ done — verified via go.mod 2026-11-07 | ~~-~~ | ~~v2.0.1~~ |
+| ~~charm.land/log/v2~~ done — verified via go.mod 2026-11-07 | ~~-~~ | ~~v2.0.0~~ |
+| ~~github.com/charmbracelet/lipgloss~~ done — verified via go.mod 2026-11-07 | ~~v1.1.0~~ | ~~indirect~~ |
+| ~~github.com/charmbracelet/log~~ done — verified via go.mod 2026-11-07 | ~~v1.0.0~~ | ~~removed~~ |
 
 ### Key Indirect Dependencies
 
@@ -407,15 +407,15 @@ ok      github.com/LarsArtmann/GoReleaser-Wizard/internal/validation      (cache
 
 The charmbracelet/log v2 migration is complete and successful. The project builds and tests pass. However, significant technical debt remains in the form of:
 
-1. Massive files needing splitting (7 files > 300 lines)
-2. Poor test coverage in critical packages (8 at 0%)
-3. Dual lipgloss dependency due to `huh` lagging behind
+~~1. Massive files needing splitting (7 files > 300 lines)~~ **Superseded — TODO_LIST.md (split-oversized-files).**
+~~2. Poor test coverage in critical packages (8 at 0%)~~ **Superseded — TODO_LIST.md (M19-M21).**
+~~3. Dual lipgloss dependency due to `huh` lagging behind~~ done at `52a5a96`
 
 **Next Immediate Actions:**
 
-1. Address the Top 4 P0 items
-2. Monitor `huh` for v2/lipgloss v2 update
-3. Continue incremental file splitting
+~~1. Address the Top 4 P0 items~~ **Superseded — subset done (8edf0b1, 9f4bd71); rest in TODO_LIST.md.**
+~~2. Monitor `huh` for v2/lipgloss v2 update~~ done at `52a5a96`
+~~3. Continue incremental file splitting~~ **Superseded — TODO_LIST.md (split-oversized-files).**
 
 **Overall Assessment:** Project is functional but needs ongoing refactoring for maintainability.
 

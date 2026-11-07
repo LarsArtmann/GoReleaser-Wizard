@@ -3,18 +3,18 @@
 **Project**: GoReleaser-Wizard — interactive GoReleaser configuration wizard
 **Repository**: https://github.com/LarsArtmann/GoReleaser-Wizard
 
-Only non-obvious, session-critical context lives here. Full history in git; details in README.md / FEATURES.md / docs/.
+Only non-obvious, session-critical context lives here. Full history in git; details in README.md / FEATURES.md / TODO_LIST.md / ROADMAP.md / CHANGELOG.md / docs/.
 
 ## Overview
 
 Interactive CLI that generates production-ready GoReleaser configurations with CI workflows (github/forgejo/dual targets). Clean Architecture + DDD:
 
-1. **Domain** (`internal/domain/`): pure business logic, zero external deps. Core: `SafeProjectConfig`, typed enums, `DomainError` system (`internal/errors/domain_errors.go`)
+1. **Domain** (`internal/domain/`): pure business logic, zero external deps. Core: `SafeProjectConfig`, typed enums, `DomainError` system (`internal/domain/errors.go`, `New*Error()` constructors — migrated out of the removed `internal/errors/` in `dde1081`)
 2. **Application** (`cmd/goreleaser-wizard/`): Cobra CLI, workflow/job execution system, typed generators (`generators/`)
 3. **Infrastructure** (`internal/git/`, `internal/utils/`): git wrappers, utilities
 4. **Templates** (`cmd/goreleaser-wizard/templates/`, embedded in `templates/embedded.go`): THE single source of truth for generated files; rendered only by generators. `types/template_data.go` holds typed template data + owner/repo resolution (flag > git remote > placeholder)
 
-**Stack**: Go 1.27, Cobra, Viper, Charm (lipgloss/log), golangci-lint, go-arch-lint, GoReleaser v2.17 as the generation target.
+**Stack**: Go 1.27, Cobra, Koanf (replaced Viper in `50c0feb`, 2026-03), Charm (lipgloss/log), golangci-lint, go-arch-lint, GoReleaser v2.17 as the generation target.
 
 ## Essential Commands
 

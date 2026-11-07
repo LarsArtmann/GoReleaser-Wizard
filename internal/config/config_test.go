@@ -135,12 +135,34 @@ func TestManagerSetGetResetRoundTrip(t *testing.T) {
 
 func TestGlobalManagerRoundTrip(t *testing.T) {
 	original := GetManager()
+
 	t.Cleanup(func() { SetGlobalManager(original) })
 
 	replacement := NewManager()
+
 	SetGlobalManager(replacement)
 
 	if GetManager() != replacement {
 		t.Error("GetManager() did not return the manager SetGlobalManager installed")
+	}
+}
+
+func TestManagerEmptyEnvDoesNotOverrideFile(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "gw.yaml")
+
+	if err := os.WriteFile(path, []byte("debug: true\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	t.Setenv("GORELEASER_WIZARD_DEBUG", "")
+
+	m := NewManager()
+
+	if err := m.Load(path); err != nil {
+		t.Fatalf("Load() = %v", err)
+	}
+
+	if !m.IsDebug() {
+		t.Error("empty GORELEASER_WIZARD_DEBUG must not override file debug:true")
 	}
 }

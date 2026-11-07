@@ -76,6 +76,19 @@ func (m *Manager) Load(cfgFile string) error {
 		Prefix:      "GORELEASER_WIZARD_",
 		EnvironFunc: os.Environ,
 		TransformFunc: func(key, value string) (string, any) {
+			// An empty env var means "unset": returning a blank key makes
+			// the provider skip it, so GORELEASER_WIZARD_DEBUG= cannot
+			// silently override a value from the config file (common in CI).
+			if value == "" {
+				return "", nil
+			}
+
+			// The callback receives the full raw env var name (the prefix
+			// is NOT stripped before the callback), so drop it while the
+			// original casing/underscores are still intact, then fold the
+			// rest into koanf's dashed key style:
+			// GORELEASER_WIZARD_NO_COLOR -> no-color.
+			key = strings.TrimPrefix(key, "GORELEASER_WIZARD_")
 			key = strings.ToLower(key)
 			key = strings.ReplaceAll(key, "_", "-")
 

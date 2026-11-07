@@ -73,15 +73,6 @@ func (p CIProvider) ReleasesToForgejo() bool {
 	return p == CIProviderForgejo || p == CIProviderDual
 }
 
-// OrEmpty normalizes an unset provider to GitHub.
-func (p CIProvider) OrEmpty() CIProvider {
-	if p == "" {
-		return CIProviderGitHub
-	}
-
-	return p
-}
-
 // ValidateCIProvider validates a CI provider value.
 func ValidateCIProvider(provider CIProvider) error {
 	return validateEnum("CI provider", string(provider), provider.IsValid())

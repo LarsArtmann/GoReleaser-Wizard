@@ -22,8 +22,7 @@ func runInitWizard(cmd *cobra.Command, _ []string) {
 	force := getBoolFlag(cmd, "force")
 	interactive := getBoolFlag(cmd, "interactive")
 
-	fmt.Println(titleStyle.Render("🧙 Initializing GoReleaser Configuration"))
-	fmt.Println()
+	printCommandHeader("🧙 Initializing GoReleaser Configuration")
 
 	// If interactive mode requested but not in a terminal, error with helpful message
 	if interactive && !IsTerminal() {

@@ -15,6 +15,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
 )
 
@@ -51,21 +52,23 @@ func main() {
 	os.Exit(exitCode)
 }
 
+// markdownLinkPattern captures group 1 = the link target.
+var markdownLinkPattern = regexp.MustCompile(`\[[^\]]*\]\(([^)]+)\)`)
+
 // checkRelativeLinks walks every .md file under root (skipping archived
 // history, which is closed) and verifies each relative link target exists.
+//
+//nolint:gosec // G703: read-only local docs walk over the repo being gated
 func checkRelativeLinks(root string) []string {
 	var findings []string
 
-	linkPattern := regexp.MustCompile(`\[[^\]]*\]\(([^)]+)\)`)
-
-	err := filepath.WalkDir(root, func(path string, d os.DirEntry, walkErr error) error {
+	walkErr := filepath.WalkDir(root, func(path string, entry os.DirEntry, walkErr error) error {
 		if walkErr != nil {
 			return walkErr
 		}
 
-		if d.IsDir() {
-			// Closed history is not re-gated; node_modules/vendor never exist here.
-			if d.Name() == "archived" || d.Name() == "node_modules" || d.Name() == "vendor" || d.Name() == ".git" {
+		if skip, reason := skipPath(entry); skip {
+			if reason == skipReasonDirectory {
 				return filepath.SkipAll
 			}
 
@@ -76,112 +79,168 @@ func checkRelativeLinks(root string) []string {
 			return nil
 		}
 
-		content, readErr := os.ReadFile(path)
-		if readErr != nil {
-			findings = append(findings, path+": unreadable: "+readErr.Error())
-
-			return nil
-		}
-
-		for _, match := range linkPattern.FindAllStringSubmatch(string(content), -1) {
-			target := match[1]
-
-			if strings.HasPrefix(target, "http://") || strings.HasPrefix(target, "https://") ||
-				strings.HasPrefix(target, "#") || strings.HasPrefix(target, "mailto:") ||
-				target == "" {
-				continue
-			}
-
-			// Strip anchors before resolving.
-			resolved := target
-			if idx := strings.Index(resolved, "#"); idx != -1 {
-				resolved = resolved[:idx]
-			}
-
-			if resolved == "" {
-				continue
-			}
-
-			base := filepath.Dir(path)
-			full := filepath.Join(base, resolved)
-
-			if _, statErr := os.Stat(full); statErr != nil {
-				findings = append(findings, path+" -> "+target)
-			}
-		}
+		findings = append(findings, checkFileLinks(path)...)
 
 		return nil
 	})
-	if err != nil {
-		findings = append(findings, "walk failed: "+err.Error())
+	if walkErr != nil {
+		findings = append(findings, "walk failed: "+walkErr.Error())
 	}
 
 	return findings
 }
 
+type skipReason int
+
+const (
+	skipReasonNone skipReason = iota
+	skipReasonDirectory
+)
+
+// skipPath reports whether a walked entry is excluded from gating.
+func skipPath(entry os.DirEntry) (bool, skipReason) {
+	switch entry.Name() {
+	case "archived", "node_modules", "vendor", ".git":
+		if entry.IsDir() {
+			return true, skipReasonDirectory
+		}
+
+		return true, skipReasonNone
+	default:
+		return false, skipReasonNone
+	}
+}
+
+// checkFileLinks verifies relative links in one markdown file.
+func checkFileLinks(path string) []string {
+	content, readErr := os.ReadFile(path)
+	if readErr != nil {
+		return []string{path + ": unreadable: " + readErr.Error()}
+	}
+
+	var findings []string
+
+	for _, match := range markdownLinkPattern.FindAllStringSubmatch(string(content), -1) {
+		resolved := relativeTarget(match[1])
+		if resolved == "" {
+			continue
+		}
+
+		full := filepath.Join(filepath.Dir(path), resolved)
+
+		//nolint:gosec // G703: path derives from the walked repo tree
+		if _, statErr := os.Stat(full); statErr != nil {
+			findings = append(findings, path+" -> "+match[1])
+		}
+	}
+
+	return findings
+}
+
+// relativeTarget strips schemes, anchors and pure-hash links from a markdown
+// link target, returning the filesystem path to verify ("" = nothing to check).
+func relativeTarget(target string) string {
+	if isExternal(target) {
+		return ""
+	}
+
+	resolved := target
+	if idx := strings.Index(resolved, "#"); idx != -1 {
+		resolved = resolved[:idx]
+	}
+
+	return resolved
+}
+
+func isExternal(target string) bool {
+	for _, prefix := range []string{"http://", "https://", "#", "mailto:", ""} {
+		if strings.HasPrefix(target, prefix) && prefix != "" {
+			return true
+		}
+	}
+
+	return target == ""
+}
+
+// statusVocabulary is the FEATURES.md status set (docs-health canon).
+//
+//nolint:gochecknoglobals // fixed vocabulary table, never mutated
+var statusVocabulary = []string{
+	"FULLY_FUNCTIONAL",
+	"PARTIALLY_FUNCTIONAL",
+	"BROKEN",
+	"PLANNED",
+	"DEMAND_GATED",
+	"ON_HOLD",
+	"OUT_OF_SCOPE",
+	"DISABLED",
+}
+
+// declaredCountsPattern matches "13 FULLY_FUNCTIONAL" style totals.
+var declaredCountsPattern = regexp.MustCompile(`(\d+)\s+([A-Z_]+)`)
+
 // checkFeaturesCounts verifies FEATURES.md's counts table against its own
 // status rows: the counts must be derivable, never hand-rounded.
+//
+//nolint:gosec // G703: featuresPath is repo-root-joined inside main
 func checkFeaturesCounts(featuresPath string) []string {
 	content, err := os.ReadFile(featuresPath)
 	if err != nil {
 		return []string{featuresPath + ": unreadable: " + err.Error()}
 	}
 
+	rowCounts := countStatusRows(string(content))
+	declaredTotals := declaredTotals(string(content), rowCounts)
+
 	var findings []string
 
-	lines := strings.Split(string(content), "\n")
-
-	// Find the counts table row(s): | <label> | <n> | style entries in a
-	// section whose rows declare statuses.
-	statusCounts := map[string]int{
-		"FULLY_FUNCTIONAL":       0,
-		"PARTIALLY_FUNCTIONAL":   0,
-		"BROKEN":                 0,
-		"PLANNED":                0,
-		"DEMAND_GATED":           0,
-		"ON_HOLD":                0,
-		"OUT_OF_SCOPE":           0,
-		"DISABLED":               0,
-	}
-
-	for _, line := range lines {
-		for status := range statusCounts {
-			if strings.Contains(line, "| "+status+" |") ||
-				strings.Contains(line, "| "+status+"  ") {
-				statusCounts[status]++
-			}
-		}
-	}
-
-	// Match declared totals: "13 FULLY_FUNCTIONAL" style phrases.
-	declared := regexp.MustCompile(`(\d+)\s+([A-Z_]+)`)
-
-	declaredTotal := map[string]int{}
-
-	for _, line := range lines {
-		for _, match := range declared.FindAllStringSubmatch(line, -1) {
-			count := 0
-
-			fmt.Sscanf(match[1], "%d", &count)
-
-			status := match[2]
-			if _, tracked := statusCounts[status]; tracked {
-				declaredTotal[status] = count
-			}
-		}
-	}
-
-	for status, declared := range declaredTotal {
-		if statusCounts[status] == 0 {
+	for status, declared := range declaredTotals {
+		if rowCounts[status] == 0 {
 			continue
 		}
 
-		if statusCounts[status] != declared {
+		if rowCounts[status] != declared {
 			findings = append(findings, fmt.Sprintf(
 				"%s declares %d %s rows but the table holds %d",
-				featuresPath, declared, status, statusCounts[status]))
+				featuresPath, declared, status, rowCounts[status]))
 		}
 	}
 
 	return findings
+}
+
+// countStatusRows counts table rows carrying each status literal.
+func countStatusRows(content string) map[string]int {
+	counts := make(map[string]int, len(statusVocabulary))
+
+	for line := range strings.SplitSeq(content, "\n") {
+		for _, status := range statusVocabulary {
+			if strings.Contains(line, "| "+status+" |") {
+				counts[status]++
+			}
+		}
+	}
+
+	return counts
+}
+
+// declaredTotals extracts declared totals for statuses present in the rows.
+func declaredTotals(content string, rowCounts map[string]int) map[string]int {
+	totals := make(map[string]int, len(rowCounts))
+
+	for line := range strings.SplitSeq(content, "\n") {
+		for _, match := range declaredCountsPattern.FindAllStringSubmatch(line, -1) {
+			count, parseErr := strconv.Atoi(match[1])
+			if parseErr != nil {
+				continue
+			}
+
+			status := match[2]
+			if rowCounts[status] > 0 {
+				totals[status] = count
+			}
+		}
+	}
+
+	return totals
 }

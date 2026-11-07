@@ -104,6 +104,27 @@ jobs:
       - name: Provider proof (${{ matrix.provider }})
         run: go test ./cmd/goreleaser-wizard -run '^${{ matrix.test }}$' -v -count=1
 
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Go
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: "go.mod"
+          cache: true
+
+      # Standing docs gates: relative links resolve, FEATURES counts are
+      # derivable from its own rows. Archived history is excluded (closed).
+      # Markdown FORMAT is deliberately not gated here: this repo pins every
+      # third-party install to a verified SHA and a curl|sh dprint installer
+      # would breach that posture; formatting is enforced locally by the
+      # BuildFlow pre-commit hook on every commit instead.
+      - name: Docs gates (links + counts)
+        run: go run ./cmd/docs-check .
+
   # nix flake check intentionally does NOT run on GitHub-hosted runners:
   # this repo pins every third-party action to a commit SHA, and the nix
   # install action's SHA cannot be verified offline when editing CI. The

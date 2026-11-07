@@ -3,6 +3,7 @@
 > Long-term direction and raw ideas. Items here are NOT actionable tasks.
 > When an idea is refined into bounded work, it moves to [TODO_LIST.md](TODO_LIST.md).
 > Rebuilt 2026-11-07 from the docs-health audit of `docs/status/` (2026-01 … 2026-11) and `docs/research/2026-08-10_GORELASER_17_RESEARCH.md`.
+> Next quarterly review: ~2027-02 (prune stale themes, re-derive from the newest docs-health audit).
 
 ## Themes
 

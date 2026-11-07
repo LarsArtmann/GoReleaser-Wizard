@@ -22,6 +22,7 @@ If a word means something different to a developer than to a customer, define it
 | Pin                    | A deliberately frozen version (BuildFlow flake rev, goreleaser v2.17.1) rendered into workflows                    | Bumped deliberately, never floats                                   |
 | Golden file            | Checked-in expected output of a generator; `-update-golden` regenerates byte-identically                           | Regression net for generated artifacts                              |
 | Deprecation-free proof | The E2E gate: generated output must pass `goreleaser check` with exit 0 and zero deprecations                      | The product's definition of correct                                 |
+| Flip                   | Migrating a repo's CI and releases from GitHub Actions to Forgejo Actions (workflow files + goreleaser targets)    | Fleet operation; `forgejo-preflight` judges flip-readiness          |
 
 ## Entities
 
@@ -42,12 +43,23 @@ If a word means something different to a developer than to a customer, define it
 | SigningLevel            | Enum for cosign/gpg configuration depth                                            | CI-side installer only today        |
 | GitHubTarget            | Resolved owner/repo: flag > git remote > placeholder                               | `types/template_data.go`            |
 
+## Commands
+
+| Term     | Definition                                                                                                  | Context                                    |
+| -------- | ----------------------------------------------------------------------------------------------------------- | ------------------------------------------ |
+| init     | Interactive first-run questionnaire composing the full generation workflow                                   | Onboarding path for a fresh repo           |
+| generate | Scriptable, config-driven generation: `--config file.yaml` plus flag overrides, no prompts                   | CI and repeat-run path                     |
+| validate | Reads an existing `.goreleaser.yaml` and reports schema errors, domain violations, and deprecation findings  | Post-generation gate; emits `DeprecationFinding` |
+| version  | Prints binary version and build metadata                                                                     | Support and diagnostics                    |
+
 ## Events
 
 | Term                      | Definition                                                         | Context                |
 | ------------------------- | ------------------------------------------------------------------ | ---------------------- |
 | GenerationPreflightPassed | All target-file existence checks passed before writing             | Atomic generation gate |
 | JobRolledBack             | A failed job triggered removal of files written earlier in the run | Rollback support       |
+| DeprecationFinding        | One deprecated goreleaser key occurrence with source line and a before→after replacement hint | `validate` output; verified against goreleaser v2.17.1 |
+| ForgejoPreflightGate      | One local PASS/FAIL check a repo must pass before its flip to Forgejo | `forgejo-preflight` exits 0/1/2 |
 
 ---
 

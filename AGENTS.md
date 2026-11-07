@@ -61,7 +61,7 @@ The E2E test `TestGeneratedConfigPassesGoReleaserCheck` automates this; skips gr
 
 **5. Nix first** — no justfiles, no Makefile.
 
-**11. Go 1.27: `GOEXPERIMENT=jsonv2` no longer needed (2026-10-28)** — `internal/types` imports `encoding/json/v2`; since go.mod bumped to 1.27, jsonv2 is the default. CI no longer sets the flag; a user-level `go env -w GOEXPERIMENT=jsonv2` is harmless.
+**11. (obsolete, kept for history)** — `GOEXPERIMENT=jsonv2` mattered only pre-Go-1.27; obsolete since the 1.27 bump (2026-10-28).
 
 **12. `/mnt/buildcache` may be broken** — symptom: `failed to initialize build cache at /mnt/buildcache/...`. Fix: the GOCACHE/GOMODCACHE/GOLANGCI_LINT_CACHE exports above.
 

@@ -31,9 +31,16 @@ This command will:
 }
 
 func init() {
-	validateCmd.Flags().Bool("verbose", false, "show detailed validation output")
-	validateCmd.Flags().Bool("fix", false, "attempt to fix common issues")
-	validateCmd.Flags().Bool("project-only", false, "validate project structure only")
+	configureValidateCommand(validateCmd)
+}
+
+// configureValidateCommand adds the validate command's flags. Both the real
+// command and tests wire flags through it, so flag lookups can never hit an
+// unregistered name.
+func configureValidateCommand(cmd *cobra.Command) {
+	cmd.Flags().Bool("verbose", false, "show detailed validation output")
+	cmd.Flags().Bool("fix", false, "attempt to fix common issues")
+	cmd.Flags().Bool("project-only", false, "validate project structure only")
 }
 
 func runValidate(cmd *cobra.Command, _ []string) {

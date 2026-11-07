@@ -141,7 +141,10 @@ func detectProjectInfo(config *domain.SafeProjectConfig) error {
 	projectName := parts[len(parts)-1]
 
 	// Detect main path
-	mainPath, binaryName, projectType := detectMainStructure(wd)
+	mainPath, binaryName, projectType, err := detectMainStructure(wd)
+	if err != nil {
+		return err
+	}
 
 	// Set configuration values
 	config.ProjectName = projectName
@@ -160,17 +163,17 @@ func detectProjectInfo(config *domain.SafeProjectConfig) error {
 }
 
 // detectMainStructure detects the main.go structure and determines project type.
-func detectMainStructure(wd string) (string, string, string) {
+func detectMainStructure(wd string) (string, string, string, error) {
 	const cli = "cli"
 
 	// Check for main.go in root
 	if _, err := os.Stat(filepath.Join(wd, "main.go")); err == nil {
-		return ".", filepath.Base(wd), cli
+		return ".", filepath.Base(wd), cli, nil
 	}
 
 	// Check for cmd/*/main.go structure
 	if mainPath, binaryName, ok := detectCmdStructure(wd); ok {
-		return mainPath, binaryName, cli
+		return mainPath, binaryName, cli, nil
 	}
 
 	// Check for other common structures
@@ -232,8 +235,16 @@ func selectBestBinary(cmdDirs []string, projectName string) string {
 	return binaryName
 }
 
+// globProjects resolves a glob pattern under wd. It is a variable so tests can
+// inject malformed-pattern failures without crafting filesystem states.
+//
+//nolint:gochecknoglobals // test seam; swapped only inside tests with defer-restore
+var globProjects = func(wd, pattern string) ([]string, error) {
+	return filepath.Glob(filepath.Join(wd, pattern))
+}
+
 // detectAlternativeStructure checks for alternative project structures.
-func detectAlternativeStructure(wd string) (string, string, string) {
+func detectAlternativeStructure(wd string) (string, string, string, error) {
 	const cli = "cli"
 
 	patterns := []struct {
@@ -247,7 +258,16 @@ func detectAlternativeStructure(wd string) (string, string, string) {
 	}
 
 	for _, pattern := range patterns {
-		matches, _ := filepath.Glob(filepath.Join(wd, pattern.path))
+		matches, err := globProjects(wd, pattern.path)
+		if err != nil {
+			return "", "", "", domain.NewSystemError(
+				domain.ErrInvalidProjectStructure,
+				fmt.Sprintf("Failed to scan project structure (pattern=%q)", pattern.path),
+				"The file-matching pattern used to detect the project layout is malformed",
+				err,
+			).WithContext(wd)
+		}
+
 		if len(matches) == 0 {
 			continue
 		}
@@ -256,28 +276,28 @@ func detectAlternativeStructure(wd string) (string, string, string) {
 			// Extract binary name from path
 			selectedBinary := extractBinaryFromPath(matches[0])
 
-			return pattern.path, selectedBinary, pattern.projType
+			return pattern.path, selectedBinary, pattern.projType, nil
 		}
 
-		return pattern.path, pattern.binName, pattern.projType
+		return pattern.path, pattern.binName, pattern.projType, nil
 	}
 
 	// Default fallback
-	return ".", filepath.Base(wd), cli
+	return ".", filepath.Base(wd), cli, nil
 }
 
 // extractBinaryFromPath extracts the binary name from a matched file path.
+// For src/<bin>/main.go layouts the binary is the directory holding main.go,
+// matching detectCmdStructure's cmd/<bin>/main.go convention.
 func extractBinaryFromPath(matchPath string) string {
 	parts := strings.Split(matchPath, string(filepath.Separator))
 	for i, part := range parts {
 		if (part == "src" || part == "pkg") && i+1 < len(parts) {
-			binaryName := filepath.Base(matchPath)
-
-			return strings.TrimSuffix(binaryName, ".go")
+			return parts[i+1]
 		}
 	}
 
-	return filepath.Base(matchPath)
+	return strings.TrimSuffix(filepath.Base(matchPath), ".go")
 }
 
 func init() {

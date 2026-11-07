@@ -151,10 +151,9 @@ go 1.21
 			config.GetManager().Reset()
 			config.GetManager().Set("debug", false)
 
-			// Create test command
+			// Create test command with the production flag set
 			cmd := &cobra.Command{}
-			cmd.Flags().Bool("verbose", false, "show detailed validation output")
-			cmd.Flags().Bool("fix", false, "attempt to fix common issues")
+			configureValidateCommand(cmd)
 
 			// Set flags
 			for flag, value := range tt.flags {
@@ -460,10 +459,9 @@ build:
 	config.GetManager().Reset()
 	config.GetManager().Set("debug", false)
 
-	// Create test command
+	// Create test command with the production flag set
 	cmd := &cobra.Command{}
-	cmd.Flags().Bool("verbose", false, "show detailed validation output")
-	cmd.Flags().Bool("fix", false, "attempt to fix common issues")
+	configureValidateCommand(cmd)
 
 	// Run validation and check that it doesn't panic
 	func() {

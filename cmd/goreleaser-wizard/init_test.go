@@ -92,8 +92,11 @@ func TestInitCommand(t *testing.T) {
 				Run:   runInitWizard,
 			}
 
-			// Add flags (simplified version)
-			cmd.Flags().Bool("force", false, "force overwrite existing configuration")
+			// Wire the production flag set: runInitWizard reads
+			// --github-owner/--github-repo (applyGitHubOverrides), so a
+			// simplified flag list diverges from the real command and fails
+			// the flag-lookup guards in flags.go.
+			configureInitCommand(cmd)
 
 			// Set flag values
 			for flag, value := range tt.flags {

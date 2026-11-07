@@ -217,5 +217,5 @@ result-*
 # <<< buildflow-managed (.gitignore) <<<
 *.orig
 
-# local build artifacts
-goreleaser-wizard
+# local build artifacts (root-anchored: the bare pattern also matched cmd/goreleaser-wizard/)
+/goreleaser-wizard

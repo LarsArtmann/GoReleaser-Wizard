@@ -1,6 +1,8 @@
 package main
 
 import (
+	"errors"
+	"io/fs"
 	"os"
 	"regexp"
 	"strconv"
@@ -14,6 +16,12 @@ import (
 // stale pin fails every nix build with "go.mod requires go >= X".
 func TestFlakeGoVersionMeetsGoModRequirement(t *testing.T) {
 	flakeBytes, err := os.ReadFile("../../flake.nix")
+	if errors.Is(err, fs.ErrNotExist) {
+		t.Skip(
+			"flake.nix is absent from this source snapshot (nix builds exclude it); the pin guard runs where the flake lives",
+		)
+	}
+
 	if err != nil {
 		t.Fatalf("read flake.nix: %v", err)
 	}

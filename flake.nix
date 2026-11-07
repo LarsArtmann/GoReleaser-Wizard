@@ -37,7 +37,11 @@
         let
           version = self.rev or self.dirtyRev or "dev";
 
-          vendorHash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+          # FOD hash for the go module vendor dir. Update on go.sum changes:
+          # `nix flake check` fails with the new `got:` hash; paste it here.
+          # (buildflow -s nix-hash-fix --fix cannot patch this let-binding shape,
+          # 88% step failure rate per its own telemetry, 2026-11-07.)
+          vendorHash = "sha256-8okTpo0ilLc6pRHjP1vhqWUBvhAknhEMpQva/YVv9X0=";
 
           # go.mod requires go >= 1.27 (encoding/json/v2 is default there, no GOEXPERIMENT needed).
           # Pin explicitly: nixpkgs' default `go` trails at 1.26 and buildGoModule sets GOTOOLCHAIN=local.

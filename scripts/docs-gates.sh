@@ -18,19 +18,19 @@ cd "$(git rev-parse --show-toplevel)" || exit 1
 
 echo "== 1/3 dprint format check (markdown + config files) =="
 if command -v dprint >/dev/null 2>&1; then
-	dprint check || echo "[advisory] formatting drift; run: dprint fmt"
+  dprint check || echo "[advisory] formatting drift; run: dprint fmt"
 else
-	echo "[advisory] dprint not installed; skipping format check"
+  echo "[advisory] dprint not installed; skipping format check"
 fi
 
 echo
 echo "== 2/3 docs-gates battery (freshness, audit-all, annotate, routing, cadence) =="
 if command -v docs-gates >/dev/null 2>&1; then
-	docs-gates run .
+  docs-gates run .
 elif command -v nix >/dev/null 2>&1; then
-	nix run github:Artmann-Technologies/docs-gates -- run . || echo "[advisory] battery red; see matrix above"
+  nix run github:Artmann-Technologies/docs-gates -- run . || echo "[advisory] battery red; see matrix above"
 else
-	echo "[advisory] neither docs-gates nor nix available; skipping battery"
+  echo "[advisory] neither docs-gates nor nix available; skipping battery"
 fi
 
 echo

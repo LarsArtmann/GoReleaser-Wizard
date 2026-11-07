@@ -7,7 +7,7 @@ Format loosely follows [Keep a Changelog](https://keepachangelog.com); each entr
 
 ### Docs (2026-11-07)
 
-- docs-health AUDIT: created `TODO_LIST.md` + `ROADMAP.md`, refreshed `FEATURES.md`/`README.md`/`AGENTS.md` to the post-Forgejo/Go-1.27 reality, annotated and archived the 2026-01…08 status corpus to `docs/status/archived/` (this sweep)
+- docs-health AUDIT: created `TODO_LIST.md` + `ROADMAP.md`, refreshed `FEATURES.md`/`README.md`/`AGENTS.md` to the post-Forgejo/Go-1.27 reality, annotated and archived the 2026-01…08 status corpus to `docs/status/archived/` (`2fcc8a2`, sweep commit)
 
 ### Added
 

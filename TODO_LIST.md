@@ -65,7 +65,6 @@
 | docs-gates adoption: run `docs-gates run .`, seed `.docs-gates.json`, wire `scripts/docs-gates.sh`                                                                                                                                                      | 🔴 `TODO` | Low-Med | 30min  | battery not installed locally (skill §battery)                                   |
 | Dated-claims re-verify: local snapshot `goreleaser check` on own config → re-date FEATURES Docker claim; scan living docs for other dated claims                                                                                                        | 🔴 `TODO` | Low-Med | 45min  | FEATURES.md "Verified end-to-end 2026-08-17"                                     |
 | 2025 pre-canon corpus sweep: annotate (pre-canon files get routing banners, not fake verdicts) + archive the 29 unarchived 2025 status reports so docs-gates cadence/routing go green (`docs-gates run .` is wired advisory in `scripts/docs-gates.sh`) | 🔴 `TODO` | Med     | 3h     | `docs-gates run .` 5-gate FAIL matrix 2026-11-07; oldest report 508d             |
-| Root sprawl + `github_issues/` disposition proposal (inventory + classification; execution awaits owner call)                                                                                                                                           | 🔴 `TODO` | Low     | 30min  | 17 root `.md` files + `github_issues/` (25 files)                                |
 
 ---
 

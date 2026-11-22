@@ -16,6 +16,8 @@ Interactive CLI that generates production-ready GoReleaser configurations with C
 
 **Stack**: Go 1.27, Cobra, Koanf (replaced Viper in `50c0feb`, 2026-03), Charm (lipgloss/log), golangci-lint, go-arch-lint, GoReleaser v2.17 as the generation target.
 
+**First-party lib verdicts (fleet audit 2026-11-22, `docs/review/libs/`)**: NONE of the 20 LarsArtmann libraries audited is in use (only dep: go-branded-id v0.7.1). 18 STAY-OUT (structural mismatch: no HTTP/UI/daemon/CQRS in a single-shot CLI — Web UI is a roadmap non-goal); 2 CONSIDER: go-atomic-write v0.6.2 (crash-safe writes at `generators.WriteFile`) and cmdguard v5.1.0 (adopt cmdguard/lint now; full migration deferred — fang v1/v2 duplication). Audit surfaced: failed generate/init exits 0, double error rendering — both routed to TODO_LIST. Re-audit trigger: any ROADMAP change adding a server/UI/daemon, or fang v2 migration. Citation gate: `python3 scripts/citation-sweep.py` must stay exit 0 after editing reports.
+
 ## Essential Commands
 
 Export these prefixes for every Go command while `/mnt/buildcache` is broken (gotcha 12):

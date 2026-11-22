@@ -18,8 +18,9 @@
 
 <!-- check-rows:ledger -->
 
-| Task | Status | Impact | Effort | Evidence |
-| ---- | ------ | ------ | ------ | -------- |
+| Task                                                                                                                                                                    | Status    | Impact | Effort | Evidence                                                                                                      |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- | ------ | ------ | ------------------------------------------------------------------------------------------------------------- |
+| Failed `generate`/`init` exits 0: handlers are void `Run:` funcs that swallow errors via `displayError`; only `validate` sets exit codes — CI scripts cannot detect failure. Convert handlers to `RunE`, propagate, exit non-zero | 🔴 `TODO` | High   | 1h     | `cmd/goreleaser-wizard/generate.go:26-30`, `main.go:332-337` (fleet libs audit 2026-11-22, `docs/review/libs/cmdguard.md`) |
 
 ## Medium Impact
 
@@ -33,6 +34,10 @@
 | M12: wave-1 preflight generator for the 7 Phase-F repos + preflight checklists (starred/pending-verdict gates)                                                                                                    | 🔴 `TODO` | Med     | 2h     | builds on the M3 `forgejo-post-flip-verify` harness, fixture-green but never run live (2026-11-04 f.17/f.42)                  |
 | Fix `git log` failures on stoptube/papdashboard/autocart/buildflow (safe.directory/worktree) — unblocks wave-3 preflights                                                                                         | 🔴 `TODO` | Med     | 30min  | (repo: machine/fleet) 2026-11-04 f.18                                                                                         |
 | Consolidate root-level doc sprawl: 17 root `.md` files (2025-era: `BDD_TESTS_REVIEW.md`, `COMPREHENSIVE_REFACTORING_TODO.md`, `EXECUTION_PLAN.md`, …) → archive to `docs/` or delete; root keeps only living docs | 🔴 `TODO` | Low-Med | 1h     | `ls *.md` (2026-06-30 report §06 item 6; root keeps README/FEATURES/TODO_LIST/ROADMAP/CHANGELOG/AGENTS/SECURITY/CONTRIBUTING) |
+| Fix double error rendering: `fang.Execute` renders the error, then `displayError` re-renders it (cmdguard CG006 pattern) — drop one of the two paths | 🔴 `TODO` | Med     | 30min  | `cmd/goreleaser-wizard/main.go:138-148` (fleet libs audit 2026-11-22)                                         |
+| CONSIDER go-atomic-write v0.6.2: swap bare `os.WriteFile` → `atomicwrite.WriteWithPerm` at the `generators.WriteFile` choke point (+ migrate `validation_fixes.go:39` straggler) — crash-safe writes complementing preflight atomicity | 🔴 `TODO` | Med     | 2h     | `docs/review/libs/go-atomic-write.md` (before/after sketch + test plan included)                              |
+| Adopt `cmdguard/lint` (CG001-CG008) standalone into the lint pipeline; full cmdguard v5 migration deferred until the command layer changes shape (fang v1→v2 duplication today) | 🔴 `TODO` | Med     | 1h     | `docs/review/libs/cmdguard.md` (fleet libs audit 2026-11-22)                                                  |
+| Resolve stale `// TODO: Add workflow persistence and recovery` + "SPLIT IMMEDIATELY" self-flag when splitting `workflow.go` (not open backlog — delete or convert to a real item) | 🔴 `TODO` | Low     | 15min  | `cmd/goreleaser-wizard/workflow.go:3, :11` (fleet libs audit 2026-11-22)                                      |
 
 ## Blocked (external decision or owner action needed)
 

@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Report Title</title>
+    <title>Fleet Library Adoption Audit — GoReleaser-Wizard</title>
     <style>
       /* =========================================================================
          BAUHAUS DARK — Dashboard template
@@ -828,9 +828,9 @@
   <body>
     <!-- Full-bleed top bar (optional — remove for quieter reports) -->
     <div class="top-bar">
-      <span>REPORT TYPE</span>
-      <span>YYYY-MM-DD</span>
-      <span>AUTHOR / TEAM</span>
+      <span>FLEET LIBRARY ADOPTION AUDIT</span>
+      <span>2026-11-22</span>
+      <span>ORCHESTRATOR + GROUPS A–E</span>
     </div>
 
     <div class="layout">
@@ -839,10 +839,11 @@
         <nav>
           <div class="label">Contents</div>
           <a href="#summary">Summary</a>
-          <a href="#findings">Findings</a>
-          <a href="#issues">Issue Cards</a>
-          <a href="#proposal">Proposal</a>
-          <a href="#plan">Plan</a>
+          <a href="#verdicts">Verdict Table</a>
+          <a href="#candidates">Candidates</a>
+          <a href="#incidental">Incidental Findings</a>
+          <a href="#method">Method</a>
+          <a href="#verify">Verify</a>
         </nav>
       </aside>
 
@@ -855,178 +856,245 @@
             <div class="square"></div>
             <div class="tri"></div>
           </div>
-          <div class="hero-badge">Report Type</div>
-          <h1>Report Title</h1>
+          <div class="hero-badge">Library Adoption Audit</div>
+          <h1>First-Party Library Adoption Audit</h1>
           <p class="hero-subtitle">
-            One-sentence description of what this report covers.
+            20 LarsArtmann Go libraries × GoReleaser-Wizard @ a493950 — used?
+            leveraged to the max? and if not, why should or shouldn't we adopt?
           </p>
         </div>
-
-        <!-- Inline TOC (alternative to sidebar; pick one) -->
-        <nav class="toc">
-          <h3>Contents</h3>
-          <ul>
-            <li><a href="#summary">Summary</a></li>
-            <li><a href="#findings">Findings</a></li>
-            <li><a href="#issues">Issue Cards</a></li>
-            <li><a href="#proposal">Proposal</a></li>
-            <li><a href="#plan">Plan</a></li>
-          </ul>
-        </nav>
 
         <!-- Stats Dashboard -->
         <h2 id="summary"><span class="num">00</span>Summary</h2>
         <div class="stat-grid">
           <div class="stat-card">
-            <div class="stat-value">42</div>
-            <div class="stat-label">Total Items</div>
+            <div class="stat-value">20</div>
+            <div class="stat-label">Libraries Audited</div>
           </div>
-          <div class="stat-card stat-bad">
-            <div class="stat-value">7</div>
-            <div class="stat-label">Critical</div>
+          <div class="stat-card">
+            <div class="stat-value">0</div>
+            <div class="stat-label">In Use Today</div>
           </div>
           <div class="stat-card stat-warn">
-            <div class="stat-value">12</div>
-            <div class="stat-label">Warnings</div>
+            <div class="stat-value">2</div>
+            <div class="stat-label">CONSIDER</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">18</div>
+            <div class="stat-label">STAY-OUT</div>
           </div>
           <div class="stat-card stat-good">
-            <div class="stat-value">35</div>
-            <div class="stat-label">Resolved</div>
+            <div class="stat-value">328</div>
+            <div class="stat-label">Citations Verified</div>
+          </div>
+          <div class="stat-card stat-good">
+            <div class="stat-value">0</div>
+            <div class="stat-label">Sweep Failures</div>
           </div>
         </div>
+        <p>
+          GoReleaser-Wizard is a short-lived, offline, subprocess-driven CLI
+          wizard: zero <code>net/http</code>, no DB, no web UI (an explicit
+          roadmap non-goal), no daemon, no event sourcing. Its only first-party
+          dependency is go-branded-id v0.7.1. <strong>None of the 20 audited
+          libraries is in use.</strong> 18 verdicts are structural stay-outs —
+          the library's shape (service, HTTP, hypermedia, streaming, storage,
+          daemon) simply does not intersect this binary. Two candidates earn a
+          CONSIDER on real gaps: go-atomic-write (crash-safe file writes) and
+          cmdguard (typed CLI + exit-code contract). The audit also surfaced
+          two genuine product defects, routed to TODO_LIST.md.
+        </p>
 
         <!-- Findings as Cards -->
-        <h2 id="findings"><span class="num">01</span>Findings</h2>
-
-        <div class="card card-problem">
-          <h4>Critical Issue</h4>
-          <p>Description of the problem and its impact.</p>
-        </div>
-
-        <div class="card card-solution">
-          <h4>Recommended Fix</h4>
-          <p>Description of the solution with rationale.</p>
-        </div>
-
-        <!-- Issue Cards -->
-        <h2 id="issues"><span class="num">02</span>Issue Cards</h2>
-
-        <div class="issue issue-critical">
-          <span class="severity severity-critical">Blocking</span>
-          <h3>Critical finding title</h3>
-          <div class="where">path/to/file.go:42-58</div>
-          <p>
-            Describe the problem and cite the code or behavior that proves it.
-          </p>
-          <div class="callout callout-solution">
-            <strong>Fix</strong>
-            State the concrete recommended action.
-          </div>
-        </div>
-
-        <div class="issue issue-important">
-          <span class="severity severity-important">Important</span>
-          <h3>Important finding title</h3>
-          <div class="where">path/to/another.go:12-19</div>
-          <p>
-            Explain the risk and why a careful reviewer would hesitate before
-            shipping.
-          </p>
-        </div>
-
-        <div class="issue issue-nice">
-          <span class="severity severity-nice">Nice to have</span>
-          <h3>Polish suggestion</h3>
-          <div class="where">docs/ or config</div>
-          <p>
-            Minor documentation gaps or future-proofing suggestions go here.
-          </p>
-        </div>
-
-        <!-- Strengths -->
-        <h2>Strengths</h2>
-        <div class="strengths">
-          <div class="strength">
-            <div class="check">+</div>
-            <div class="text">
-              <strong>Specific strength</strong>
-              <span>Explain why it matters and what it enables.</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Table with Badges -->
-        <h2>Issue Table</h2>
+        <h2 id="verdicts"><span class="num">01</span>Verdict Table</h2>
+        <p>
+          Every library is <strong>NOT-ADOPTED</strong> (0 import hits). The
+          recommendation column is the audit's judgment: adopt-worthy gap vs
+          structural mismatch. Click a library name for the full report.
+        </p>
         <table>
           <thead>
             <tr>
               <th>#</th>
-              <th>Severity</th>
-              <th>Issue</th>
-              <th>Status</th>
+              <th>Library</th>
+              <th>Latest local tag</th>
+              <th>Recommendation</th>
+              <th>One-line reason</th>
+              <th>Report</th>
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>1</td>
-              <td><span class="badge badge-critical">Critical</span></td>
-              <td>Missing error handling</td>
-              <td><span class="badge badge-fixed">Fixed</span></td>
-            </tr>
-            <tr>
-              <td>2</td>
-              <td><span class="badge badge-high">High</span></td>
-              <td>Race condition</td>
-              <td><span class="badge badge-low">Open</span></td>
-            </tr>
+            <tr><td>1</td><td>go-error-family</td><td>v0.12.0</td><td><span class="badge badge-low">STAY-OUT</span></td><td>Duplicates the deliberately-built DomainError system; competes with cockroachdb/errors policy</td><td><a href="go-error-family.md">report</a></td></tr>
+            <tr><td>2</td><td>go-retry</td><td>v0.9.0</td><td><span class="badge badge-low">STAY-OUT</span></td><td>No retryable ops in a single-shot CLI; fleet resilience policy is failsafe-go</td><td><a href="go-retry.md">report</a></td></tr>
+            <tr><td>3</td><td>go-idempotency</td><td>v0.6.0</td><td><span class="badge badge-low">STAY-OUT</span></td><td>At-least-once dedup for services; preflight refusal already covers it</td><td><a href="go-idempotency.md">report</a></td></tr>
+            <tr><td>4</td><td><strong>go-atomic-write</strong></td><td>v0.6.2</td><td><span class="badge badge-high">CONSIDER</span></td><td>Real gap: bare os.WriteFile + rename-away backup window; 1–2 h drop-in</td><td><a href="go-atomic-write.md">report</a></td></tr>
+            <tr><td>5</td><td>go-filewatcher</td><td>v2.5.0</td><td><span class="badge badge-low">STAY-OUT</span></td><td>Daemon-grade watcher for a process that exits in seconds</td><td><a href="go-filewatcher.md">report</a></td></tr>
+            <tr><td>6</td><td>httputil (+server_timing, endpoints)</td><td>v1.9.0</td><td><span class="badge badge-low">STAY-OUT</span></td><td>Zero net/http surface; Web UI is a roadmap non-goal</td><td><a href="httputil.md">report</a></td></tr>
+            <tr><td>7</td><td>go-etag</td><td>v0.7.1</td><td><span class="badge badge-low">STAY-OUT</span></td><td>Both sides attach to net/http objects never constructed</td><td><a href="go-etag.md">report</a></td></tr>
+            <tr><td>8</td><td>go-sse</td><td>v0.7.0</td><td><span class="badge badge-low">STAY-OUT</span></td><td>Every entrypoint presupposes a server holding connections</td><td><a href="go-sse.md">report</a></td></tr>
+            <tr><td>9</td><td>go-datastar</td><td>v0.7.0</td><td><span class="badge badge-low">STAY-OUT</span></td><td>Server-side hypermedia; no browser, no server, deepest dep chain</td><td><a href="go-datastar.md">report</a></td></tr>
+            <tr><td>10</td><td>go-daemon</td><td>v0.4.0</td><td><span class="badge badge-low">STAY-OUT</span></td><td>Resident-process machinery; the wizard exits after generation</td><td><a href="go-daemon.md">report</a></td></tr>
+            <tr><td>11</td><td>go-health</td><td>v0.10.0</td><td><span class="badge badge-low">STAY-OUT</span></td><td>Kubelet probes for long-lived services with dependencies</td><td><a href="go-health.md">report</a></td></tr>
+            <tr><td>12</td><td>go-health-dashboard</td><td>v0.13.3</td><td><span class="badge badge-low">STAY-OUT</span></td><td>Needs go-health + samber/do + HTTP server first</td><td><a href="go-health-dashboard.md">report</a></td></tr>
+            <tr><td>13</td><td>go-credentials-store</td><td>v0.4.3</td><td><span class="badge badge-low">STAY-OUT</span></td><td>No credential to store — wizard only writes secret references; heaviest dep tree</td><td><a href="go-credentials-store.md">report</a></td></tr>
+            <tr><td>14</td><td>go-codec</td><td>v0.3.3</td><td><span class="badge badge-low">STAY-OUT</span></td><td>CBOR/JSON/Raw only — no YAML codec; decisive format mismatch</td><td><a href="go-codec.md">report</a></td></tr>
+            <tr><td>15</td><td><strong>cmdguard</strong></td><td>v5.1.0</td><td><span class="badge badge-high">CONSIDER</span></td><td>Typed flags + exit-code contract fix real gaps; cheaper local RunE fix first; adopt cmdguard/lint now</td><td><a href="cmdguard.md">report</a></td></tr>
+            <tr><td>16</td><td>go-output</td><td>v0.38.7</td><td><span class="badge badge-low">STAY-OUT</span></td><td>No tables/trees/exports in a bullet-list TUI</td><td><a href="go-output.md">report</a></td></tr>
+            <tr><td>17</td><td>templ-components</td><td>v1.27.2</td><td><span class="badge badge-low">STAY-OUT</span></td><td>Web-rendering family; terminal product by explicit ruling</td><td><a href="templ-components.md">report</a></td></tr>
+            <tr><td>18</td><td>go-appkit</td><td>v0.13.0</td><td><span class="badge badge-low">STAY-OUT</span></td><td>Fleet service foundation; nothing to boot, probe, or drain</td><td><a href="go-appkit.md">report</a></td></tr>
+            <tr><td>19</td><td>go-cqrs-lite (system/v4)</td><td>v4.19.0</td><td><span class="badge badge-low">STAY-OUT</span></td><td>Job engine is not CQRS; no events, no replay; proprietary license</td><td><a href="go-cqrs-lite.md">report</a></td></tr>
+            <tr><td>20</td><td>cqrs-htmx</td><td>v4.19.0</td><td><span class="badge badge-low">STAY-OUT</span></td><td>setup.New is a runtime composition root, not codegen; needs net/http + users + events</td><td><a href="cqrs-htmx.md">report</a></td></tr>
           </tbody>
         </table>
 
-        <!-- Before/After Comparison -->
-        <h2 id="proposal">Before / After</h2>
-        <div class="compare-header">
-          <div class="compare-before">Before</div>
-          <div class="compare-after">After</div>
-        </div>
-        <div class="compare-row">
-          <div>
-            <pre><code><span class="tok-comment">// Old code</span>
-<span class="tok-keyword">func</span> <span class="tok-func">process</span>(data <span class="tok-type">interface</span>{}) { }</code></pre>
-          </div>
-          <div>
-            <pre><code><span class="tok-comment">// New code</span>
-<span class="tok-keyword">func</span> <span class="tok-func">process</span>[T <span class="tok-type">any</span>](data T) { }</code></pre>
+        <!-- Issue Cards -->
+        <h2 id="candidates"><span class="num">02</span>Candidates</h2>
+
+        <div class="issue issue-important">
+          <span class="severity severity-important">CONSIDER</span>
+          <h3>go-atomic-write v0.6.2 — crash-safe file writes</h3>
+          <div class="where">cmd/goreleaser-wizard/generators/template_utils.go:24 · generators/goreleaser.go:85</div>
+          <p>
+            All generator writes funnel through one choke point that calls bare
+            <code>os.WriteFile</code>; a crash mid-write can truncate
+            <code>.goreleaser.yaml</code>, and <code>createBackup</code>'s
+            rename-away leaves the target absent if the process dies before the
+            rewrite. Temp+fsync+rename closes both windows per file and
+            <em>complements</em> (not replaces) the preflight+rollback job-level
+            atomicity. Two direct deps; golden tests unaffected.
+          </p>
+          <div class="callout callout-solution">
+            <strong>Fix</strong>
+            Swap <code>os.WriteFile</code> for
+            <code>atomicwrite.WriteWithPerm</code> at the choke point (+2
+            stragglers), ~1–2 h. Escalate to ADOPT-NOW when files grow large,
+            concurrent CI runs are supported, or rerun-idempotence becomes a
+            documented feature.
           </div>
         </div>
 
-        <!-- ASCII Diagram -->
-        <h2>Dependency Tree</h2>
-        <div class="dep-tree">
-          <span class="root">root</span> ├──
-          <span class="ok">wanted-dep</span> └──
-          <span class="unwanted">unwanted-dep</span>
+        <div class="issue issue-important">
+          <span class="severity severity-important">CONSIDER</span>
+          <h3>cmdguard v5.1.0 — typed CLI + exit-code contract</h3>
+          <div class="where">cmd/goreleaser-wizard/main.go:138-148 · generate.go:26-30</div>
+          <p>
+            Typed struct-tag flags would replace ~15 hand-registered string
+            flags and name-lookup reads, and the exit-code contract would fix
+            the sharpest gap (see incidental findings). But the config layer is
+            already solved on the same koanf versions, the huh wizard is richer
+            than cmdguard's prompts submodule, and cmdguard pins
+            <code>charm.land/fang/v2</code> while this repo is on fang v1 — two
+            majors in one binary unless fang migrates too. Migration: ~2–4
+            focused days.
+          </p>
+          <div class="callout callout-solution">
+            <strong>Fix</strong>
+            Do the cheap 90% locally now: switch handlers to <code>RunE</code>,
+            propagate errors, exit on them. Adopt <strong>cmdguard/lint</strong>
+            (CG001–CG008) into the lint pipeline immediately — zero runtime
+            coupling, catches both defects below. Full migration when the
+            command layer next changes shape.
+          </div>
         </div>
 
-        <!-- Numbered Steps -->
-        <h2 id="plan"><span class="num">03</span>Migration Plan</h2>
+        <h2 id="incidental"><span class="num">03</span>Incidental Findings</h2>
+
+        <div class="issue issue-critical">
+          <span class="severity severity-critical">Defect</span>
+          <h3>Failed generate/init exits 0</h3>
+          <div class="where">cmd/goreleaser-wizard/generate.go:26-30 · main.go:332-337</div>
+          <p>
+            Handlers are void <code>Run:</code> funcs that swallow errors via
+            <code>displayError(err); return</code> — only validate sets a real
+            exit code. A CI script consuming <code>generate</code> cannot detect
+            failure. Routed to TODO_LIST.md.
+          </p>
+          <div class="callout callout-solution">
+            <strong>Fix</strong>
+            Convert handlers to <code>RunE</code>, propagate the error, exit
+            non-zero on it. No new dependency required.
+          </div>
+        </div>
+
+        <div class="issue issue-important">
+          <span class="severity severity-important">Defect</span>
+          <h3>Double error rendering</h3>
+          <div class="where">cmd/goreleaser-wizard/main.go:138-148</div>
+          <p>
+            <code>fang.Execute</code> renders the error, then
+            <code>displayError</code> re-renders the same error with lipgloss —
+            exactly the double-print pattern cmdguard's CG006 rule exists to
+            catch. Routed to TODO_LIST.md.
+          </p>
+        </div>
+
+        <div class="issue issue-nice">
+          <span class="severity severity-nice">Hygiene</span>
+          <h3>Stale workflow TODO in a self-flagged file</h3>
+          <div class="where">cmd/goreleaser-wizard/workflow.go:3, :11</div>
+          <p>
+            A file-level <code>TODO: Add workflow persistence and recovery</code>
+            sits in a file self-flagged "SPLIT IMMEDIATELY". Not open backlog
+            (no TODO_LIST item) — resolve or delete when splitting the file.
+          </p>
+        </div>
+
+        <h2 id="method"><span class="num">04</span>Method</h2>
         <div class="migration-step">
           <div class="migration-num">1</div>
           <div class="migration-content">
-            <h4>Add generic type parameter</h4>
-            <p>Update the function signature to accept a type parameter.</p>
+            <h4>Inventory</h4>
+            <p>go.mod + full-repo import grep: 0 of 20 libraries present; only first-party dep is go-branded-id v0.7.1.</p>
           </div>
         </div>
         <div class="migration-step">
           <div class="migration-num">2</div>
           <div class="migration-content">
-            <h4>Update all call sites</h4>
-            <p>Pass explicit types at each call site for type safety.</p>
+            <h4>Stamped facts</h4>
+            <p>All module paths and latest tags derived by the orchestrator's own commands (semver-sorted git tags over the 20 local checkouts, all dated 2026-11-14 → 2026-11-22) — subagents never stamp numbers.</p>
+          </div>
+        </div>
+        <div class="migration-step">
+          <div class="migration-num">3</div>
+          <div class="migration-content">
+            <h4>Research fan-out</h4>
+            <p>Five read-only auditor groups (A: robustness/files · B: HTTP/realtime · C: runtime/ops · D: CLI/output/UI · E: CQRS) mapped each library's capability surface against the consumer's actual code, with per-row applicability judgments and flip triggers.</p>
+          </div>
+        </div>
+        <div class="migration-step">
+          <div class="migration-num">4</div>
+          <div class="migration-content">
+            <h4>QC sampling</h4>
+            <p>First report of every group + both CONSIDER verdicts re-verified line-by-line; three line-range corrections applied before shipping.</p>
+          </div>
+        </div>
+        <div class="migration-step">
+          <div class="migration-num">5</div>
+          <div class="migration-content">
+            <h4>Citation sweep (ship gate)</h4>
+            <p><code>scripts/citation-sweep.py</code> re-verified all 328 file:line citations across the consumer repo and the 20 library checkouts — 0 failures, exit 0. First draft had 9 ambiguous citations (two resolving to the wrong file); all fixed.</p>
           </div>
         </div>
 
+        <h2 id="verify"><span class="num">05</span>Verify</h2>
+        <div class="dep-tree">
+          <span class="root">re-derive</span> ├──
+          <span class="ok">python3 scripts/citation-sweep.py</span> (328/0) └──
+          <span class="ok">rg 'larsartmann/' go.mod</span> (go-branded-id only)
+        </div>
+        <pre><code><span class="tok-comment"># Re-derive the core numbers of this audit</span>
+cd /home/lars/projects/GoReleaser-Wizard
+python3 scripts/citation-sweep.py          <span class="tok-comment"># 328 citations, 0 failures, exit 0</span>
+rg -c <span class="tok-string">'larsartmann/'</span> go.mod                <span class="tok-comment"># 1 hit: go-branded-id v0.7.1</span>
+rg -c <span class="tok-string">'net/http'</span> --glob <span class="tok-string">'*.go'</span>             <span class="tok-comment"># 0 hits — the structural reason 10 libs are stay-outs</span>
+sed -n <span class="tok-string">'67p'</span> ROADMAP.md                    <span class="tok-comment"># Web UI non-goal — blocks the web-shaped family</span>
+<span class="tok-keyword">for</span> d <span class="tok-keyword">in</span> go-atomic-write cmdguard; <span class="tok-keyword">do</span> git -C ~/projects/$d tag --list <span class="tok-string">'v*'</span> --sort=-v:refname | head -1; <span class="tok-keyword">done</span>
+<span class="tok-comment"># v0.6.2 / v5.1.0 — latest local tags of the two candidates</span></code></pre>
+
         <footer class="footer">
-          Generated YYYY-MM-DD &middot; All claims verified against source code
-          where noted
+          Generated 2026-11-22 &middot; GoReleaser-Wizard @ a493950 &middot; Groups A–E
+          &middot; 328 citations swept, 0 failures &middot; per-library reports in
+          this directory &middot; findings routed to TODO_LIST.md
         </footer>
       </main>
     </div>

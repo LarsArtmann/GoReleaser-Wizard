@@ -41,7 +41,7 @@ If a word means something different to a developer than to a customer, define it
 | Platform / Architecture | Enums for build targets; windows+arm64 is rejected as incompatible                 | Domain validation rule              |
 | DockerSupport           | Enum: none, build-only, publish-only, build-and-publish                            | Gates `dockers_v2` + Dockerfile job |
 | SigningLevel            | Enum for cosign/gpg configuration depth                                            | CI-side installer only today        |
-| GitHubTarget            | Resolved owner/repo: flag > git remote > placeholder                               | `types/template_data.go`            |
+| GitHubTarget            | Resolved owner/repo: flag > git remote > placeholder                               | `cmd/goreleaser-wizard/types/template_data.go` |
 
 ## Commands
 

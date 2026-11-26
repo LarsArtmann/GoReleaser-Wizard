@@ -1,31 +1,31 @@
 # go-daemon — Library Adoption Audit
 
-| Field | Value |
-| --- | --- |
-| Library | `github.com/LarsArtmann/go-daemon` (note the capital module path) |
-| Local checkout | `/home/lars/projects/go-daemon` @ `b6af9f1` (2026-11-18) |
-| Latest local tag | `v0.4.0` |
-| Consumer | GoReleaser-Wizard @ `a493950` (2026-11-22) |
-| Used? | **No** — `rg 'larsartmann/go-daemon'` (case-insensitive) → 0 hits |
-| Verdict | NOT-ADOPTED → **STAY-OUT** |
-| Score | n/a — 0 applicable capabilities (9 rows, all N/A) |
-| Provenance | Fleet audit Group C, 2026-11-22; citations QC-sampled by orchestrator |
+| Field            | Value                                                                 |
+| ---------------- | --------------------------------------------------------------------- |
+| Library          | `github.com/LarsArtmann/go-daemon` (note the capital module path)     |
+| Local checkout   | `/home/lars/projects/go-daemon` @ `b6af9f1` (2026-11-18)              |
+| Latest local tag | `v0.4.0`                                                              |
+| Consumer         | GoReleaser-Wizard @ `a493950` (2026-11-22)                            |
+| Used?            | **No** — `rg 'larsartmann/go-daemon'` (case-insensitive) → 0 hits     |
+| Verdict          | NOT-ADOPTED → **STAY-OUT**                                            |
+| Score            | n/a — 0 applicable capabilities (9 rows, all N/A)                     |
+| Provenance       | Fleet audit Group C, 2026-11-22; citations QC-sampled by orchestrator |
 
 ## What the library offers
 
 Daemon/server lifecycle machinery: a Unix-socket HTTP server with stale-socket cleanup and graceful drain, sd_notify integration (READY/STOPPING/watchdog), socket-dialing HTTP transports, content negotiation (JSON/CBOR), encoded response writers, SSE parsing, a flight recorder, and a liveness probe.
 
-| Capability | What it does | Citation | Applicable here? |
-| --- | --- | --- | --- |
-| Socket server lifecycle | Stale-socket cleanup, 0600 perms, graceful drain, ordered hooks | go-daemon/socket.go:60, :81, :183, :213 | N/A — single-shot CLI with no listener; 0 `net/http` imports in non-test code |
-| Any-network server variant | Same lifecycle over TCP / pre-built listener | go-daemon/socket.go:158, :150 | N/A |
-| sd_notify integration | READY/STOPPING/watchdog keepalive; no-ops without systemd | go-daemon/notify.go:59, :75, :46 | N/A — process exits in seconds under a user terminal |
-| Socket HTTP transports | Pooled keep-alive client dialing a daemon socket | go-daemon/transport.go:25, :41 | N/A — consumer shells out to git via os/exec (internal/git/commands.go:57) |
-| Content negotiation | JSON/CBOR resolution with q-value ranking | go-daemon/negotiation.go:73, :98 | N/A |
-| Encoded response writers | Pooled-buffer JSON/encoded/error writes | go-daemon/write.go:29, :60, :66 | N/A — output is stdout via charm/log |
-| SSE parsing | WHATWG-conformant framing | go-daemon/sse.go:42 | N/A |
-| Flight recorder | Execution-trace recorder with slow-request trigger, metrics | go-daemon/flightrecorder.go:198 | N/A |
-| Liveness probe | `IsSocketAlive` | go-daemon/socket.go:418 | N/A |
+| Capability                 | What it does                                                    | Citation                                | Applicable here?                                                              |
+| -------------------------- | --------------------------------------------------------------- | --------------------------------------- | ----------------------------------------------------------------------------- |
+| Socket server lifecycle    | Stale-socket cleanup, 0600 perms, graceful drain, ordered hooks | go-daemon/socket.go:60, :81, :183, :213 | N/A — single-shot CLI with no listener; 0 `net/http` imports in non-test code |
+| Any-network server variant | Same lifecycle over TCP / pre-built listener                    | go-daemon/socket.go:158, :150           | N/A                                                                           |
+| sd_notify integration      | READY/STOPPING/watchdog keepalive; no-ops without systemd       | go-daemon/notify.go:59, :75, :46        | N/A — process exits in seconds under a user terminal                          |
+| Socket HTTP transports     | Pooled keep-alive client dialing a daemon socket                | go-daemon/transport.go:25, :41          | N/A — consumer shells out to git via os/exec (internal/git/commands.go:57)    |
+| Content negotiation        | JSON/CBOR resolution with q-value ranking                       | go-daemon/negotiation.go:73, :98        | N/A                                                                           |
+| Encoded response writers   | Pooled-buffer JSON/encoded/error writes                         | go-daemon/write.go:29, :60, :66         | N/A — output is stdout via charm/log                                          |
+| SSE parsing                | WHATWG-conformant framing                                       | go-daemon/sse.go:42                     | N/A                                                                           |
+| Flight recorder            | Execution-trace recorder with slow-request trigger, metrics     | go-daemon/flightrecorder.go:198         | N/A                                                                           |
+| Liveness probe             | `IsSocketAlive`                                                 | go-daemon/socket.go:418                 | N/A                                                                           |
 
 Dependencies it would drag in: go-systemd/v22, go-codec, go-flightrecorder, go-sse/sseparse, prometheus/client_golang (go-daemon/go.mod:5-10).
 

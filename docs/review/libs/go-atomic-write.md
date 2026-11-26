@@ -1,29 +1,29 @@
 # go-atomic-write — Library Adoption Audit
 
-| Field | Value |
-| --- | --- |
-| Library | `github.com/larsartmann/go-atomic-write` |
-| Local checkout | `/home/lars/projects/go-atomic-write` @ `4f10347` (2026-11-15) |
-| Latest local tag | `v0.6.2` |
-| Consumer | GoReleaser-Wizard @ `a493950` (2026-11-22) |
-| Used? | **No** — `rg 'larsartmann/go-atomic-write'` → 0 hits |
-| Verdict | NOT-ADOPTED → **CONSIDER** (the strongest adoption candidate of the 20-audit) |
-| Score | 0 of 6 applicable capabilities leveraged (0% — utilization band: low, expected for a non-adopted lib) |
-| Provenance | Fleet audit Group A, 2026-11-22; citations QC-sampled by orchestrator |
+| Field            | Value                                                                                                 |
+| ---------------- | ----------------------------------------------------------------------------------------------------- |
+| Library          | `github.com/larsartmann/go-atomic-write`                                                              |
+| Local checkout   | `/home/lars/projects/go-atomic-write` @ `4f10347` (2026-11-15)                                        |
+| Latest local tag | `v0.6.2`                                                                                              |
+| Consumer         | GoReleaser-Wizard @ `a493950` (2026-11-22)                                                            |
+| Used?            | **No** — `rg 'larsartmann/go-atomic-write'` → 0 hits                                                  |
+| Verdict          | NOT-ADOPTED → **CONSIDER** (the strongest adoption candidate of the 20-audit)                         |
+| Score            | 0 of 6 applicable capabilities leveraged (0% — utilization band: low, expected for a non-adopted lib) |
+| Provenance       | Fleet audit Group A, 2026-11-22; citations QC-sampled by orchestrator                                 |
 
 ## What the library offers
 
 Crash-safe file writes: stage to a unique temp file → fsync → rename, plus optional concurrent-modification detection and skip-if-unchanged semantics. Two direct dependencies (xxhash, flock); `golang.org/x/sys` indirect — already in the consumer's graph.
 
-| Capability | What it does | Citation | Applicable here? |
-| --- | --- | --- | --- |
-| `Write(path, data)` | Temp + fsync + rename; crash-safe single-file write | go-atomic-write/atomicwrite.go:17 | **APPLICABLE** — replaces bare `os.WriteFile` in `generators.WriteFile`; a crash mid-write today can truncate `.goreleaser.yaml` |
-| `WriteWithPerm(path, data, perm)` | Same, explicit perms (consumer mandates `0o644`) | go-atomic-write/atomicwrite.go:42 | **APPLICABLE** — exact drop-in for the consumer's `WriteFile(path, data, perm)` signature |
-| `WriteVerified(path, data, fp)` | + flock + fingerprint re-verify → `ErrConcurrentModification` on TOCTOU | go-atomic-write/atomicwrite.go:65; commit.go:13, :20 | **APPLICABLE** (borderline) — protects the backup-then-write sequence; two wizard processes in one repo are plausible in CI |
-| `WriteIfChanged(path, data)` | No-op when bytes identical → no mtime bump, no watcher trigger | go-atomic-write/atomicwrite.go:91 | **APPLICABLE** — re-running `generate` (dogfood flow, AGENTS.md gotcha 19) currently always rewrites and bumps mtimes |
-| `Fingerprint` (xxhash64) | `FingerprintFromBytes`/`FingerprintFile`/`Matches` | go-atomic-write/fingerprint.go:13, :26, :35 | **APPLICABLE** — input to `WriteVerified` |
-| Durability details | fsync temp before rename, `syncDir` after, parent `MkdirAll` | go-atomic-write/rename_unix.go:11, :20; stage.go:16 | **APPLICABLE** — replaces ad-hoc `os.MkdirAll` in generators (github_actions.go:66, forgejo_workflows.go:55, homebrew.go:129) |
-| Streaming variants | `WriteFunc*` callback writers for large content | go-atomic-write/atomicwrite.go:125, :151, :167 | N/A — generated artifacts are single small buffers |
+| Capability                        | What it does                                                            | Citation                                             | Applicable here?                                                                                                                 |
+| --------------------------------- | ----------------------------------------------------------------------- | ---------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `Write(path, data)`               | Temp + fsync + rename; crash-safe single-file write                     | go-atomic-write/atomicwrite.go:17                    | **APPLICABLE** — replaces bare `os.WriteFile` in `generators.WriteFile`; a crash mid-write today can truncate `.goreleaser.yaml` |
+| `WriteWithPerm(path, data, perm)` | Same, explicit perms (consumer mandates `0o644`)                        | go-atomic-write/atomicwrite.go:42                    | **APPLICABLE** — exact drop-in for the consumer's `WriteFile(path, data, perm)` signature                                        |
+| `WriteVerified(path, data, fp)`   | + flock + fingerprint re-verify → `ErrConcurrentModification` on TOCTOU | go-atomic-write/atomicwrite.go:65; commit.go:13, :20 | **APPLICABLE** (borderline) — protects the backup-then-write sequence; two wizard processes in one repo are plausible in CI      |
+| `WriteIfChanged(path, data)`      | No-op when bytes identical → no mtime bump, no watcher trigger          | go-atomic-write/atomicwrite.go:91                    | **APPLICABLE** — re-running `generate` (dogfood flow, AGENTS.md gotcha 19) currently always rewrites and bumps mtimes            |
+| `Fingerprint` (xxhash64)          | `FingerprintFromBytes`/`FingerprintFile`/`Matches`                      | go-atomic-write/fingerprint.go:13, :26, :35          | **APPLICABLE** — input to `WriteVerified`                                                                                        |
+| Durability details                | fsync temp before rename, `syncDir` after, parent `MkdirAll`            | go-atomic-write/rename_unix.go:11, :20; stage.go:16  | **APPLICABLE** — replaces ad-hoc `os.MkdirAll` in generators (github_actions.go:66, forgejo_workflows.go:55, homebrew.go:129)    |
+| Streaming variants                | `WriteFunc*` callback writers for large content                         | go-atomic-write/atomicwrite.go:125, :151, :167       | N/A — generated artifacts are single small buffers                                                                               |
 
 ## What GoReleaser-Wizard does today
 
@@ -32,7 +32,7 @@ All generator writes funnel through one choke point: `generators.WriteFile` (cmd
 ## Why CONSIDER
 
 - **Real gap, right scope**: a crash mid-`os.WriteFile` (template_utils.go:24) can leave a truncated `.goreleaser.yaml`, and `createBackup`'s rename-away (goreleaser.go:85) leaves the target missing if the process dies before the write — temp+fsync+rename closes both windows per file.
-- **It complements, not duplicates, the atomic-generation property**: DOMAIN_LANGUAGE.md's "all target files checked before any is written; a refusal leaves zero partial state" is enforced by preflight+rollback at the job level; this library adds crash-atomicity at the byte level *within* each write, which the current machinery does not cover.
+- **It complements, not duplicates, the atomic-generation property**: DOMAIN_LANGUAGE.md's "all target files checked before any is written; a refusal leaves zero partial state" is enforced by preflight+rollback at the job level; this library adds crash-atomicity at the byte level _within_ each write, which the current machinery does not cover.
 - **Does not replace the `.backup` user-facing feature** (goreleaser.go:83) — that stays; only the write mechanics change.
 - **Cost is genuinely small**: 2 direct deps, one choke-point function + 2 stragglers; golden tests unaffected (content byte-identical).
 - **Against**: single-shot CLI with tiny files makes the crash window microscopic; `WriteIfChanged` is nice-to-have; not urgent — hence CONSIDER, not ADOPT-NOW.

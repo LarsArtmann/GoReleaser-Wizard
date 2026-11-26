@@ -1,29 +1,29 @@
 # go-codec — Library Adoption Audit
 
-| Field | Value |
-| --- | --- |
-| Library | `github.com/larsartmann/go-codec` |
-| Local checkout | `/home/lars/projects/go-codec` @ `98bb1bc` (2026-11-15) |
-| Latest local tag | `v0.3.3` |
-| Consumer | GoReleaser-Wizard @ `a493950` (2026-11-22) |
-| Used? | **No** — `rg 'larsartmann/go-codec'` → 0 hits |
-| Verdict | NOT-ADOPTED → **STAY-OUT** |
-| Score | n/a — 0 applicable capabilities (7 rows, all N/A — decisive: no YAML codec exists) |
-| Provenance | Fleet audit Group C, 2026-11-22; citations QC-sampled by orchestrator |
+| Field            | Value                                                                              |
+| ---------------- | ---------------------------------------------------------------------------------- |
+| Library          | `github.com/larsartmann/go-codec`                                                  |
+| Local checkout   | `/home/lars/projects/go-codec` @ `98bb1bc` (2026-11-15)                            |
+| Latest local tag | `v0.3.3`                                                                           |
+| Consumer         | GoReleaser-Wizard @ `a493950` (2026-11-22)                                         |
+| Used?            | **No** — `rg 'larsartmann/go-codec'` → 0 hits                                      |
+| Verdict          | NOT-ADOPTED → **STAY-OUT**                                                         |
+| Score            | n/a — 0 applicable capabilities (7 rows, all N/A — decisive: no YAML codec exists) |
+| Provenance       | Fleet audit Group C, 2026-11-22; citations QC-sampled by orchestrator              |
 
 ## What the library offers
 
 A codec abstraction over **CBOR, JSON, and Raw** — canonical RFC 7049 CBOR, strict RFC 8949 compact CBOR, stdlib JSON (+ opt-in `encoding/json/v2` variant) — with streaming encoders/decoders, a generic `DecodeEnvelopeOrLegacy[T]`, `TranscodeToJSON`, format autodetection, an observability wrapper, and deterministic-codec contracts. Dependencies: fxamacker/cbor/v2, go-error-family (go-codec/go.mod:5-9).
 
-| Capability | What it does | Citation | Applicable here? |
-| --- | --- | --- | --- |
-| CBOR (canonical/compact) | Signing-safe deterministic binary encoding | go-codec/cbor.go:19, cbor_compact.go | N/A — consumer emits no binary/event payloads |
-| JSON codec + streaming | Stdlib JSON behind the `Codec` interface | go-codec/json.go:6, streaming.go:32, :42 | N/A — consumer's one JSON use is stdlib `json.Unmarshal` at internal/domain/config_core.go:393 |
-| Raw passthrough | `RawCodec` | go-codec/raw.go:9 | N/A |
-| **YAML** | **Does not exist** — `Encoding` consts are exactly `json\|cbor\|raw` | go-codec/codec.go:14-17, :38 | N/A — and this is decisive: the consumer's entire real encoding surface is YAML |
-| Envelope/generics | `DecodeEnvelopeOrLegacy[T]`, `WrapEncode`/`UnwrapDecode` | go-codec/envelope.go:85, :23, :48 | N/A — no mixed-format streams, no signing |
-| Transcode / autodetect | `TranscodeToJSON`, `AutoDetect` | go-codec/transcode.go:37, autodetect.go:63 | N/A |
-| Observability | `ObserveCodec` metrics wrapper, `Size` | go-codec/observability.go:146, size.go:17 | N/A |
+| Capability               | What it does                                                         | Citation                                   | Applicable here?                                                                               |
+| ------------------------ | -------------------------------------------------------------------- | ------------------------------------------ | ---------------------------------------------------------------------------------------------- |
+| CBOR (canonical/compact) | Signing-safe deterministic binary encoding                           | go-codec/cbor.go:19, cbor_compact.go       | N/A — consumer emits no binary/event payloads                                                  |
+| JSON codec + streaming   | Stdlib JSON behind the `Codec` interface                             | go-codec/json.go:6, streaming.go:32, :42   | N/A — consumer's one JSON use is stdlib `json.Unmarshal` at internal/domain/config_core.go:393 |
+| Raw passthrough          | `RawCodec`                                                           | go-codec/raw.go:9                          | N/A                                                                                            |
+| **YAML**                 | **Does not exist** — `Encoding` consts are exactly `json\|cbor\|raw` | go-codec/codec.go:14-17, :38               | N/A — and this is decisive: the consumer's entire real encoding surface is YAML                |
+| Envelope/generics        | `DecodeEnvelopeOrLegacy[T]`, `WrapEncode`/`UnwrapDecode`             | go-codec/envelope.go:85, :23, :48          | N/A — no mixed-format streams, no signing                                                      |
+| Transcode / autodetect   | `TranscodeToJSON`, `AutoDetect`                                      | go-codec/transcode.go:37, autodetect.go:63 | N/A                                                                                            |
+| Observability            | `ObserveCodec` metrics wrapper, `Size`                               | go-codec/observability.go:146, size.go:17  | N/A                                                                                            |
 
 ## What GoReleaser-Wizard does today (its real encoding work)
 

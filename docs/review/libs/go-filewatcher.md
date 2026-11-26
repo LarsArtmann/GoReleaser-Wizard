@@ -1,29 +1,29 @@
 # go-filewatcher — Library Adoption Audit
 
-| Field | Value |
-| --- | --- |
-| Library | `github.com/larsartmann/go-filewatcher/v2` |
-| Local checkout | `/home/lars/projects/go-filewatcher` @ `26459ba` (2026-11-17) |
-| Latest local tag | `v2.5.0` |
-| Consumer | GoReleaser-Wizard @ `a493950` (2026-11-22) |
-| Used? | **No** — `rg 'larsartmann/go-filewatcher'` → 0 hits; `fsnotify` appears in go.mod only as an indirect dep of bubbletea |
-| Verdict | NOT-ADOPTED → **STAY-OUT** |
-| Score | n/a — 0 applicable capabilities (7 rows, all N/A) |
-| Provenance | Fleet audit Group A, 2026-11-22; citations QC-sampled by orchestrator |
+| Field            | Value                                                                                                                  |
+| ---------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| Library          | `github.com/larsartmann/go-filewatcher/v2`                                                                             |
+| Local checkout   | `/home/lars/projects/go-filewatcher` @ `26459ba` (2026-11-17)                                                          |
+| Latest local tag | `v2.5.0`                                                                                                               |
+| Consumer         | GoReleaser-Wizard @ `a493950` (2026-11-22)                                                                             |
+| Used?            | **No** — `rg 'larsartmann/go-filewatcher'` → 0 hits; `fsnotify` appears in go.mod only as an indirect dep of bubbletea |
+| Verdict          | NOT-ADOPTED → **STAY-OUT**                                                                                             |
+| Score            | n/a — 0 applicable capabilities (7 rows, all N/A)                                                                      |
+| Provenance       | Fleet audit Group A, 2026-11-22; citations QC-sampled by orchestrator                                                  |
 
 ## What the library offers
 
 A daemon-grade recursive file watcher: fsnotify-based `Watcher` with rich events, ~20 filters, 19 middleware, ~40 options, and operational resilience (self-heal, circuit breaker, health, metrics, OTel).
 
-| Capability | What it does | Citation | Applicable here? |
-| --- | --- | --- | --- |
-| `New(paths, opts...)` + `Watch(ctx)` | Recursive watching returning `<-chan Event` | go-filewatcher/watcher.go:237, :369; :62 | N/A — single-shot generate-then-exit; no event loop exists or is wanted |
-| `WatchOnce(ctx)` | Block for a single event | go-filewatcher/watcher.go:462 | N/A — nothing to wait for |
-| Rich `Event` | Path/Op/Timestamp/IsDir/Size/ModTime/optional SHA-256 | go-filewatcher/event.go:99, :14 | N/A |
-| 20 filters + combinators | `FilterExtensions`, `FilterAnd/Or/Not`, gitignore-aware | go-filewatcher/filter.go:24, :289, :303, :316; go-filewatcher/options.go:349 | N/A |
-| 19 middleware | Logging, recovery, rate limiting | go-filewatcher/middleware.go:39, :46, :66 | N/A |
-| ~40 options | Debounce (options.go:24), per-path debounce (:36), polling fallback (:232), max-watches (:380) | go-filewatcher/options.go | N/A |
-| Resilience: self-heal, circuit breaker, health, metrics, OTel | ENOSPC recovery, NFS polling, Prometheus/OTel hooks | watcher_selfheal.go, health.go, metrics.go, otel.go | N/A — long-running-daemon machinery; dead weight in a CLI that exits in seconds |
+| Capability                                                    | What it does                                                                                   | Citation                                                                     | Applicable here?                                                                |
+| ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| `New(paths, opts...)` + `Watch(ctx)`                          | Recursive watching returning `<-chan Event`                                                    | go-filewatcher/watcher.go:237, :369; :62                                     | N/A — single-shot generate-then-exit; no event loop exists or is wanted         |
+| `WatchOnce(ctx)`                                              | Block for a single event                                                                       | go-filewatcher/watcher.go:462                                                | N/A — nothing to wait for                                                       |
+| Rich `Event`                                                  | Path/Op/Timestamp/IsDir/Size/ModTime/optional SHA-256                                          | go-filewatcher/event.go:99, :14                                              | N/A                                                                             |
+| 20 filters + combinators                                      | `FilterExtensions`, `FilterAnd/Or/Not`, gitignore-aware                                        | go-filewatcher/filter.go:24, :289, :303, :316; go-filewatcher/options.go:349 | N/A                                                                             |
+| 19 middleware                                                 | Logging, recovery, rate limiting                                                               | go-filewatcher/middleware.go:39, :46, :66                                    | N/A                                                                             |
+| ~40 options                                                   | Debounce (options.go:24), per-path debounce (:36), polling fallback (:232), max-watches (:380) | go-filewatcher/options.go                                                    | N/A                                                                             |
+| Resilience: self-heal, circuit breaker, health, metrics, OTel | ENOSPC recovery, NFS polling, Prometheus/OTel hooks                                            | watcher_selfheal.go, health.go, metrics.go, otel.go                          | N/A — long-running-daemon machinery; dead weight in a CLI that exits in seconds |
 
 ## What GoReleaser-Wizard does today
 

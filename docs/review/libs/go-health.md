@@ -1,31 +1,31 @@
 # go-health — Library Adoption Audit
 
-| Field | Value |
-| --- | --- |
-| Library | `github.com/larsartmann/go-health` |
-| Local checkout | `/home/lars/projects/go-health` @ `3ca6644` (2026-11-20) |
-| Latest local tag | `v0.10.0` |
-| Consumer | GoReleaser-Wizard @ `a493950` (2026-11-22) |
-| Used? | **No** — `rg 'larsartmann/go-health'` → 0 hits |
-| Verdict | NOT-ADOPTED → **STAY-OUT** |
-| Score | n/a — 0 applicable capabilities (9 rows, all N/A) |
-| Provenance | Fleet audit Group C, 2026-11-22; citations QC-sampled by orchestrator |
+| Field            | Value                                                                 |
+| ---------------- | --------------------------------------------------------------------- |
+| Library          | `github.com/larsartmann/go-health`                                    |
+| Local checkout   | `/home/lars/projects/go-health` @ `3ca6644` (2026-11-20)              |
+| Latest local tag | `v0.10.0`                                                             |
+| Consumer         | GoReleaser-Wizard @ `a493950` (2026-11-22)                            |
+| Used?            | **No** — `rg 'larsartmann/go-health'` → 0 hits                        |
+| Verdict          | NOT-ADOPTED → **STAY-OUT**                                            |
+| Score            | n/a — 0 applicable capabilities (9 rows, all N/A)                     |
+| Provenance       | Fleet audit Group C, 2026-11-22; citations QC-sampled by orchestrator |
 
 ## What the library offers
 
 Kubelet-semantics health probing for services: three probes (liveness/readiness/startup) from one `Probe`, critical-service classification, `/healthz`-family JSON routes, a version endpoint, a response envelope with per-check detail, federation/aggregate merging, and shutdown-aware draining.
 
-| Capability | What it does | Citation | Applicable here? |
-| --- | --- | --- | --- |
-| Three-probe SDK | Liveness/readiness/startup from one `Probe` with kubelet semantics | go-health/probe.go:161 (`New(injector, …)`), :67 | N/A — requires a samber/do DI injector and an HTTP mux; consumer has neither |
-| Critical-service classification | Non-critical failures surface without 503 | go-health/options.go:48 | N/A — no services to check |
-| Route registration | `/healthz` `/readyz` `/startupz` JSON handlers | go-health/handlers.go:37, :14 | N/A — no HTTP server |
-| Version endpoint | `VersionHandler` answering JSON | go-health/version.go:56 | N/A — consumer's version is `fmt.Printf` at cmd/goreleaser-wizard/main.go:256-263 |
-| Response envelope | pass/warn/fail status, uptime, per-check detail, `InstanceID` | go-health/types.go:151, :148, :11 | N/A |
-| Health-recorder decoupling | Build probe from a plain function | go-health/options.go:127; probe.go:22 | N/A |
-| Checks batteries | Named `CheckFunc` map with durations | go-health/checks.go:15, :44 | N/A |
-| Federation/aggregate | Merge remote probes | go-health/federation/, aggregate/ | N/A |
-| Shutdown awareness | One-way drain with grace period | go-health/options.go:86 | N/A — process lifetime is seconds |
+| Capability                      | What it does                                                       | Citation                                         | Applicable here?                                                                  |
+| ------------------------------- | ------------------------------------------------------------------ | ------------------------------------------------ | --------------------------------------------------------------------------------- |
+| Three-probe SDK                 | Liveness/readiness/startup from one `Probe` with kubelet semantics | go-health/probe.go:161 (`New(injector, …)`), :67 | N/A — requires a samber/do DI injector and an HTTP mux; consumer has neither      |
+| Critical-service classification | Non-critical failures surface without 503                          | go-health/options.go:48                          | N/A — no services to check                                                        |
+| Route registration              | `/healthz` `/readyz` `/startupz` JSON handlers                     | go-health/handlers.go:37, :14                    | N/A — no HTTP server                                                              |
+| Version endpoint                | `VersionHandler` answering JSON                                    | go-health/version.go:56                          | N/A — consumer's version is `fmt.Printf` at cmd/goreleaser-wizard/main.go:256-263 |
+| Response envelope               | pass/warn/fail status, uptime, per-check detail, `InstanceID`      | go-health/types.go:151, :148, :11                | N/A                                                                               |
+| Health-recorder decoupling      | Build probe from a plain function                                  | go-health/options.go:127; probe.go:22            | N/A                                                                               |
+| Checks batteries                | Named `CheckFunc` map with durations                               | go-health/checks.go:15, :44                      | N/A                                                                               |
+| Federation/aggregate            | Merge remote probes                                                | go-health/federation/, aggregate/                | N/A                                                                               |
+| Shutdown awareness              | One-way drain with grace period                                    | go-health/options.go:86                          | N/A — process lifetime is seconds                                                 |
 
 Dependencies: samber/do v2, go-branded-id (go-health/go.mod:5-8).
 

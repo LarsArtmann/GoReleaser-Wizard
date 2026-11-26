@@ -1,30 +1,30 @@
 # go-idempotency — Library Adoption Audit
 
-| Field | Value |
-| --- | --- |
-| Library | `github.com/larsartmann/go-idempotency` (+ `idemtest`) |
-| Local checkout | `/home/lars/projects/go-idempotency` @ `220c218` (2026-11-20) |
-| Latest local tags | root `v0.6.0` · idemtest `v0.1.1` |
-| Consumer | GoReleaser-Wizard @ `a493950` (2026-11-22) |
-| Used? | **No** — `rg 'larsartmann/go-idempotency'` → 0 hits |
-| Verdict | NOT-ADOPTED → **STAY-OUT** |
-| Score | n/a — 0 applicable capabilities (8 rows, all N/A) |
-| Provenance | Fleet audit Group A, 2026-11-22; citations QC-sampled by orchestrator |
+| Field             | Value                                                                 |
+| ----------------- | --------------------------------------------------------------------- |
+| Library           | `github.com/larsartmann/go-idempotency` (+ `idemtest`)                |
+| Local checkout    | `/home/lars/projects/go-idempotency` @ `220c218` (2026-11-20)         |
+| Latest local tags | root `v0.6.0` · idemtest `v0.1.1`                                     |
+| Consumer          | GoReleaser-Wizard @ `a493950` (2026-11-22)                            |
+| Used?             | **No** — `rg 'larsartmann/go-idempotency'` → 0 hits                   |
+| Verdict           | NOT-ADOPTED → **STAY-OUT**                                            |
+| Score             | n/a — 0 applicable capabilities (8 rows, all N/A)                     |
+| Provenance        | Fleet audit Group A, 2026-11-22; citations QC-sampled by orchestrator |
 
 ## What the library offers
 
 An idempotency-key SDK for services: a `Store` contract (you implement the backend), atomic `CheckAndRecord` dedup, an HTTP middleware, a contract test suite, and test drills.
 
-| Capability | What it does | Citation | Applicable here? |
-| --- | --- | --- | --- |
-| `Store` interface | `Seen`/`Record`/`CheckAndRecord` with atomicity + TTL contracts | go-idempotency/store.go:77 | N/A — no at-least-once delivery, no commands, no racing invocations |
-| `CheckAndRecord` atomic dedup | Concurrent same-key callers: exactly one wins | go-idempotency/store.go:103 (interface), :271 (MemoryStore) | N/A — the "run twice" hazard is solved in-process by `GenerationPreflightJob` |
-| `ErrDuplicate` / `ErrInvalidTTL` | Conflict-/Rejection-classified sentinels | go-idempotency/store.go:21, :41 | N/A — duplicate-file refusal is a plain error at cmd/goreleaser-wizard/jobs.go:486-490 |
-| `Forever` TTL sentinel | Permanent "only once ever" claims | go-idempotency/store.go:63 | N/A — generation is deliberately re-runnable (`--force`, backups) |
-| `MemoryStore` (dev/test only) | In-map store with sweeper | go-idempotency/store.go:157, :177 | N/A — production needs a Redis/SQL backend; consumer has no store of any kind |
-| HTTP middleware | Key-extraction + dedup around `http.Handler` | go-idempotency/middleware/http.go:30 | N/A — no HTTP server |
-| Contract test suite | Conformance suite for custom Stores | go-idempotency/contract/contract.go | N/A — nothing to conform |
-| `idemtest` drills | `RequireExactlyOnce`, `RequireOneWinner`, `PinnedClock` | go-idempotency/idemtest/drill.go:36, :82; idemtest/clock.go:22 | N/A |
+| Capability                       | What it does                                                    | Citation                                                       | Applicable here?                                                                       |
+| -------------------------------- | --------------------------------------------------------------- | -------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| `Store` interface                | `Seen`/`Record`/`CheckAndRecord` with atomicity + TTL contracts | go-idempotency/store.go:77                                     | N/A — no at-least-once delivery, no commands, no racing invocations                    |
+| `CheckAndRecord` atomic dedup    | Concurrent same-key callers: exactly one wins                   | go-idempotency/store.go:103 (interface), :271 (MemoryStore)    | N/A — the "run twice" hazard is solved in-process by `GenerationPreflightJob`          |
+| `ErrDuplicate` / `ErrInvalidTTL` | Conflict-/Rejection-classified sentinels                        | go-idempotency/store.go:21, :41                                | N/A — duplicate-file refusal is a plain error at cmd/goreleaser-wizard/jobs.go:486-490 |
+| `Forever` TTL sentinel           | Permanent "only once ever" claims                               | go-idempotency/store.go:63                                     | N/A — generation is deliberately re-runnable (`--force`, backups)                      |
+| `MemoryStore` (dev/test only)    | In-map store with sweeper                                       | go-idempotency/store.go:157, :177                              | N/A — production needs a Redis/SQL backend; consumer has no store of any kind          |
+| HTTP middleware                  | Key-extraction + dedup around `http.Handler`                    | go-idempotency/middleware/http.go:30                           | N/A — no HTTP server                                                                   |
+| Contract test suite              | Conformance suite for custom Stores                             | go-idempotency/contract/contract.go                            | N/A — nothing to conform                                                               |
+| `idemtest` drills                | `RequireExactlyOnce`, `RequireOneWinner`, `PinnedClock`         | go-idempotency/idemtest/drill.go:36, :82; idemtest/clock.go:22 | N/A                                                                                    |
 
 ## What GoReleaser-Wizard does today
 

@@ -12,6 +12,7 @@ Resolution order per citation:
   4. full path under each library checkout
   5. FAIL
 """
+
 from __future__ import annotations
 
 import re
@@ -21,11 +22,26 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parent.parent
 LIBS_ROOT = Path("/home/lars/projects")
 LIB_NAMES = [
-    "go-error-family", "go-idempotency", "go-retry", "go-etag", "httputil",
-    "go-codec", "go-sse", "go-datastar", "go-atomic-write", "go-filewatcher",
-    "go-daemon", "go-output", "go-health", "go-health-dashboard",
-    "go-credentials-store", "cmdguard", "templ-components", "go-appkit",
-    "go-cqrs-lite", "cqrs-htmx",
+    "go-error-family",
+    "go-idempotency",
+    "go-retry",
+    "go-etag",
+    "httputil",
+    "go-codec",
+    "go-sse",
+    "go-datastar",
+    "go-atomic-write",
+    "go-filewatcher",
+    "go-daemon",
+    "go-output",
+    "go-health",
+    "go-health-dashboard",
+    "go-credentials-store",
+    "cmdguard",
+    "templ-components",
+    "go-appkit",
+    "go-cqrs-lite",
+    "cqrs-htmx",
 ]
 CONTEXT_PREFIXES = [
     "cmd/goreleaser-wizard",
@@ -45,7 +61,10 @@ def candidates(rel: str):
     p = Path(rel)
     yield REPO / p, "repo"
     for prefix in CONTEXT_PREFIXES:
-        yield REPO / prefix / p.name if p.parent == Path(".") else REPO / prefix / rel, f"ctx:{prefix}"
+        yield (
+            REPO / prefix / p.name if p.parent == Path(".") else REPO / prefix / rel,
+            f"ctx:{prefix}",
+        )
     first = rel.split("/", 1)[0]
     if first in LIB_NAMES and "/" in rel:
         rest = rel.split("/", 1)[1]
@@ -93,7 +112,9 @@ def main() -> int:
                 )
                 failures += 1
             else:
-                print(f"OK   {report.name}: {rel}:{start}-{end} -> {via}:{path.relative_to(REPO if REPO in path.parents else LIBS_ROOT)}")
+                print(
+                    f"OK   {report.name}: {rel}:{start}-{end} -> {via}:{path.relative_to(REPO if REPO in path.parents else LIBS_ROOT)}"
+                )
     print(f"\n{checked} citations checked, {failures} failures")
     return 1 if failures else 0
 

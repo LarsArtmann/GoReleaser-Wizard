@@ -33,9 +33,17 @@ func setupBasicTestProject(
 	prefix string,
 	includeGoreleaser bool,
 	goreleaserExtra string,
-) func() string {
-	return func() string {
-		dir, _ := os.MkdirTemp("", prefix)
+) func(t *testing.T) string {
+	return func(t *testing.T) string {
+		t.Helper()
+
+		dir, err := os.MkdirTemp("", prefix)
+		if err != nil {
+			t.Fatalf("failed to create temp dir: %v", err)
+		}
+
+		t.Cleanup(func() { os.RemoveAll(dir) })
+
 		goMod := `module github.com/user/test
 go 1.21
 `
@@ -60,7 +68,7 @@ project_name: test
 func TestRunValidate(t *testing.T) {
 	tests := []struct {
 		name        string
-		setupFunc   func() string
+		setupFunc   func(t *testing.T) string
 		args        []string
 		flags       map[string]bool
 		expectPass  bool
@@ -68,8 +76,9 @@ func TestRunValidate(t *testing.T) {
 	}{
 		{
 			name: "valid_project",
-			setupFunc: func() string {
-				dir, _ := os.MkdirTemp("", "wizard-validate-test")
+			setupFunc: func(t *testing.T) string {
+				t.Helper()
+				dir := t.TempDir()
 				// Create go.mod
 				goMod := `module github.com/user/test
 go 1.21
@@ -96,15 +105,7 @@ build:
 					[]byte("package main\n\nfunc main() {}"),
 					0o644,
 				)
-				// Initialize git
-				exec.Command("git", "init").Dir = dir
-				exec.Command("git", "init").Run()
-				exec.Command("git", "config", "user.email", "test@example.com").Dir = dir
-				exec.Command("git", "config", "user.email", "test@example.com").Run()
-				exec.Command("git", "add", ".").Dir = dir
-				exec.Command("git", "add", ".").Run()
-				exec.Command("git", "commit", "-m", "init").Dir = dir
-				exec.Command("git", "commit", "-m", "init").Run()
+				initGitRepository(t, dir)
 
 				return dir
 			},
@@ -114,8 +115,9 @@ build:
 		},
 		{
 			name: "missing_goreleaser_config",
-			setupFunc: func() string {
-				dir, _ := os.MkdirTemp("", "wizard-validate-test")
+			setupFunc: func(t *testing.T) string {
+				t.Helper()
+				dir := t.TempDir()
 				goMod := `module github.com/user/test
 go 1.21
 `
@@ -138,7 +140,7 @@ go 1.21
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			testDir := tt.setupFunc()
+			testDir := tt.setupFunc(t)
 			defer os.RemoveAll(testDir)
 
 			// Change to test directory
@@ -189,14 +191,15 @@ go 1.21
 func TestValidateProjectStructure(t *testing.T) {
 	tests := []struct {
 		name           string
-		setupFunc      func() string
+		setupFunc      func(t *testing.T) string
 		expectIssues   []string
 		expectWarnings []string
 	}{
 		{
 			name: "valid_simple_project",
-			setupFunc: func() string {
-				dir, _ := os.MkdirTemp("", "wizard-structure-test")
+			setupFunc: func(t *testing.T) string {
+				t.Helper()
+				dir := t.TempDir()
 				goMod := `module github.com/user/test
 go 1.21
 `
@@ -222,8 +225,9 @@ build:
 		},
 		{
 			name: "project_with_cmd_structure",
-			setupFunc: func() string {
-				dir, _ := os.MkdirTemp("", "wizard-structure-test")
+			setupFunc: func(t *testing.T) string {
+				t.Helper()
+				dir := t.TempDir()
 				goMod := `module github.com/user/test
 go 1.21
 `
@@ -261,7 +265,7 @@ build:
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			testDir := tt.setupFunc()
+			testDir := tt.setupFunc(t)
 			defer os.RemoveAll(testDir)
 
 			// Change to test directory

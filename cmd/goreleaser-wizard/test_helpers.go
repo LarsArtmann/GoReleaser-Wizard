@@ -2,6 +2,7 @@ package main
 
 import (
 	"os"
+	"os/exec"
 	"path/filepath"
 	"reflect"
 	"testing"
@@ -77,4 +78,29 @@ func CreateTempDir(prefix string) string {
 	}
 
 	return dir
+}
+
+func initGitRepository(t *testing.T, dir string) {
+	t.Helper()
+
+	if _, err := exec.LookPath("git"); err != nil {
+		t.Skipf("git not found in PATH: %v", err)
+	}
+
+	commands := [][]string{
+		{"init", "-q"},
+		{"config", "user.email", "test@example.com"},
+		{"config", "user.name", "Test User"},
+		{"add", "."},
+		{"commit", "-q", "-m", "init"},
+	}
+
+	for _, args := range commands {
+		gitCmd := exec.CommandContext(t.Context(), "git", args...)
+		gitCmd.Dir = dir
+
+		if out, err := gitCmd.CombinedOutput(); err != nil {
+			t.Fatalf("git %v in %s failed: %v: %s", args, dir, err, out)
+		}
+	}
 }

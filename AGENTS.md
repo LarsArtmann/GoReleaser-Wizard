@@ -100,4 +100,6 @@ The E2E test `TestGeneratedConfigPassesGoReleaserCheck` automates this; skips gr
 
 **21. Root-anchor binary patterns in .gitignore** — the bare `goreleaser-wizard` entry (added for a stray build binary) also matched `cmd/goreleaser-wizard/`, making `git add` refuse tracked files under the source dir; binary ignores must be `/name` at root. Also a daemon trap: it auto-stages files mid-flight, so a single-file commit may carry co-staged neighbors — read `git show --stat` before assuming.
 
+**22. Throwaway `exec.Cmd` ran git in the source tree (fixed 2026-11-26)** — `exec.Command(...).Dir = dir` followed by a separate `exec.Command(...).Run()` runs in the test's cwd; this created `cmd/goreleaser-wizard/.git` (81 `init` commits, `test@example.com` identity) and left a tracked `cmd/goreleaser-wizard/.goreleaser.yaml` (`project_name: concurrent-test-1`) behind. Use `initGitRepository(t, dir)` in `test_helpers.go`, and set `Dir` on a variable you actually run. Guards: `test_hygiene_test.go` rejects the throwaway-assignment pattern and fails if `.git` exists in the package dir.
+
 > This file was auto-trimmed. Full history in git.
